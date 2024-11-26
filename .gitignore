@@ -1,7 +1,7 @@
-indoor_framework\.vs
-indoor_framework\Rendering_Framework\x64
-indoor_framework\x64
-outdoor_framework\.vs
-outdoor_framework\Rendering_Framework\Debug
-outdoor_framework\Rendering_Framework\x64
-outdoor_framework\x64
+indoor_framework/.vs
+indoor_framework/Rendering_Framework/x64
+indoor_framework/x64
+outdoor_framework/.vs
+outdoor_framework/Rendering_Framework/Debug
+outdoor_framework/Rendering_Framework/x64
+outdoor_framework/x64
