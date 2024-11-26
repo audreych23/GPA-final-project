@@ -26,6 +26,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Scene\Indoor.cpp" />
     <ClCompile Include="main2.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Rendering\Camera\Camera.cpp" />
@@ -34,9 +35,11 @@
     <ClCompile Include="src\RenderWidgets\RenderingOrderExp.cpp" />
     <ClCompile Include="src\Scene\Mesh.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
+    <ClCompile Include="src\Scene\Trice.cpp" />
     <ClCompile Include="util_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\Indoor.h" />
     <ClInclude Include="src\Rendering\Camera\Camera.h" />
     <ClInclude Include="src\Rendering\RendererBase.h" />
     <ClInclude Include="src\Rendering\Shader.h" />
@@ -44,6 +47,7 @@
     <ClInclude Include="src\RenderWidgets\RenderingOrderExp.h" />
     <ClInclude Include="src\Scene\Mesh.h" />
     <ClInclude Include="src\Scene\Model.h" />
+    <ClInclude Include="src\Scene\Trice.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>

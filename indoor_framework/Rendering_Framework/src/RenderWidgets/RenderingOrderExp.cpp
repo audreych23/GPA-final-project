@@ -54,8 +54,15 @@ namespace INANOA {
 
 			/*this->merged_model = new MODEL::MergedModel();
 			this->merged_model->init();*/
+			
+			this->indoor = new MODEL::Indoor();
+			this->indoor->init(glm::mat4(1.0));
+			// get model matrix of indoor 
+			glm::mat4 base_model_mat = this->indoor->getModelMat();
 
-			this->indoor = new MODEL::Model("models\\indoor_model\\Grey_White_Room.obj");
+			this->trice = new MODEL::Trice();
+			this->trice->init(base_model_mat);
+
 		}
 
 
@@ -122,27 +129,11 @@ namespace INANOA {
 		this->m_horizontalGround->render();*/
 		//// this is what supposed to happen in a higher level
 
-		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::SLIME_MODEL);
+		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
 		this->indoor->render();
-		
-		//this->m_renderer->useResetCSProgram();
-		//////// rebind to new compute shader
-		//this->m_renderer->useCullingCSProgram(slime->getLastPosition());
-		//// bind matrix di sini
-		//this->m_renderer->setCamera(
-		//	this->m_playerCamera->projMatrix(),
-		//	this->m_playerCamera->viewMatrix(),
-		//	this->m_playerCamera->viewOrig()
-		//);
-		
-		//// make sure this is called before rendering the real object after frustum culling
-		/*this->m_renderer->useRenderBaseProgram();
-		this->m_renderer->setCamera(
-			m_godCamera->projMatrix(),
-			m_godCamera->viewMatrix(),
-			m_godCamera->viewOrig()
-		);
-		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::BUSH_MODEL);
-		this->merged_model->render();*/
+
+		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
+		this->trice->render();
+
 	}
 }

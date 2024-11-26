@@ -10,8 +10,8 @@ namespace INANOA {
 	namespace OPENGL {
 		enum class ShadingModelType : int {
 			PROCEDURAL_GRID = 0,
-			BUSH_MODEL = 1,
-			SLIME_MODEL = 2,
+			TRICE_MODEL = 1,
+			INDOOR_MODEL = 2,
 			UNLIT = 5
 		};
 

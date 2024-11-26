@@ -90,24 +90,24 @@ void RenderSlime() {
 }
 
 void RenderBushModel() {
-	//if (hasTexture == 0) {
-		//fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	//} else {
+	if (hasTexture == 0) {
+		fragColor = vec4(kd, 1.0f);
+	} else {
 		
-		// vec4 texel = texture(bushTexture, f_texCoord);
+		vec4 texel = texture(slimeTexture, f_texCoord.xy);
 
-		//if (texel.a < 0.5) {
-			//discard;
-		//}
+		if (texel.a < 0.5) {
+			discard;
+		}
 
-		//fragColor = texel;
-		fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	//}
+		fragColor = texel;
+		// fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
 	
 }
 
 
-void main(){	
+void main(){
 	if (shadingModelId == 5){
 		RenderViewFrustum();
 	} else if (shadingModelId == 1) {
