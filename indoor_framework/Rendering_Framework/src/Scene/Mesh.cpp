@@ -31,12 +31,13 @@ namespace INANOA {
 			if (this->textures.empty()) {
 				_has_texture = 0;
 			}
+			std::cout << _has_texture;
 		}
 
 		void Mesh::render() {
 			glActiveTexture(GL_TEXTURE0);
 			if (!textures.empty()) glBindTexture(GL_TEXTURE_2D, textures[0].id);
-
+			
 			glUniform3fv(SHADER_PARAMETER_BINDING::KA_LOCATION, 1, &ka[0]);
 			glUniform3fv(SHADER_PARAMETER_BINDING::KD_LOCATION, 1, &kd[0]);
 			glUniform3fv(SHADER_PARAMETER_BINDING::KS_LOCATION, 1, &ks[0]);

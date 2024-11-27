@@ -1,11 +1,5 @@
 #version 450 core
 
-in vec3 f_worldVertex;
-in vec3 f_viewVertex;
-in vec3 f_neg_viewVertex;
-in vec3 f_normal;
-in vec3 f_texCoord;
-
 layout (location = 0) out vec4 fragColor;
 layout (location = 5) uniform int shadingModelId;
 
@@ -18,39 +12,74 @@ layout (location = 11) uniform int hasTexture;
 
 uniform sampler2D modelTexture;
 
+in VertexData
+{
+    vec3 N; // eye space normal
+    vec3 L; // eye space light vector
+    vec3 H; // eye space halfway vector
+    vec3 texCoord;
+} vertexData;
+
+vec3 Ia = vec3(0.1, 0.1, 0.1);
+vec3 Id = vec3(0.7, 0.7, 0.7);
+vec3 Is = vec3(0.2, 0.2, 0.2);
+
 void RenderIndoor() {
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
+
 	if (hasTexture == 0) {
-		fragColor = vec4(kd, 1.0f);
+
+		vec3 ambient = Ia * kd;
+
+        float diff = max(dot(N, L), 0.0);
+        vec3 diffuse = Id * diff * kd;
+
+        float spec = pow(max(dot(N, H), 0.0), ns);
+        vec3 specular = Is * spec * ks;
+
+        vec3 color = ambient + diffuse + specular;
+
+        fragColor = vec4(color, 1.0);
 	} else {
-		
-		vec4 texel = texture(modelTexture, f_texCoord.xy);
+		vec4 texel = texture(modelTexture, vertexData.texCoord.xy);
 
 		if (texel.a < 0.5) {
 			discard;
 		}
 
-		fragColor = texel;
-		// fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	}
-	// fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		vec3 ambient = Ia * texel.rgb;
 
+        float diff = max(dot(N, L), 0.0);
+        vec3 diffuse = Id * diff * texel.rgb;
+
+        float spec = pow(max(dot(N, H), 0.0), ns);
+        vec3 specular = Is * spec * ks;
+
+        vec3 color = ambient + diffuse + specular;
+
+        fragColor = vec4(color, texel.a);
+	}
 }
 
 void RenderTrice() {
-	if (hasTexture == 0) {
-		fragColor = vec4(kd, 1.0f);
-	} else {
-		
-		vec4 texel = texture(modelTexture, f_texCoord.xy);
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
 
-		if (texel.a < 0.5) {
-			discard;
-		}
+	// actually trice has no texture
+	vec3 ambient = Ia * kd;
 
-		fragColor = texel;
-		// fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	}
-	
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * kd;
+
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
+
+	vec3 color = ambient + diffuse + specular;
+
+	fragColor = vec4(color, 1.0);
 }
 
 
