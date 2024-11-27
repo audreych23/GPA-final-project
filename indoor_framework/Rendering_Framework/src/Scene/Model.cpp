@@ -77,6 +77,7 @@ namespace INANOA {
 					glm::vec3 vec;
 					vec.x = mesh->mTextureCoords[0][i].x;
 					vec.y = mesh->mTextureCoords[0][i].y;
+					vec.z = 0.0;
 					vertex.tex_coords = vec;
 				}
 				else {

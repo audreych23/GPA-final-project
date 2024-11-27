@@ -44,17 +44,8 @@ namespace INANOA {
 			this->m_godCamera->viewOrig()
 		);
 
-		// view frustum and horizontal ground
-		{
-			/*this->m_viewFrustum = new SCENE::RViewFrustum(1, nullptr);
-			this->m_viewFrustum->resize(this->m_playerCamera);*/
-
-			/*this->m_horizontalGround = new SCENE::EXPERIMENTAL::HorizonGround(2, nullptr);
-			this->m_horizontalGround->resize(this->m_playerCamera);*/
-
-			/*this->merged_model = new MODEL::MergedModel();
-			this->merged_model->init();*/
-			
+		// initialize model
+		{		
 			this->indoor = new MODEL::Indoor();
 			this->indoor->init(glm::mat4(1.0));
 			// get model matrix of indoor 

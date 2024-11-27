@@ -21,21 +21,10 @@ namespace INANOA {
 			this->m_shaderProgram->useProgram();
 
 			// added for textureBinding
-			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "bushTexture"), 0);
-			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "slimeTexture"), 1);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTexture"), 0);
 			// API setting
 			glEnable(GL_DEPTH_TEST);
 			glLineWidth(2.0f);
-
-			//this->m_resetCSProgram = ShaderProgram::createShaderProgramForComputeShader("src\\shader\\resetShader_ogl_450.glsl");
-			//if (this->m_resetCSProgram == nullptr) {
-			//	return false;
-			//}
-
-			//this->m_cullingCSProgram = ShaderProgram::createShaderProgramForComputeShader("src\\shader\\computeShader_ogl_450.glsl");
-			//if (this->m_cullingCSProgram == nullptr) {
-			//	return false;
-			//}
 
 			return true;
 		}		
@@ -67,21 +56,5 @@ namespace INANOA {
 			this->m_shaderProgram->useProgram();
 		}
 
-		void RendererBase::useCullingCSProgram(glm::vec4 slime_pos) {
-			// set camera before this, so can bind correctly
-			this->m_cullingCSProgram->useProgram();
-			int NUM_TOTAL_INSTANCE = 2797 + 1010 + 155304;
-			glUniform1i(SHADER_PARAMETER_BINDING::NUM_TOTAL_INSTANCE, NUM_TOTAL_INSTANCE);
-			//glUniform4fv(SHADER_PARAMETER_BINDING::SLIME_POS, 1, &slime_pos[0]);
-			// hard coded value 
-			glDispatchCompute((NUM_TOTAL_INSTANCE/ 1024) + 1, 1, 1);
-			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-		}
-
-		void RendererBase::useResetCSProgram() {
-			this->m_resetCSProgram->useProgram();
-			glDispatchCompute(3, 1, 1);
-			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-		}
 	}	
 }

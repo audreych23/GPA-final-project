@@ -28,30 +28,20 @@ namespace INANOA {
 
 			setupMesh();
 			_has_texture = 1;
-			//this->m_modelMat = glm::mat4(1.0f);
 			if (this->textures.empty()) {
 				_has_texture = 0;
 			}
-			//std::cout << _has_texture;
-
-			//for (auto v : vertices) {
-			//	std::cout << v.position[0] << " " << v.position[1] << " " << v.position[2] << '\n';
-			//}
 		}
 
 		void Mesh::render() {
-			// WARNING: lazy way of coding (not really but 
-			// normally should start from zero, but zero is sampler2datrray
-			glActiveTexture(GL_TEXTURE1);
-			//shader.setInt(name + number, i); done in rendererbhase
+			glActiveTexture(GL_TEXTURE0);
 			if (!textures.empty()) glBindTexture(GL_TEXTURE_2D, textures[0].id);
-			// bind model matrix
-			//glUniformMatrix4fv(SHADER_PARAMETER_BINDING::MODEL_MAT_LOCATION, 1, false, glm::value_ptr(this->m_modelMat));
-			// glUniform3fv(SHADER_PARAMETER_BINDING::KA_LOCATION, 1, &ka[0]);
+
+			glUniform3fv(SHADER_PARAMETER_BINDING::KA_LOCATION, 1, &ka[0]);
 			glUniform3fv(SHADER_PARAMETER_BINDING::KD_LOCATION, 1, &kd[0]);
-			//glUniform3fv(SHADER_PARAMETER_BINDING::KS_LOCATION, 1, &ks[0]);
-			//glUniform3fv(SHADER_PARAMETER_BINDING::KE_LOCATION, 1, &ke[0]);
-			//glUniform1f(SHADER_PARAMETER_BINDING::NS_LOCATION, ns);
+			glUniform3fv(SHADER_PARAMETER_BINDING::KS_LOCATION, 1, &ks[0]);
+			glUniform3fv(SHADER_PARAMETER_BINDING::KE_LOCATION, 1, &ke[0]);
+			glUniform1f(SHADER_PARAMETER_BINDING::NS_LOCATION, this->ns);
 			glUniform1i(SHADER_PARAMETER_BINDING::HAS_TEXTURE_LOCATION, _has_texture);
 
 

@@ -9,10 +9,8 @@
 namespace INANOA {
 	namespace OPENGL {
 		enum class ShadingModelType : int {
-			PROCEDURAL_GRID = 0,
+			INDOOR_MODEL = 0,
 			TRICE_MODEL = 1,
-			INDOOR_MODEL = 2,
-			UNLIT = 5
 		};
 
 		class RendererBase
@@ -34,8 +32,6 @@ namespace INANOA {
 			void clearRenderTarget();
 
 			void useRenderBaseProgram();
-			void useCullingCSProgram(glm::vec4 slime_pos);
-			void useResetCSProgram();
 
 		public:
 			inline void setShadingModel(const ShadingModelType type) {
@@ -57,8 +53,6 @@ namespace INANOA {
 			int m_frameHeight = 64;
 
 			ShaderProgram* m_shaderProgram = nullptr;
-			ShaderProgram* m_resetCSProgram = nullptr;
-			ShaderProgram* m_cullingCSProgram = nullptr;
 		};
 	}
 	

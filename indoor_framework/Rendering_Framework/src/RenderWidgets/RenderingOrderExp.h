@@ -5,7 +5,6 @@
 
 #include <Rendering_Framework/src/Rendering/RendererBase.h>
 #include <Rendering_Framework/src/Scene/Model.h>
-#include <Rendering_Framework/src/Scene/MergedModel.h>
 #include <Rendering_Framework/src/Rendering/Camera/Camera.h>
 #include <Rendering_Framework/src/Scene/Indoor.h>
 #include <Rendering_Framework/src/Scene/Trice.h>
@@ -31,9 +30,6 @@ namespace INANOA {
 		Camera* m_playerCamera = nullptr;
 		Camera* m_godCamera = nullptr;
 
-		//MODEL::MergedModel* merged_model = nullptr;
-		/*MODEL::Model* indoor = nullptr;
-		MODEL::Model* trice = nullptr;*/
 		MODEL::Indoor* indoor = nullptr;
 		MODEL::Trice* trice = nullptr;
 
