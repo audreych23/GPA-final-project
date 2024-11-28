@@ -71,7 +71,12 @@ namespace INANOA {
 					vec.z = mesh->mNormals[i].z;
 					vertex.normal = vec;
 				}
-
+				if (mesh->HasTangentsAndBitangents()) {
+					vec.x = mesh->mTangents[i].x;
+					vec.y = mesh->mTangents[i].y;
+					vec.z = mesh->mTangents[i].z;
+					vertex.tangents = vec;
+				}
 				// assimp allows a model to have up to 8 different textrure coordinates per vertex
 				if (mesh->mTextureCoords[0]) {// does the mesh contain texture coordinates
 					glm::vec3 vec;
@@ -132,6 +137,9 @@ namespace INANOA {
 
 				std::vector<Texture> specular_maps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 				textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
+
+				std::vector<Texture> normal_maps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height");
+				textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
 			}
 
 			return Mesh(vertices, indices, textures, ka, kd, ks, ke, shininess);
@@ -169,6 +177,7 @@ namespace INANOA {
 		{
 			std::string filename = std::string(path);
 			filename = "textures/" + filename;
+			std::cout << filename << '\n';
 			//std::cout << "file_name: " << filename << '\n';
 			/*std::string filename = std::string(path);
 			filename = directory + '/' + filename;

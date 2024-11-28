@@ -31,12 +31,21 @@ namespace INANOA {
 			if (this->textures.empty()) {
 				_has_texture = 0;
 			}
-			std::cout << _has_texture;
+			std::cout << _has_texture << '\n';
 		}
 
 		void Mesh::render() {
-			glActiveTexture(GL_TEXTURE0);
-			if (!textures.empty()) glBindTexture(GL_TEXTURE_2D, textures[0].id);
+			if (!textures.empty()) {
+				for (int i = 0; i < textures.size(); ++i) {
+					if (textures[i].type == "texture_diffuse") {
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, textures[i].id);
+					} else if (textures[i].type == "texture_height") {
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, textures[i].id);
+					}
+				}
+			}
 			
 			glUniform3fv(SHADER_PARAMETER_BINDING::KA_LOCATION, 1, &ka[0]);
 			glUniform3fv(SHADER_PARAMETER_BINDING::KD_LOCATION, 1, &kd[0]);
@@ -74,6 +83,9 @@ namespace INANOA {
 
 			glEnableVertexAttribArray(SHADER_PARAMETER_BINDING::TEX_COORDS_LOCATION);
 			glVertexAttribPointer(SHADER_PARAMETER_BINDING::TEX_COORDS_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
+
+			glEnableVertexAttribArray(SHADER_PARAMETER_BINDING::TANGENTS_LOCATION);
+			glVertexAttribPointer(SHADER_PARAMETER_BINDING::TANGENTS_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangents));
 
 			glBindVertexArray(0);
 		}

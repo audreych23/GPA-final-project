@@ -11,6 +11,7 @@ layout (location = 10) uniform float ns;
 layout (location = 11) uniform int hasTexture;
 
 uniform sampler2D modelTexture;
+uniform sampler2D modelTextureNormal;
 
 in VertexData
 {
@@ -18,6 +19,10 @@ in VertexData
     vec3 L; // eye space light vector
     vec3 H; // eye space halfway vector
     vec3 texCoord;
+
+	// for normal mapping
+	vec3 lightDirNormalMapping;
+	vec3 eyeDirNormalMapping;
 } vertexData;
 
 vec3 Ia = vec3(0.1, 0.1, 0.1);
@@ -64,17 +69,32 @@ void RenderIndoor() {
 }
 
 void RenderTrice() {
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
+	// vec3 N = normalize(vertexData.N);
+	// vec3 L = normalize(vertexData.L);
+	// vec3 H = normalize(vertexData.H);
+	// vec3 ambient = Ia * kd;
 
+	// float diff = max(dot(N, L), 0.0);
+	// vec3 diffuse = Id * diff * kd;
+
+	// float spec = pow(max(dot(N, H), 0.0), ns);
+	// vec3 specular = Is * spec * ks;
+
+	// vec3 color = ambient + diffuse + specular;
+	// fragColor = vec4(color, 1.0);
+
+	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(vertexData.lightDirNormalMapping);
+
+	vec3 R = reflect(-L, N);
 	// actually trice has no texture
 	vec3 ambient = Ia * kd;
 
 	float diff = max(dot(N, L), 0.0);
 	vec3 diffuse = Id * diff * kd;
 
-	float spec = pow(max(dot(N, H), 0.0), ns);
+	float spec = pow(max(dot(R, V), 0.0), ns);
 	vec3 specular = Is * spec * ks;
 
 	vec3 color = ambient + diffuse + specular;
