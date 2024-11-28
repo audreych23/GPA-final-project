@@ -16,6 +16,7 @@ layout (location = 0) uniform mat4 modelMat;
 layout (location = 1) uniform mat4 viewMat;
 layout (location = 2) uniform mat4 projMat;
 
+// light pos is in world space
 vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 
 void main(){
@@ -25,9 +26,9 @@ void main(){
 	
 	vertexData.texCoord = v_texCoord;
 	vertexData.N = mat3(viewMat * modelMat) * v_normal;
-	vertexData.L = normalize(viewLightPosition - vec3(viewVertex));
-	vec3 V = normalize(-viewVertex).xyz;
-	vertexData.H = normalize(vertexData.L + V);
+	vertexData.L = viewLightPosition - vec3(viewVertex);
+	vec3 V = normalize((-viewVertex).xyz);
+	vertexData.H = vertexData.L + V;
 
 	gl_Position = projMat * viewVertex;
 }
