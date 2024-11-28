@@ -11,6 +11,9 @@ namespace INANOA {
 		this->m_cameraRotationSpeed = glm::radians(0.1f);
 		this->m_frameWidth = 64;
 		this->m_frameHeight = 64;
+
+		_x_offset = 0.0f;
+		_y_offset = 0.0f;
 	}
 	RenderingOrderExp::~RenderingOrderExp(){}
 
@@ -68,16 +71,16 @@ namespace INANOA {
 	}
 	void RenderingOrderExp::update() {		
 		// camera update (god)
-		if (_key_map[GLFW_KEY_UP]) {
+		if (_key_map[GLFW_KEY_W]) {
 			m_godCamera->forward(glm::vec3(0.0f, 0.0f, -m_cameraForwardSpeed), false);
 		}
-		else if (_key_map[GLFW_KEY_RIGHT]) {
+		else if (_key_map[GLFW_KEY_D]) {
 			m_godCamera->forward(glm::vec3(m_cameraForwardSpeed, 0.0f, 0.0f), false);
 		}
-		else if (_key_map[GLFW_KEY_DOWN]) {
+		else if (_key_map[GLFW_KEY_S]) {
 			m_godCamera->forward(glm::vec3(0.0f, 0.0f, m_cameraForwardSpeed), false);
 		}
-		else if (_key_map[GLFW_KEY_LEFT]) {
+		else if (_key_map[GLFW_KEY_A]) {
 			m_godCamera->forward(glm::vec3(-m_cameraForwardSpeed, 0.0f, 0.0f), false);
 		}
 		else if (_key_map[GLFW_KEY_Z]) {
@@ -86,18 +89,15 @@ namespace INANOA {
 		else if (_key_map[GLFW_KEY_X]) {
 			m_godCamera->forward(glm::vec3(0.0f, -m_cameraForwardSpeed, 0.0f), false);
 		}
-		else if (_key_map[GLFW_KEY_C]) {
-			this->m_godCamera->rotateLeftRight(m_cameraRotationSpeed);
+		else if (_x_offset != 0.0f || _y_offset != 0.0f) {
+			this->m_godCamera->rotateLookCenterAccordingToViewOrg(glm::radians(_x_offset) * 0.1);
+			this->m_godCamera->rotateLookCenterYaw(glm::radians(_y_offset) * 0.1);
+
+			// set back mouse offset to 0 after one camera update
+			_x_offset = 0.0;
+			_y_offset = 0.0;
 		}
-		else if (_key_map[GLFW_KEY_V]) {
-			this->m_godCamera->rotateLeftRight(-m_cameraRotationSpeed);
-		}
-		else if (_key_map[GLFW_KEY_B]) {
-			this->m_godCamera->rotateUpDown(m_cameraRotationSpeed, true);
-		}
-		else if (_key_map[GLFW_KEY_N]) {
-			this->m_godCamera->rotateUpDown(-m_cameraRotationSpeed, true);
-		}
+
 		m_godCamera->update();
 	}
 	void RenderingOrderExp::render() {

@@ -87,9 +87,16 @@ namespace INANOA {
 
 		this->translateLookCenterAndViewOrg(forward);
 	}
+
 	void Camera::rotateLookCenterAccordingToViewOrg(const float rad) {
 		this->setLookCenter(
 			Camera::rotateLookCenterAccordingToViewOrg(this->m_lookCenter, this->m_viewOrg, this->m_viewMat, rad)
+		);
+	}
+
+	void Camera::rotateLookCenterYaw(const float rad) {
+		this->setLookCenter(
+			Camera::rotateLookCenterYaw(this->m_lookCenter, this->m_viewOrg, rad)
 		);
 	}
 
@@ -103,6 +110,38 @@ namespace INANOA {
 		glm::vec4 resP = rotMat * glm::vec4(p.x, p.y, p.z, 1.0);
 
 		return glm::vec3(resP.x + eye.x, resP.y + eye.y, resP.z + eye.z);
+	}
+
+	glm::vec3 Camera::rotateLookCenterYaw(const glm::vec3& center, const glm::vec3& eye, float rad) {
+		// Calculate the current forward vector
+		glm::vec3 forward = glm::normalize(center - eye);
+
+		// Calculate the current angle from the up vector
+		float currentAngle = glm::degrees(glm::acos(glm::dot(forward, m_upVector)));
+
+		// Calculate the new angle after rotation
+		float newAngle = currentAngle + glm::degrees(rad);
+
+		// Clamp the new angle between -89 and 89 degrees
+		if (newAngle > 155.0f) {
+			rad = glm::radians(155.0f - currentAngle);
+		}
+		else if (newAngle < 25.0f) {
+			rad = glm::radians(25.0f - currentAngle);
+		}
+
+		// Extract the right (x-axis) vector from the view matrix (cross product of world up and forward)
+		glm::vec3 right = glm::normalize(glm::cross(m_upVector, forward));
+
+		// Create a quaternion for the yaw rotation around the right axis
+		glm::quat q = glm::angleAxis(rad, right);
+		glm::mat4 rotMat = glm::toMat4(q);
+
+		// Perform the rotation
+		glm::vec3 p = center - eye;
+		glm::vec4 resP = rotMat * glm::vec4(p, 1.0);
+
+		return glm::vec3(resP) + eye;
 	}
 
 	void Camera::viewFrustumClipPlaneCornersInViewSpace(const float depth, float* corners) const {
@@ -131,37 +170,6 @@ namespace INANOA {
 		}
 	}
 
-	//void Camera::rotateUpDownLeftRight(float x_offset, float y_offset, bool constraint_pitch) {
-	//	// Mouse sensitivity (you can adjust this)
-	//	const float sensitivity = 0.0001f;
-
-	//	x_offset *= sensitivity;
-	//	y_offset *= sensitivity;
-
-	//	// Yaw rotation (left/right)
-	//	glm::vec3 forwardVec = glm::normalize(this->m_lookCenter - this->m_viewOrg);
-	//	glm::quat yawQuat = glm::angleAxis(glm::radians(x_offset), this->m_upVector);
-
-	//	// Pitch rotation (up/down)
-	//	glm::vec3 rightAxis = glm::normalize(glm::cross(forwardVec, this->m_upVector));
-	//	float currentPitch = std::asin(glm::clamp(forwardVec.y, -1.0f, 1.0f));
-	//	float newPitch = currentPitch - y_offset; // Inverted to match typical mouse look
-
-	//	// Optional pitch clamping
-	//	if (constraint_pitch) {
-	//		newPitch = glm::clamp(newPitch, glm::radians(-89.0f), glm::radians(89.0f));
-	//	}
-
-	//	float pitchRad = newPitch - currentPitch;
-	//	glm::quat pitchQuat = glm::angleAxis(pitchRad, rightAxis);
-
-	//	// Combine rotations
-	//	glm::vec3 newViewOrg = this->m_viewOrg - this->m_lookCenter; // Translate to origin
-	//	newViewOrg = yawQuat * newViewOrg;  // Yaw rotation
-	//	newViewOrg = pitchQuat * newViewOrg;  // Pitch rotation
-
-	//	this->m_viewOrg = this->m_lookCenter + newViewOrg;  // Translate back
-	//}
 
 	void Camera::rotateUpDown(const float rad, bool constraint_pitch) {
 		// Calculate the forward vector (view direction)

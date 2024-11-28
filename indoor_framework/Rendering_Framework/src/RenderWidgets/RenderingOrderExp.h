@@ -20,12 +20,12 @@ namespace INANOA {
 	public:
 		bool init(const int w, const int h) ;
 		void resize(const int w, const int h) ;
-		void update() ;
+		void update();
 		void render();
 
 		void setKeyMap(std::map<int, int>& key_map) { _key_map = key_map;  }
 
-		void setMouseOffset(float x, float y, bool is_dragged) { _x_offset = x; _y_offset = y; _is_dragged = is_dragged;  }
+		void setMouseOffset(float x, float y) { _x_offset = x; _y_offset = y; }
 	private:
 		Camera* m_playerCamera = nullptr;
 		Camera* m_godCamera = nullptr;
@@ -45,7 +45,6 @@ namespace INANOA {
 		std::map<int, int> _key_map;
 		float _x_offset;
 		float _y_offset;
-		bool _is_dragged;
 	};
 
 }

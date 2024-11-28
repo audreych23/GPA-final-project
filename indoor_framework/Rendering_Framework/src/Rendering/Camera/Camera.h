@@ -36,6 +36,8 @@ namespace INANOA {
 		void rotateUpDown(const float rad, bool constraint_pitch);
 		void rotateLeftRight(const float rad);
 
+		glm::vec3 rotateLookCenterYaw(const glm::vec3& center, const glm::vec3& eye, float rad);
+		void rotateLookCenterYaw(const float rad);
 
 		void resize(const int w, const int h);
 

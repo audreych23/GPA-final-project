@@ -37,10 +37,12 @@ double PROGRAM_FPS = 0.0;
 double FRAME_MS = 0.0;
 
 std::map<int, int> key_mapping;
-//bool is_first_mouse = false;
-//bool is_mouse_pressed = false;
-//float last_x = 0;
-//float last_y = 0;
+
+bool first_mouse = true;
+bool is_mouse_pressed = false;
+
+float last_x = FRAME_WIDTH / 2.0f;
+float last_y = FRAME_HEIGHT / 2.0f;
 
 int main() {
 	glfwInit();
@@ -126,7 +128,7 @@ bool initializeGL() {
 	if (m_renderWidget->init(FRAME_WIDTH, FRAME_HEIGHT) == false) {
 		return false;
 	}
-	
+
 	return true;
 }
 void resizeGL(GLFWwindow* window, int w, int h) {
@@ -167,19 +169,43 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		//is_first_mouse = true;
 		//is_mouse_pressed = true;
+		is_mouse_pressed = true;
 	}
 
 	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 		/*is_first_mouse = false;
 		is_mouse_pressed = false;
 		if (m_renderWidget != nullptr) m_renderWidget->setMouseOffset(0.0f, 0.0f, false);*/
+		first_mouse = true;
+		is_mouse_pressed = false;
+		if (m_renderWidget != nullptr) m_renderWidget->setMouseOffset(0.0f, 0.0f);
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {}
 
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {}
 }
 void cursorPosCallback(GLFWwindow* window, double x, double y) {
+	float xpos = static_cast<float>(x);
+	float ypos = static_cast<float>(y);
+
+	if (first_mouse)
+	{
+		last_x = xpos;
+		last_y = ypos;
+		first_mouse = false;
+	}
+	else {
+
+		float xoffset = xpos - last_x;
+		float yoffset = last_y - ypos; // reversed since y-coordinates go from bottom to top
+
+		last_x = xpos;
+		last_y = ypos;
+		//processMouseMovement(xoffset, yoffset);
+		if (m_renderWidget != nullptr && is_mouse_pressed) m_renderWidget->setMouseOffset(xoffset, yoffset);
+
+	}
 	//if (!is_mouse_pressed) return;
 	//if (is_first_mouse)
 	//{
@@ -197,76 +223,43 @@ void cursorPosCallback(GLFWwindow* window, double x, double y) {
 	//if (m_renderWidget != nullptr) m_renderWidget->setMouseOffset(x_offset, y_offset, true);
 }
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if(key == GLFW_KEY_W && action == GLFW_PRESS){
+	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
 		key_mapping[GLFW_KEY_W] = 1;
-	} else if (key == GLFW_KEY_W && action == GLFW_RELEASE){
+	}
+	else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
 		key_mapping[GLFW_KEY_W] = 0;
-	} else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+	}
+	else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
 		key_mapping[GLFW_KEY_A] = 1;
-	} else if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+	}
+	else if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
 		key_mapping[GLFW_KEY_A] = 0;
-	} else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+	}
+	else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
 		key_mapping[GLFW_KEY_S] = 1;
-	} else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+	}
+	else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
 		key_mapping[GLFW_KEY_S] = 0;
-	} else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+	}
+	else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
 		key_mapping[GLFW_KEY_D] = 1;
-	} else if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+	}
+	else if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
 		key_mapping[GLFW_KEY_D] = 0;
-	} else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_LEFT] = 1;
-	} else if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_LEFT] = 0;
-	} else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_RIGHT] = 1;
-	} else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_RIGHT] = 0;
-	} else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_UP] = 1;
-	} else if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_UP] = 0;
-	} else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_DOWN] = 1;
-	} else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_DOWN] = 0;
-	} else if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_Q] = 1;
-	} else if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_Q] = 0;
-	} else if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_E] = 1;
-	} else if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_E] = 0;
-	} else if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_C] = 1;
-	} else if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_C] = 0;
-	} else if (key == GLFW_KEY_V && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_V] = 1;
-	} else if (key == GLFW_KEY_V && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_V] = 0;
-	} else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+	}
+	else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
 		key_mapping[GLFW_KEY_Z] = 1;
-	} else if (key == GLFW_KEY_Z && action == GLFW_RELEASE) {
+	}
+	else if (key == GLFW_KEY_Z && action == GLFW_RELEASE) {
 		key_mapping[GLFW_KEY_Z] = 0;
-	} else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+	}
+	else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
 		key_mapping[GLFW_KEY_X] = 1;
 	}
 	else if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 		key_mapping[GLFW_KEY_X] = 0;
 	}
-	else if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_B] = 1;
-	}
-	else if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_B] = 0;
-	}
-	else if (key == GLFW_KEY_N && action == GLFW_PRESS) {
-		key_mapping[GLFW_KEY_N] = 1;
-	}
-	else if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
-		key_mapping[GLFW_KEY_N] = 0;
-	}
+
 	if (m_renderWidget != nullptr) m_renderWidget->setKeyMap(key_mapping);
 }
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {}
