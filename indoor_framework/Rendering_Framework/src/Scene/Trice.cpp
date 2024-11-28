@@ -8,8 +8,9 @@ namespace INANOA {
 
 		void Trice::init(glm::mat4 base) {
 			this->m_modelMat = glm::mat4(1.0);
+			this->m_modelMat = glm::translate(m_modelMat, glm::vec3(2.05, 0.628725, -1.9));
 			this->m_modelMat = glm::scale(m_modelMat, glm::vec3(0.001, 0.001, 0.001));
-			this->m_modelMat = glm::translate(m_modelMat, glm::vec3(2200.0, 650.0, -1850.0));
+			
 			this->m_modelMat = m_modelMat * base;
 
 			this->trice_model = new MODEL::Model("models\\indoor_model\\trice.obj");
