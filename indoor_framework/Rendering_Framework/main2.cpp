@@ -141,9 +141,10 @@ void updateState() {
 void paintGL() {
 
 #ifdef IMGUI_ENABLED
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
+	//ImGui_ImplOpenGL3_NewFrame();
+	//ImGui_ImplGlfw_NewFrame();
+	//ImGui::NewFrame();
+
 #endif // IMGUI_ENABLED
 
 	m_renderWidget->render();
@@ -153,14 +154,14 @@ void paintGL() {
 	sprintf_s(fpsBuf + 5, 16, "%.5f", PROGRAM_FPS);
 	sprintf_s(msBuf + 4, 16, "%.5f", (1000.0 / PROGRAM_FPS));
 
-#ifdef IMGUI_ENABLED	
-	ImGui::Begin("Information");
-	ImGui::Text(fpsBuf);
-	ImGui::Text(msBuf);
-	ImGui::End();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-#endif // IMGUI_ENABLED
+//#ifdef IMGUI_ENABLED	
+//	ImGui::Begin("Information");
+//	ImGui::Text(fpsBuf);
+//	ImGui::Text(msBuf);
+//	ImGui::End();
+//	ImGui::Render();
+//	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+//#endif // IMGUI_ENABLED
 }
 
 ////////////////////////////////////////////////

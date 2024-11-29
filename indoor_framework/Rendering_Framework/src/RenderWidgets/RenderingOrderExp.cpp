@@ -137,9 +137,10 @@ namespace INANOA {
 		this->trice->render();
 
 		// post_processing
-		glDisable(GL_DEPTH_TEST);
+		
 		this->_post_processing->render();
-		glEnable(GL_DEPTH_TEST);
+
+		this->_gui.render();
 
 	}
 }

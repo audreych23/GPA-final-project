@@ -26,6 +26,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\RenderWidgets\GUI.cpp" />
     <ClCompile Include="src\Rendering\PostProcessing.cpp" />
     <ClCompile Include="src\Scene\Indoor.cpp" />
     <ClCompile Include="main2.cpp" />
@@ -40,6 +41,7 @@
     <ClCompile Include="util_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\RenderWidgets\GUI.h" />
     <ClInclude Include="src\Rendering\PostProcessing.h" />
     <ClInclude Include="src\Scene\Indoor.h" />
     <ClInclude Include="src\Rendering\Camera\Camera.h" />

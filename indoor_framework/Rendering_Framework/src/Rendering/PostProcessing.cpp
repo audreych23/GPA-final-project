@@ -87,7 +87,8 @@ namespace INANOA {
 
 	void PostProcessing::render() {
 		if (!_use_postprocessing) return;
-		
+		glDisable(GL_DEPTH_TEST);
+		// unbind fbo
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -100,7 +101,7 @@ namespace INANOA {
 
 		// END ANSWER
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void PostProcessing::bindFBO() {
@@ -108,7 +109,4 @@ namespace INANOA {
 		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	}
 
-	void PostProcessing::unbindFBO() {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	}
 }

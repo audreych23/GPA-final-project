@@ -93,6 +93,9 @@
     <ClCompile Include="src\Rendering\PostProcessing.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderWidgets\GUI.cpp">
+      <Filter>Source Files\RenderWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -124,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="src\Rendering\PostProcessing.h">
       <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderWidgets\GUI.h">
+      <Filter>Header Files\RenderWidgets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

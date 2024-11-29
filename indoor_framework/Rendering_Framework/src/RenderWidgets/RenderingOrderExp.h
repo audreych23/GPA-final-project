@@ -9,6 +9,7 @@
 #include <Rendering_Framework/src/Scene/Indoor.h>
 #include <Rendering_Framework/src/Scene/Trice.h>
 #include <Rendering_Framework/src/Rendering/PostProcessing.h>
+#include <Rendering_Framework/src/RenderWidgets/GUI.h>
 //#include "Shader.h"
 
 namespace INANOA {
@@ -48,6 +49,8 @@ namespace INANOA {
 		float _y_offset;
 
 		PostProcessing* _post_processing = nullptr;
+
+		GUI _gui;
 	};
 
 }

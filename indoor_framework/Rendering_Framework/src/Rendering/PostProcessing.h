@@ -16,17 +16,14 @@ namespace INANOA {
 
 		void render();
 
-		void setupQuadWindow();
-
-		void setupFBO();
-
 		void resize(int width, int height);
 
 		void usePostProcessing(bool use) { _use_postprocessing = use; }
-
 		void bindFBO();
-		void unbindFBO();
 	private:
+		void setupQuadWindow();
+		void setupFBO();
+
 		OPENGL::ShaderProgram* regular_fbo_shader = nullptr;
 
 		bool _use_postprocessing;
