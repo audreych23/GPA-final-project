@@ -23,6 +23,7 @@ in VertexData
 	// for normal mapping
 	vec3 lightDirNormalMapping;
 	vec3 eyeDirNormalMapping;
+	vec3 halfwayDirNormalMapping;
 } vertexData;
 
 vec3 Ia = vec3(0.1, 0.1, 0.1);
@@ -86,15 +87,16 @@ void RenderTrice() {
 	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
 	vec3 V = normalize(vertexData.eyeDirNormalMapping);
 	vec3 L = normalize(vertexData.lightDirNormalMapping);
+	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
 
-	vec3 R = reflect(-L, N);
+	// vec3 R = reflect(-L, N);
 	// actually trice has no texture
 	vec3 ambient = Ia * kd;
 
 	float diff = max(dot(N, L), 0.0);
 	vec3 diffuse = Id * diff * kd;
 
-	float spec = pow(max(dot(R, V), 0.0), ns);
+	float spec = pow(max(dot(N, H), 0.0), ns);
 	vec3 specular = Is * spec * ks;
 
 	vec3 color = ambient + diffuse + specular;

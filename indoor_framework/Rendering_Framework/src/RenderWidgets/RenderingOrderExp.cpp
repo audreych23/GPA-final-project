@@ -57,6 +57,8 @@ namespace INANOA {
 			this->trice = new MODEL::Trice();
 			this->trice->init(base_model_mat);
 
+			this->_post_processing = new PostProcessing();
+			this->_post_processing->init();
 		}
 
 
@@ -68,6 +70,8 @@ namespace INANOA {
 		m_renderer->resize(w, h);
 		this->m_frameWidth = w;
 		this->m_frameHeight = h;
+
+		this->_post_processing->resize(w, h);
 	}
 	void RenderingOrderExp::update() {		
 		// camera update (god)
@@ -101,7 +105,12 @@ namespace INANOA {
 		m_godCamera->update();
 	}
 	void RenderingOrderExp::render() {
+		
+		this->_post_processing->bindFBO();
 
+		this->m_renderer->useRenderBaseProgram();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->m_renderer->clearRenderTarget();
 		const int HW = this->m_frameWidth * 0.5;
 
@@ -119,12 +128,18 @@ namespace INANOA {
 		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::PROCEDURAL_GRID);
 		this->m_horizontalGround->render();*/
 		//// this is what supposed to happen in a higher level
+		
 
 		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
 		this->indoor->render();
 
 		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 		this->trice->render();
+
+		// post_processing
+		glDisable(GL_DEPTH_TEST);
+		this->_post_processing->render();
+		glEnable(GL_DEPTH_TEST);
 
 	}
 }

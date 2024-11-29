@@ -14,6 +14,7 @@ out VertexData {
 	// for normal mapping
 	vec3 lightDirNormalMapping;
 	vec3 eyeDirNormalMapping;
+    vec3 halfwayDirNormalMapping;
 } vertexData;
 
 layout (location = 0) uniform mat4 modelMat;
@@ -54,6 +55,12 @@ void main() {
         dot(worldViewVector, worldTangent),
         dot(worldViewVector, worldBitangent),
         dot(worldViewVector, worldNormal)
+    ));
+
+    vertexData.halfwayDirNormalMapping = normalize(vec3(
+        dot(worldHalfwayVector, worldTangent),
+        dot(worldHalfwayVector, worldBitangent),
+        dot(worldHalfwayVector, worldNormal)
     ));
 
     gl_Position = projMat * viewMat * worldVertex;

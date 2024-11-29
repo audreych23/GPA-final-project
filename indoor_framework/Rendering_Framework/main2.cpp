@@ -91,6 +91,7 @@ int main() {
 	glfwSwapInterval(0);
 #endif // VSYNC_DISABLED
 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	double previousTimeStamp = glfwGetTime();
 	int frameCounter = 0;
 	while (!glfwWindowShouldClose(window)) {
