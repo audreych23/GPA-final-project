@@ -23,25 +23,44 @@ layout (location = 2) uniform mat4 projMat;
 // light pos is in world space
 vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 
-void main(){
-	mat4 mvMat = viewMat * modelMat;
-	vec4 viewVertex = mvMat * vec4(v_vertex, 1.0);
-	vec3 viewLightPosition = mat3(viewMat) * lightPosition;
-	
-	vec3 T = normalize(mat3(mvMat) * v_tangents);
-	vec3 N = normalize(mat3(mvMat) * v_normal);
-	vec3 B = cross(N, T);
+void main() {
+    // Transform vertex position to world space
+    vec4 worldVertex = modelMat * vec4(v_vertex, 1.0);
+    vec3 worldPosition = worldVertex.xyz;
 
-	vec3 L = normalize(viewLightPosition - vec3(viewVertex));
-	vertexData.lightDirNormalMapping = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
+    // Transform normal and tangent to world space
+    vec3 worldNormal = normalize(mat3(modelMat) * v_normal);
+    vec3 worldTangent = normalize(mat3(modelMat) * v_tangents);
+    vec3 worldBitangent = cross(worldNormal, worldTangent);
 
-	vec3 V = normalize((-viewVertex).xyz);
-	vertexData.eyeDirNormalMapping = normalize(vec3(dot(V, T), dot(V, B), dot(V, N)));
+    // Compute light vector in world space
+    vec3 worldLightVector = normalize(lightPosition - worldPosition);
 
-	vertexData.H = normalize(L + V);
-	vertexData.N = N;
-	vertexData.L = L;
-	vertexData.texCoord = v_texCoord;  
+    // Compute view vector in world space
+    vec3 worldViewVector = normalize(-worldPosition);
 
-	gl_Position = projMat * viewVertex;
+    // Compute halfway vector in world space
+    vec3 worldHalfwayVector = normalize(worldLightVector + worldViewVector);
+
+    // Pass world space data to fragment shader
+    vertexData.N = worldNormal;
+    vertexData.L = worldLightVector;
+    vertexData.H = worldHalfwayVector;
+    vertexData.texCoord = v_texCoord;
+
+    // For normal mapping, transform light and view directions into tangent space
+    vertexData.lightDirNormalMapping = normalize(vec3(
+        dot(worldLightVector, worldTangent),
+        dot(worldLightVector, worldBitangent),
+        dot(worldLightVector, worldNormal)
+    ));
+
+    vertexData.eyeDirNormalMapping = normalize(vec3(
+        dot(worldViewVector, worldTangent),
+        dot(worldViewVector, worldBitangent),
+        dot(worldViewVector, worldNormal)
+    ));
+
+    // Transform vertex position to clip space for rendering
+    gl_Position = projMat * viewMat * worldVertex;
 }
