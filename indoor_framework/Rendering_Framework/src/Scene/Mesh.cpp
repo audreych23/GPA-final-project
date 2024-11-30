@@ -8,8 +8,12 @@ namespace INANOA {
 		Mesh::Mesh(std::vector<Vertex> vertices,
 			std::vector<unsigned int> indices,
 			std::vector<Texture> textures,
-			glm::vec3 ka, glm::vec3 kd, glm::vec3 ks, glm::vec3 ke, float ns) {
+			glm::vec3 ka, glm::vec3 kd, glm::vec3 ks, glm::vec3 ke, float ns,
+			std::string mesh_name) {
 			this->vertices = vertices;
+			/*for (auto vertex : vertices) {
+				std::cout << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << '\n';
+			}*/
 			this->indices = indices;
 			this->textures = textures;
 			this->ka = ka;
@@ -17,6 +21,8 @@ namespace INANOA {
 			this->ks = ks;
 			this->ke = ke;
 			this->ns = ns;
+
+			this->mesh_name = mesh_name;
 			//std::cout << "======mesh======" << '\n';
 			//std::cout << vertices.size() << '\n';
 			//std::cout << indices.size() << '\n';

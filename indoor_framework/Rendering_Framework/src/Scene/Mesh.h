@@ -26,7 +26,7 @@ namespace INANOA {
 		{
 		public:
 			Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, 
-				glm::vec3 ka, glm::vec3 kd, glm::vec3 ks, glm::vec3 ke, float shininess);
+				glm::vec3 ka, glm::vec3 kd, glm::vec3 ks, glm::vec3 ke, float shininess, std::string mesh_name);
 			void render();
  
 			std::vector<Vertex> vertices;
@@ -37,6 +37,8 @@ namespace INANOA {
 			glm::vec3 ks;
 			glm::vec3 ke;
 			float ns;
+
+			std::string mesh_name;
 
 		private:
 			GLuint _vao, _vbo, _ebo;

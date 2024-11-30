@@ -11,6 +11,7 @@ namespace INANOA {
 
 		void Model::render() {
 			for (unsigned int i = 0; i < _meshes.size(); ++i) {
+				//if (i != 39) continue; // for debug
 				_meshes[i].render();
 			}
 		}
@@ -25,7 +26,7 @@ namespace INANOA {
 			const aiScene* scene = importer.ReadFile(path, aiProcess_CalcTangentSpace |
 				aiProcess_Triangulate |
 				aiProcess_JoinIdenticalVertices |
-				aiProcess_SortByPType);
+				aiProcess_SortByPType); 
 
 			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 			{
@@ -41,7 +42,9 @@ namespace INANOA {
 			// process all node's meshes if it exists
 			for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-				_meshes.push_back(processMesh(mesh, scene)); // process the mesh into the data structure we packed
+				Mesh processed_mesh = processMesh(mesh, scene);
+				if (processed_mesh.indices.empty()) continue;
+				_meshes.push_back(processed_mesh); // process the mesh into the data structure we packed
 			}
 			// recursively call its children
 			for (unsigned int i = 0; i < node->mNumChildren; ++i) {
@@ -54,6 +57,10 @@ namespace INANOA {
 			std::vector<Vertex> vertices;
 			std::vector<unsigned int> indices;
 			std::vector<Texture> textures;
+			if (mesh->mPrimitiveTypes & aiPrimitiveType_LINE) {
+				return Mesh(vertices, indices, textures, glm::vec3(0.0), glm::vec3(0.0), glm::vec3(0.0), 
+					glm::vec3(0.0), 0.0, mesh->mName.data);; // Skip line primitives
+			}
 
 			for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 				Vertex vertex;
@@ -95,6 +102,7 @@ namespace INANOA {
 			// process indices
 			// each face represents a single primitive
 			for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+				//if (i < 1) continue;
 				aiFace face = mesh->mFaces[i];
 				for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 					indices.push_back(face.mIndices[j]);
@@ -128,9 +136,7 @@ namespace INANOA {
 				if (material->Get(AI_MATKEY_COLOR_EMISSIVE, emissive_color) == AI_SUCCESS) {
 					ke = glm::vec3(emissive_color.r, emissive_color.g, emissive_color.b);
 				}
-				if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {
-					std::cout << "shininess" << shininess << '\n';
-				}
+				if (material->Get(AI_MATKEY_SHININESS, shininess) == AI_SUCCESS) {}
 				
 				std::vector<Texture> diffuse_maps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 				textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
@@ -142,7 +148,7 @@ namespace INANOA {
 				textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
 			}
 
-			return Mesh(vertices, indices, textures, ka, kd, ks, ke, shininess);
+			return Mesh(vertices, indices, textures, ka, kd, ks, ke, shininess, mesh->mName.data);
 		}
 
 		std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string type_name) {
