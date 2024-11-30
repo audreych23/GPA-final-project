@@ -114,6 +114,7 @@ namespace INANOA {
 		this->m_renderer->clearRenderTarget();
 		const int HW = this->m_frameWidth * 0.5;
 
+
 		// =====================================================
 		// god view
 		this->m_renderer->setCamera(
@@ -140,7 +141,10 @@ namespace INANOA {
 		
 		this->_post_processing->render();
 
+		// set camera gui 
+		this->_gui.setLookAt(m_godCamera->lookCenter());
 		this->_gui.render();
-
+		glm::vec3 new_look_at = _gui.getLookAt();
+		this->m_godCamera->setLookCenter(new_look_at);
 	}
 }

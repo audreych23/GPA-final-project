@@ -17,9 +17,9 @@ namespace INANOA {
 
 		ImGui::Checkbox("normal", _options);
 		ImGui::Checkbox("bloom", _options + 1);
-		ImGui::InputFloat("lookat x", _look_at);
-		ImGui::InputFloat("lookat y", _look_at + 1);
-		ImGui::InputFloat("lookat z", _look_at + 2);
+		ImGui::InputFloat("lookat x", &_look_at[0]);
+		ImGui::InputFloat("lookat y", &_look_at[1]);
+		ImGui::InputFloat("lookat z", &_look_at[2]);
 		
         //ImGui::SliderInt("Split", &slider, 0, 800);
 

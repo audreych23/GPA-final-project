@@ -110,7 +110,7 @@ namespace INANOA {
 			}
 
 			glm::vec3 ka = glm::vec3(0.0f);
-			glm::vec3 kd = glm::vec3(0.0f);
+			glm::vec3 kd = glm::vec3(0.0f);  
 			glm::vec3 ks = glm::vec3(0.0f);
 			glm::vec3 ke = glm::vec3(0.0f);
 			float shininess = 0.0f;
