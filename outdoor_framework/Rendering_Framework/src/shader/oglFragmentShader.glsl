@@ -2,12 +2,42 @@
 
 in vec3 f_viewVertex ;
 in vec3 f_uv ;
+in vec3 f_viewNormal;
+in vec3 f_worldPos;
 
 layout (location = 0) out vec4 fragColor ;
 
 layout(location = 2) uniform int pixelProcessId;
 layout(location = 4) uniform sampler2D albedoTexture ;
+layout(location = 7) uniform mat4 viewMat;
 
+const vec3 lightDirWorld = normalize(vec3(0.4, 0.5, 0.8));
+const vec3 Ia = vec3(0.2, 0.2, 0.2);
+const vec3 Id = vec3(0.64, 0.64, 0.64);
+const vec3 Is = vec3(0.16, 0.16, 0.16);
+const float shininess = 1.0;
+
+vec4 calculateBlinnPhong(vec4 albedo) {
+    // Transform light direction to view space
+    vec3 L = normalize(mat3(viewMat) * lightDirWorld);
+    vec3 N = normalize(f_viewNormal);
+    vec3 V = normalize(-f_viewVertex);
+    vec3 H = normalize(L + V);
+
+    // Ambient
+    vec3 ambient = Ia * albedo.rgb;
+
+    // Diffuse
+    float diff = max(dot(N, L), 0.0);
+    vec3 diffuse = Id * diff * albedo.rgb;
+
+    // Specular
+    vec3 specular = vec3(0.0);
+
+    // Combine components
+    vec3 finalColor = ambient + diffuse + specular;
+    return vec4(finalColor, albedo.a);
+}
 
 vec4 withFog(vec4 color){
 	const vec4 FOG_COLOR = vec4(0.0, 0.0, 0.0, 1) ;
@@ -26,12 +56,14 @@ vec4 withFog(vec4 color){
 
 void terrainPass(){
 	vec4 texel = texture(albedoTexture, f_uv.xy) ;
-	fragColor = withFog(texel); 
+	vec4 litColor = calculateBlinnPhong(texel) ;
+	fragColor = withFog(litColor); 
 	fragColor.a = 1.0;	
 }
 
 void pureColor(){
-	fragColor = withFog(vec4(1.0, 0.0, 0.0, 1.0)) ;
+	vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0) ;
+	fragColor = withFog(baseColor) ;
 }
 
 void main(){	
