@@ -96,6 +96,9 @@
     <ClCompile Include="src\RenderWidgets\GUI.cpp">
       <Filter>Source Files\RenderWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\LightSphere.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -130,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="src\RenderWidgets\GUI.h">
       <Filter>Header Files\RenderWidgets</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\LightSphere.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

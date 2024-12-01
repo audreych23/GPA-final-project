@@ -57,6 +57,9 @@ namespace INANOA {
 			this->trice = new MODEL::Trice();
 			this->trice->init(base_model_mat);
 
+			this->light_sphere = new MODEL::LightSphere();
+			this->light_sphere->init(base_model_mat);
+
 			this->_post_processing = new PostProcessing();
 			this->_post_processing->init();
 		}
@@ -105,7 +108,7 @@ namespace INANOA {
 		m_godCamera->update();
 	}
 	void RenderingOrderExp::render() {
-		
+		// for post processing effect
 		this->_post_processing->bindFBO();
 
 		this->m_renderer->useRenderBaseProgram();
@@ -137,8 +140,11 @@ namespace INANOA {
 		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 		this->trice->render();
 
+		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
+		this->light_sphere->render();
+
 		// post_processing
-		
+		this->_post_processing->setPostProcessingType(PostProcessingType::REGULAR_EFFECT);
 		this->_post_processing->render();
 
 		// set camera gui 

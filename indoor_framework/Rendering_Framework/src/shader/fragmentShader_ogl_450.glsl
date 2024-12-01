@@ -1,6 +1,9 @@
 #version 450 core
 
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 brightColor;
+
+
 layout (location = 5) uniform int shadingModelId;
 
 layout (location = 6) uniform vec3 ka;
@@ -26,9 +29,17 @@ in VertexData
 	vec3 halfwayDirNormalMapping;
 } vertexData;
 
+in vec3 f_worldPosition;
+
 vec3 Ia = vec3(0.1, 0.1, 0.1);
 vec3 Id = vec3(0.7, 0.7, 0.7);
 vec3 Is = vec3(0.2, 0.2, 0.2);
+
+vec3 pointLightPosition = vec3(1.87659, 0.4625 , 0.103928);
+
+float constant = 1.0f;
+float linear = 0.7f;
+float quadratic = 0.14f;
 
 void RenderIndoor() {
 	vec3 N = normalize(vertexData.N);
@@ -45,6 +56,13 @@ void RenderIndoor() {
         float spec = pow(max(dot(N, H), 0.0), ns);
         vec3 specular = Is * spec * ks;
 
+		float pointLightDistance = length(pointLightPosition - f_worldPosition);
+		float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+		ambient *= attenuation;
+		diffuse *= attenuation;
+		specular *= attenuation;
+		
         vec3 color = ambient + diffuse + specular;
 
         fragColor = vec4(color, 1.0);
@@ -62,6 +80,13 @@ void RenderIndoor() {
 
         float spec = pow(max(dot(N, H), 0.0), ns);
         vec3 specular = Is * spec * ks;
+
+		float pointLightDistance = length(pointLightPosition - f_worldPosition);
+		float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+		ambient *= attenuation;
+		diffuse *= attenuation;
+		specular *= attenuation;
 
         vec3 color = ambient + diffuse + specular;
 
@@ -99,9 +124,20 @@ void RenderTrice() {
 	float spec = pow(max(dot(N, H), 0.0), ns);
 	vec3 specular = Is * spec * ks;
 
+	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
 	vec3 color = ambient + diffuse + specular;
 
 	fragColor = vec4(color, 1.0);
+}
+
+void RenderLightSphere() {
+	fragColor = vec4(1.0); // set all 4 vector values to 1.0
 }
 
 
@@ -110,5 +146,7 @@ void main(){
 		RenderIndoor();
 	} else if (shadingModelId == 1) {
 		RenderTrice();
-	} 
+	} else if (shadingModelId == 2) {
+		RenderLightSphere();
+	}
 }

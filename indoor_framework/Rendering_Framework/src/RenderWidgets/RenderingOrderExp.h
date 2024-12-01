@@ -8,6 +8,7 @@
 #include <Rendering_Framework/src/Rendering/Camera/Camera.h>
 #include <Rendering_Framework/src/Scene/Indoor.h>
 #include <Rendering_Framework/src/Scene/Trice.h>
+#include <Rendering_Framework/src/Scene/LightSphere.h>
 #include <Rendering_Framework/src/Rendering/PostProcessing.h>
 #include <Rendering_Framework/src/RenderWidgets/GUI.h>
 //#include "Shader.h"
@@ -34,6 +35,7 @@ namespace INANOA {
 
 		MODEL::Indoor* indoor = nullptr;
 		MODEL::Trice* trice = nullptr;
+		MODEL::LightSphere* light_sphere = nullptr;
 
 		glm::vec3 m_cameraForwardMagnitude;
 		float m_cameraForwardSpeed;

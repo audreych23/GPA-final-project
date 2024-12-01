@@ -23,4 +23,16 @@ namespace INANOA {
 		const GLint NS_LOCATION = 10;
 		const GLint HAS_TEXTURE_LOCATION = 11;
 	}
+
+	namespace SHADER_POST_PARAMETER_BINDING {
+		const GLuint VERTEX_LOCATION = 0;
+		const GLuint TEX_COORDS_LOCATION = 1;
+		
+
+		const GLint POST_PROCESSING_ID_LOCATION = 0;
+		const GLint POST_PROCESSING_SUB_ID_LOCATION = 1;
+		// bloom
+		const GLint HORIZONTAL_FLAG_LOCATION = 2;
+
+	}
 }
