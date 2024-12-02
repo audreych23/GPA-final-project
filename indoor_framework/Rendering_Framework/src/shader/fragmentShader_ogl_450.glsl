@@ -41,6 +41,8 @@ float constant = 1.0f;
 float linear = 0.7f;
 float quadratic = 0.14f;
 
+const float lightThreshold = 0.5;
+
 void RenderIndoor() {
 	vec3 N = normalize(vertexData.N);
 	vec3 L = normalize(vertexData.L);
@@ -69,10 +71,11 @@ void RenderIndoor() {
 
 		// to get bright color
 		float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-		if(brightness > 1.0)
+		if(brightness > lightThreshold)
 			brightColor = vec4(color, 1.0);
 		else
 			brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+		// fragColor = brightColor;
 	} else {
 		vec4 texel = texture(modelTexture, vertexData.texCoord.xy);
 
@@ -100,10 +103,11 @@ void RenderIndoor() {
         fragColor = vec4(color, texel.a);
 
 		float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-		if(brightness > 1.0)
+		if(brightness > lightThreshold)
 			brightColor = vec4(color, texel.a);
 		else
 			brightColor = vec4(0.0, 0.0, 0.0, texel.a);
+		// fragColor = brightColor;
 	}
 }
 
@@ -165,20 +169,22 @@ void RenderTrice() {
 	fragColor = vec4(color, 1.0);
 
 	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > 1.0)
+	if(brightness > lightThreshold)
 		brightColor = vec4(color, 1.0);
 	else
 		brightColor = vec4(0.0, 0.0, 0.0, 1.0); 
+	// fragColor = brightColor;
 }
 
 void RenderLightSphere() {
 	fragColor = vec4(1.0); // set all 4 vector values to 1.0
 
 	float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > 1.0)
+	if(brightness > lightThreshold)
 		brightColor = vec4(fragColor.rgb, 1.0);
 	else
 		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+	// fragColor = brightColor;
 }
 
 
