@@ -22,6 +22,8 @@ namespace INANOA {
 		// make sure this method is called before resize
 		setupQuadWindow();
 		setupFBO();
+
+		return true;
 	}
 
 	void PostProcessing::setupQuadWindow() {
@@ -123,7 +125,7 @@ namespace INANOA {
 		if (this->regular_fbo_shader == nullptr) {
 			return false;
 		}
-
+		this->regular_fbo_shader->useProgram();
 		_use_postprocessing = true;
 
 		// make sure this method is called before resize

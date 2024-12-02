@@ -34,6 +34,12 @@
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{ff5f466e-01d7-4f80-90fc-87578c74ffaa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\PostProcessing">
+      <UniqueIdentifier>{25f83046-5661-4b8f-acae-30b13c7b1450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PostProcessing">
+      <UniqueIdentifier>{5e26cf40-cc50-4013-8043-df70c0cc7def}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c">
@@ -99,6 +105,18 @@
     <ClCompile Include="src\Scene\LightSphere.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Rendering\PostProcessingBase.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcessing\RegularEffect.cpp">
+      <Filter>Source Files\PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcessing\BloomEffect.cpp">
+      <Filter>Source Files\PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcessing\ScreenQuad.cpp">
+      <Filter>Source Files\PostProcessing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -136,6 +154,18 @@
     </ClInclude>
     <ClInclude Include="src\Scene\LightSphere.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\PostProcessingBase.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\BloomEffect.h">
+      <Filter>Header Files\PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\RegularEffect.h">
+      <Filter>Header Files\PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\ScreenQuad.h">
+      <Filter>Header Files\PostProcessing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

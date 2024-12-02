@@ -26,6 +26,10 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\PostProcessing\ScreenQuad.cpp" />
+    <ClCompile Include="src\PostProcessing\BloomEffect.cpp" />
+    <ClCompile Include="src\PostProcessing\RegularEffect.cpp" />
+    <ClCompile Include="src\Rendering\PostProcessingBase.cpp" />
     <ClCompile Include="src\Scene\LightSphere.cpp" />
     <ClCompile Include="src\RenderWidgets\GUI.cpp" />
     <ClCompile Include="src\Rendering\PostProcessing.cpp" />
@@ -42,6 +46,10 @@
     <ClCompile Include="util_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\PostProcessing\ScreenQuad.h" />
+    <ClInclude Include="src\PostProcessing\BloomEffect.h" />
+    <ClInclude Include="src\PostProcessing\RegularEffect.h" />
+    <ClInclude Include="src\Rendering\PostProcessingBase.h" />
     <ClInclude Include="src\Scene\LightSphere.h" />
     <ClInclude Include="src\RenderWidgets\GUI.h" />
     <ClInclude Include="src\Rendering\PostProcessing.h" />

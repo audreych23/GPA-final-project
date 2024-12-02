@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Shader.h"
+#include <Rendering_Framework/src/Rendering/Shader.h>
 #include <Rendering_Framework/src/Rendering/ShaderParameterBindingPoint.h>
 
 namespace INANOA {
@@ -67,7 +67,6 @@ namespace INANOA {
 		// bloom gaussian blur
 		GLuint _fbo_ping_pong[2];
 		GLuint _fbo_texture_ping_pong[2];
-		
 
 	};
 

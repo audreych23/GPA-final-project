@@ -66,6 +66,13 @@ void RenderIndoor() {
         vec3 color = ambient + diffuse + specular;
 
         fragColor = vec4(color, 1.0);
+
+		// to get bright color
+		float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+		if(brightness > 1.0)
+			brightColor = vec4(color, 1.0);
+		else
+			brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 	} else {
 		vec4 texel = texture(modelTexture, vertexData.texCoord.xy);
 
@@ -91,6 +98,12 @@ void RenderIndoor() {
         vec3 color = ambient + diffuse + specular;
 
         fragColor = vec4(color, texel.a);
+
+		float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+		if(brightness > 1.0)
+			brightColor = vec4(color, texel.a);
+		else
+			brightColor = vec4(0.0, 0.0, 0.0, texel.a);
 	}
 }
 
@@ -134,10 +147,22 @@ void RenderTrice() {
 	vec3 color = ambient + diffuse + specular;
 
 	fragColor = vec4(color, 1.0);
+
+	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > 1.0)
+		brightColor = vec4(color, 1.0);
+	else
+		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 void RenderLightSphere() {
 	fragColor = vec4(1.0); // set all 4 vector values to 1.0
+
+	float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > 1.0)
+		brightColor = vec4(fragColor.rgb, 1.0);
+	else
+		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 
