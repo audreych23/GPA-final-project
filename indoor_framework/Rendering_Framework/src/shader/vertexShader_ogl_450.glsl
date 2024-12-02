@@ -45,7 +45,7 @@ void main() {
 
     vec3 worldLightVector = normalize(lightPosition - worldPosition);
 
-    vec3 worldViewVector = normalize(cameraPosition - worldPosition);
+    vec3 worldViewVector = normalize( - worldPosition);
 
     vec3 worldHalfwayVector = normalize(worldLightVector + worldViewVector);
 
