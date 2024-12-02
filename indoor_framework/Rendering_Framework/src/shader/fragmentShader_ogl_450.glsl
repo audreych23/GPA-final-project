@@ -2,6 +2,9 @@
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 brightColor;
+layout (location = 2) out vec4 ambientColor;
+layout (location = 3) out vec4 diffuseColor;
+layout (location = 4) out vec4 specularColor;
 
 
 layout (location = 5) uniform int shadingModelId;
@@ -48,67 +51,43 @@ void RenderIndoor() {
 	vec3 L = normalize(vertexData.L);
 	vec3 H = normalize(vertexData.H);
 
-	if (hasTexture == 0) {
-
-		vec3 ambient = Ia * kd;
-
-        float diff = max(dot(N, L), 0.0);
-        vec3 diffuse = Id * diff * kd;
-
-        float spec = pow(max(dot(N, H), 0.0), ns);
-        vec3 specular = Is * spec * ks;
-
-		float pointLightDistance = length(pointLightPosition - f_worldPosition);
-		float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
-
-		ambient *= attenuation;
-		diffuse *= attenuation;
-		specular *= attenuation;
-		
-        vec3 color = ambient + diffuse + specular;
-
-        fragColor = vec4(color, 1.0);
-
-		// to get bright color
-		float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-		if(brightness > lightThreshold)
-			brightColor = vec4(color, 1.0);
-		else
-			brightColor = vec4(0.0, 0.0, 0.0, 1.0);
-		// fragColor = brightColor;
-	} else {
-		vec4 texel = texture(modelTexture, vertexData.texCoord.xy);
-
-		if (texel.a < 0.5) {
-			discard;
-		}
-
-		vec3 ambient = Ia * texel.rgb;
-
-        float diff = max(dot(N, L), 0.0);
-        vec3 diffuse = Id * diff * texel.rgb;
-
-        float spec = pow(max(dot(N, H), 0.0), ns);
-        vec3 specular = Is * spec * ks;
-
-		float pointLightDistance = length(pointLightPosition - f_worldPosition);
-		float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
-
-		ambient *= attenuation;
-		diffuse *= attenuation;
-		specular *= attenuation;
-
-        vec3 color = ambient + diffuse + specular;
-
-        fragColor = vec4(color, texel.a);
-
-		float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-		if(brightness > lightThreshold)
-			brightColor = vec4(color, texel.a);
-		else
-			brightColor = vec4(0.0, 0.0, 0.0, texel.a);
-		// fragColor = brightColor;
+	vec4 originalColor = vec4(0.0);
+	if(hasTexture == 0) {
+		originalColor = vec4(kd, 1.0);
 	}
+	else {
+		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+	}
+
+	if (originalColor.a < 0.5) {
+		discard;
+	}
+
+	vec3 ambient = Ia * originalColor.rgb;
+
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * originalColor.rgb;
+
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
+
+	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	vec3 color = ambient + diffuse + specular;
+
+	fragColor = vec4(color, originalColor.a);
+
+	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > lightThreshold)
+		brightColor = vec4(color, originalColor.a);
+	else
+		brightColor = vec4(0.0, 0.0, 0.0, originalColor.a);
+	// fragColor = brightColor;
 }
 
 void RenderTrice() {

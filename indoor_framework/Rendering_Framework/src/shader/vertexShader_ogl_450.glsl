@@ -30,10 +30,6 @@ layout (location = 3) uniform vec3 cameraPosition;
 // point light pos is in world space 
 vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 
-// float constant = 1.0f;
-// float linear = 0.7f;
-// float quadratic = 0.14f;
-
 void main() {
     // For some reason we do it in world space and it works
     vec4 worldVertex = modelMat * vec4(v_vertex, 1.0);
