@@ -32,8 +32,6 @@ namespace INANOA {
 				glBindTexture(GL_TEXTURE_2D, first_iteration ? _fbo_texture[1] : _fbo_texture_ping_pong[!horizontal]);
 
 				// render Quad 
-				/*glBindVertexArray(_rect_vao);
-				glDrawArrays(GL_TRIANGLES, 0, 6);*/
 				_screen_quad->render();
 
 				horizontal = !horizontal;
@@ -93,7 +91,8 @@ namespace INANOA {
 			// Generate RBO
 			glGenRenderbuffers(1, &_rbo);
 			glBindRenderbuffer(GL_RENDERBUFFER, _rbo);
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, width, height);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo);
 
 			glGenTextures(2, _fbo_texture);
 			// Generate Color Texture For fbo
@@ -142,6 +141,7 @@ namespace INANOA {
 				if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 					std::cout << "Framebuffer not complete!" << std::endl;
 			}
+
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		}
 	}

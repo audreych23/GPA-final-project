@@ -143,8 +143,8 @@ namespace INANOA {
 	void RenderingOrderExp::render() {
 		// for post processing effect
 		//this->_post_processing->bindFBO();
-		this->_regular_effect->bindFBO();
-		//this->_bloom_effect->bindFBO();
+		//this->_regular_effect->bindFBO();
+		this->_bloom_effect->bindFBO();
 
 		this->m_renderer->useRenderBaseProgram();
 
@@ -175,12 +175,12 @@ namespace INANOA {
 		// use post processing shader program
 		this->_post_processing->usePostProcessingShaderProgram();
 		// post_processing
-		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-		this->_regular_effect->render();
+		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+		//this->_regular_effect->render();
 
 		// bloom
-		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
-		//this->_bloom_effect->render();
+		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+		this->_bloom_effect->render();
 
 		// set camera gui 
 		this->_gui.setLookAt(m_godCamera->lookCenter());
