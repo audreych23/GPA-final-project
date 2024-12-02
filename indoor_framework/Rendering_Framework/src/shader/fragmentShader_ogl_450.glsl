@@ -108,20 +108,36 @@ void RenderIndoor() {
 }
 
 void RenderTrice() {
-	// vec3 N = normalize(vertexData.N);
-	// vec3 L = normalize(vertexData.L);
-	// vec3 H = normalize(vertexData.H);
-	// vec3 ambient = Ia * kd;
+	/*
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
+	vec3 ambient = Ia * kd;
 
-	// float diff = max(dot(N, L), 0.0);
-	// vec3 diffuse = Id * diff * kd;
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * kd;
 
-	// float spec = pow(max(dot(N, H), 0.0), ns);
-	// vec3 specular = Is * spec * ks;
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
 
-	// vec3 color = ambient + diffuse + specular;
-	// fragColor = vec4(color, 1.0);
 
+	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	vec3 color = ambient + diffuse + specular;
+	fragColor = vec4(color, 1.0);
+
+			float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+		if(brightness > 1.0)
+			brightColor = vec4(color, 1.0);
+		else
+			brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+	*/
 	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
 	vec3 V = normalize(vertexData.eyeDirNormalMapping);
 	vec3 L = normalize(vertexData.lightDirNormalMapping);
@@ -152,7 +168,7 @@ void RenderTrice() {
 	if(brightness > 1.0)
 		brightColor = vec4(color, 1.0);
 	else
-		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+		brightColor = vec4(0.0, 0.0, 0.0, 1.0); 
 }
 
 void RenderLightSphere() {

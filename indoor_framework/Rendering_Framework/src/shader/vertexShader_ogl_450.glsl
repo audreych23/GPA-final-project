@@ -26,9 +26,9 @@ layout (location = 3) uniform vec3 cameraPosition;
 
 // hard coding this stuff
 // light pos is in world space
-vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
+// vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 // point light pos is in world space 
-// vec3 pointLightPosition = vec3(1.87659, 0.4625 , 0.103928);
+vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 
 // float constant = 1.0f;
 // float linear = 0.7f;

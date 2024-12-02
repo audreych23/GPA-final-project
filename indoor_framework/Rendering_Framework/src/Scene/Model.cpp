@@ -23,7 +23,7 @@ namespace INANOA {
 
 		void Model::loadModel(std::string path) {
 			Assimp::Importer importer;
-			const aiScene* scene = importer.ReadFile(path, aiProcess_CalcTangentSpace |
+			const aiScene* scene = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_CalcTangentSpace |
 				aiProcess_Triangulate |
 				aiProcess_JoinIdenticalVertices |
 				aiProcess_SortByPType); 
