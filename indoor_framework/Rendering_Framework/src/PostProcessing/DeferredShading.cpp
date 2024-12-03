@@ -18,7 +18,6 @@ namespace INANOA {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			// Clear Depth
 			glClear(GL_DEPTH_BUFFER_BIT);
-			setBloomSubProcess(DeferredShadingProcess::WORLD_SPACE_VERTEX);
 			for (int i = 0; i < 5; i++) {
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);

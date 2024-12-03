@@ -64,13 +64,19 @@ void BloomFinalEffect() {
     fragColor = vec4(hdrColor, 1.0);
 }
 
-void DifferedShading(){
-// 	uniform sampler2D screenTexture;
-// uniform sampler2D blurTexture;
-// uniform sampler2D ambientTexture;
-// uniform sampler2D diffuseTexture;
-// uniform sampler2D specularTexture;
-	fragColor = vec4(texture(ambientTexture, fs_in.texcoord).xyz, 1.0);
+
+void DefferedShading() {
+    if (postSubProcess == 0) {
+        fragColor = vec4(texture(screenTexture, fs_in.texcoord).xyz, 1.0);
+    } else if (postSubProcess == 1) {
+        fragColor = vec4(texture(blurTexture, fs_in.texcoord).xyz, 1.0);
+    } else if (postSubProcess == 2) {
+        fragColor = vec4(texture(ambientTexture, fs_in.texcoord).xyz, 1.0);
+    } else if (postSubProcess == 3) {
+        fragColor = vec4(texture(diffuseTexture, fs_in.texcoord).xyz, 1.0);
+    } else { 
+        fragColor = vec4(texture(specularTexture, fs_in.texcoord).xyz, 1.0);
+    }
 }
 
 void main()
@@ -89,6 +95,6 @@ void main()
 		}
 	}
 	else if (postProcessingEffect == 2){
-		DifferedShading();
+		DefferedShading();
 	}
 }
