@@ -195,8 +195,8 @@ namespace INANOA {
 
 		// deferred shading
 		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
-		glUniform1i(SHADER_POST_PARAMETER_BINDING::POST_PROCESSING_SUB_ID_LOCATION, static_cast<int>(this->_gui.getDeferredOption()));
-		this->_deferred_shading->render();
+		//glUniform1i(SHADER_POST_PARAMETER_BINDING::POST_PROCESSING_SUB_ID_LOCATION, static_cast<int>(this->_gui.getDeferredOption()));
+		this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
 
 		// set camera gui 
 		this->_gui.setLookAt(m_godCamera->lookCenter());

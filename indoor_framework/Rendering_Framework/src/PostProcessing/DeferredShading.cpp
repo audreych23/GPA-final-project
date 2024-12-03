@@ -12,7 +12,8 @@ namespace INANOA {
 			setupFBO();
 		}
 
-		void DeferredShading::render() {
+		void DeferredShading::render(DeferredShadingOption option) {
+			setDeferredShadingOption(option);
 			glDisable(GL_DEPTH_TEST);
 			// Unbind FBO
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

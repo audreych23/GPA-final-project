@@ -14,7 +14,7 @@ namespace INANOA {
 		class DeferredShading
 		{
 		public:
-			enum class DeferredShadingProcess : int {
+			enum class DeferredShadingOption : int {
 				WORLD_SPACE_VERTEX = 0,
 				WORLD_SPACE_NORMAL = 1,
 				AMBIENT_COLOR_MAP = 2,
@@ -27,7 +27,7 @@ namespace INANOA {
 
 			void init(ScreenQuad* screen_quad);
 
-			void render();
+			void render(DeferredShadingOption option);
 
 			void resize(int width, int height);
 
@@ -35,7 +35,7 @@ namespace INANOA {
 		private:
 			void setupFBO();
 
-			inline void setBloomSubProcess(const DeferredShadingProcess type) {
+			inline void setDeferredShadingOption(const DeferredShadingOption type) {
 				glUniform1i(SHADER_POST_PARAMETER_BINDING::POST_PROCESSING_SUB_ID_LOCATION, static_cast<int>(type));
 			}
 
