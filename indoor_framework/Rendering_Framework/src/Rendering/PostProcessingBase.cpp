@@ -18,6 +18,9 @@ namespace INANOA {
 
 			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "screenTexture"), 0);
 			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "blurTexture"), 1);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "ambientTexture"), 2);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "diffuseTexture"), 3);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "specularTexture"), 4);
 
 			return true;
 		}

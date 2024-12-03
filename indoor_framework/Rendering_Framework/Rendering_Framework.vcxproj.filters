@@ -117,6 +117,9 @@
     <ClCompile Include="src\PostProcessing\ScreenQuad.cpp">
       <Filter>Source Files\PostProcessing</Filter>
     </ClCompile>
+    <ClCompile Include="src\PostProcessing\DeferredShading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="src\PostProcessing\ScreenQuad.h">
       <Filter>Header Files\PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\DeferredShading.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,6 +2,9 @@
 
 uniform sampler2D screenTexture;
 uniform sampler2D blurTexture;
+uniform sampler2D ambientTexture;
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
 // uniform sampler2D
 
 out vec4 fragColor;
@@ -61,17 +64,31 @@ void BloomFinalEffect() {
     fragColor = vec4(hdrColor, 1.0);
 }
 
+void DifferedShading(){
+// 	uniform sampler2D screenTexture;
+// uniform sampler2D blurTexture;
+// uniform sampler2D ambientTexture;
+// uniform sampler2D diffuseTexture;
+// uniform sampler2D specularTexture;
+	fragColor = vec4(texture(ambientTexture, fs_in.texcoord).xyz, 1.0);
+}
+
 void main()
 {
 	if (postProcessingEffect == 0) {
 		RegularEffect();
-	} else if (postProcessingEffect == 1) {
+	} 
+	else if (postProcessingEffect == 1) {
 		if (postSubProcess == 0) {
 			// blur
 			BloomBlurEffect();
-		} else {
+		} 
+		else {
 			// final bloom
 			BloomFinalEffect();
 		}
+	}
+	else if (postProcessingEffect == 2){
+		DifferedShading();
 	}
 }

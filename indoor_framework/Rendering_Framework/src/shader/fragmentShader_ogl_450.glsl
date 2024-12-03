@@ -46,6 +46,52 @@ float quadratic = 0.14f;
 
 const float lightThreshold = 0.5;
 
+/*
+	##################################
+	#		Deferred Shading		 #
+	##################################
+*/
+void RenderIndoorDeferred(){
+	/* Init */
+	vec4 originalColor = vec4(0.0);
+	if(hasTexture == 0) {
+		originalColor = vec4(kd, 1.0);
+	}
+	else {
+		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+		if(originalColor.a < 0.5) discard;
+	}
+	vec3 N = normalize(vertexData.N);
+	vec3 H = normalize(vertexData.H);
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	/* Output */
+	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
+	brightColor = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
+	ambientColor = vec4(Ia, 1.0);
+	diffuseColor = vec4(originalColor.rgb, 1.0);
+	specularColor = vec4(Is, 1.0);
+}
+
+void RenderTriceDeferred(){
+	/* Init */
+	vec4 originalColor = vec4(kd, 1.0);
+	vec3 N = normalize(vertexData.N);
+	vec3 H = normalize(vertexData.H);
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	/* Output */
+	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
+	brightColor = vec4(vertexData.N, 1.0);
+	ambientColor = vec4(Ia, 1.0);
+	diffuseColor = vec4(originalColor.rgb, 1.0);
+	specularColor = vec4(Is, 1.0);
+}
+
+/*
+	##################################
+	#		Regular  Shading		 #
+	##################################
+*/
+
 void RenderIndoor() {
 	vec3 N = normalize(vertexData.N);
 	vec3 L = normalize(vertexData.L);
@@ -169,10 +215,11 @@ void RenderLightSphere() {
 
 void main(){
  	if (shadingModelId == 0) {
-		RenderIndoor();
+		RenderIndoorDeferred();
 	} else if (shadingModelId == 1) {
-		RenderTrice();
+		RenderTriceDeferred();
 	} else if (shadingModelId == 2) {
-		RenderLightSphere();
+		discard;
+		//RenderLightSphere();
 	}
 }

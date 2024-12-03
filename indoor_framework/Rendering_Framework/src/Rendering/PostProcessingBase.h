@@ -13,6 +13,7 @@ namespace INANOA {
 		enum class PostProcessingType : int {
 			REGULAR_EFFECT = 0,
 			BLOOM_EFFECT = 1,
+			DEFERRED_SHADING = 2,
 		};		
 		
 		class PostProcessingBase

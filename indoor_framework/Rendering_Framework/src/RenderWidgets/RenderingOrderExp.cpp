@@ -81,7 +81,7 @@ namespace INANOA {
 		}
 
 		this->_post_processing = post_processing;
-
+		
 		// initialize post processing effect
 		{
 			this->_regular_effect = new POST_PROCESSING::RegularEffect();
@@ -89,6 +89,9 @@ namespace INANOA {
 
 			this->_bloom_effect = new POST_PROCESSING::BloomEffect();
 			this->_bloom_effect->init(_screen_quad);
+
+			this->_deferred_shading = new POST_PROCESSING::DeferredShading();
+			this->_deferred_shading->init(_screen_quad);
 		}
 
 
@@ -101,8 +104,12 @@ namespace INANOA {
 		this->m_frameWidth = w;
 		this->m_frameHeight = h;
 
+		// Postprocessing
 		this->_regular_effect->resize(w, h);
 		this->_bloom_effect->resize(w, h);
+		this->_deferred_shading->resize(w, h);
+
+
 		//this->_post_processing->resize(w, h);
 		/*this->_post_processing->resizeBloomColor(w, h);
 		this->_post_processing->resizeBloomBlur(w, h);*/
@@ -140,11 +147,15 @@ namespace INANOA {
 
 		m_godCamera->update();
 	}
+
+	
+
 	void RenderingOrderExp::render() {
 		// for post processing effect
 		//this->_post_processing->bindFBO();
 		//this->_regular_effect->bindFBO();
-		this->_bloom_effect->bindFBO();
+		//this->_bloom_effect->bindFBO();
+		this->_deferred_shading->bindFBO();
 
 		this->m_renderer->useRenderBaseProgram();
 
@@ -179,8 +190,12 @@ namespace INANOA {
 		//this->_regular_effect->render();
 
 		// bloom
-		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
-		this->_bloom_effect->render();
+		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+		//this->_bloom_effect->render();
+
+		// deferred shading
+		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
+		this->_deferred_shading->render();
 
 		// set camera gui 
 		this->_gui.setLookAt(m_godCamera->lookCenter());

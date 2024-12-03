@@ -14,6 +14,7 @@
 
 #include <Rendering_Framework/src/PostProcessing/RegularEffect.h>
 #include <Rendering_Framework/src/PostProcessing/BloomEffect.h>
+#include <Rendering_Framework/src/PostProcessing/DeferredShading.h>
 //#include "Shader.h"
 
 namespace INANOA {
@@ -57,6 +58,7 @@ namespace INANOA {
 
 		POST_PROCESSING::RegularEffect* _regular_effect = nullptr;
 		POST_PROCESSING::BloomEffect* _bloom_effect = nullptr;
+		POST_PROCESSING::DeferredShading* _deferred_shading = nullptr;
 
 		// for screen size viewport
 		int m_frameWidth;

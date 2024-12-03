@@ -26,6 +26,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\PostProcessing\DeferredShading.cpp" />
     <ClCompile Include="src\PostProcessing\ScreenQuad.cpp" />
     <ClCompile Include="src\PostProcessing\BloomEffect.cpp" />
     <ClCompile Include="src\PostProcessing\RegularEffect.cpp" />
@@ -46,6 +47,7 @@
     <ClCompile Include="util_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\PostProcessing\DeferredShading.h" />
     <ClInclude Include="src\PostProcessing\ScreenQuad.h" />
     <ClInclude Include="src\PostProcessing\BloomEffect.h" />
     <ClInclude Include="src\PostProcessing\RegularEffect.h" />
