@@ -17,6 +17,10 @@ public:
 	void setAvgFPS(const double avgFPS);
 	void setAvgFrameTime(const double avgFrameTime);
 	bool isNormalMap;
+	
+	bool isTeleport0;
+	bool isTeleport1;
+	bool isTeleport2;
 
 private:
 	double m_avgFPS;

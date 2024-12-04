@@ -21,6 +21,11 @@ void MyImGuiPanel::update() {
 	ImGui::TextColored(ImVec4(0, 220, 0, 255), FT_STR.c_str());
 	
 	ImGui::Checkbox("Normal Map", &isNormalMap);
+
+	this->isTeleport0 = ImGui::Button("Teleport 0");
+	this->isTeleport1 = ImGui::Button("Teleport 1");
+	this->isTeleport2 = ImGui::Button("Teleport 2");
+
 }
 
 void MyImGuiPanel::setAvgFPS(const double avgFPS){

@@ -275,6 +275,15 @@ void paintGL(){
 	ImGui::Begin("My name is window");
 	m_imguiPanel->update();
 	isNormalMap = m_imguiPanel->isNormalMap;
+	if (m_imguiPanel->isTeleport0) {
+		m_myCameraManager->teleport(0);
+	}
+	if (m_imguiPanel->isTeleport1) {
+		m_myCameraManager->teleport(1);
+	}
+	if (m_imguiPanel->isTeleport2) {
+		m_myCameraManager->teleport(2);
+	}
 	ImGui::End();
 
 	ImGui::Render();
