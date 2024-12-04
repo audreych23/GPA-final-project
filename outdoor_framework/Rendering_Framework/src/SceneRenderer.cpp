@@ -116,6 +116,7 @@ bool SceneRenderer::setUpShader(){
 	manager->m_vs_terrainProcess = 3;
 
 	manager->m_fs_pixelProcessIdHandle = 2;
+	manager->m_isNormalMapHandle = 20;
 	manager->m_fs_pureColor = 5;
 	manager->m_fs_terrainPass = 7;
 	

@@ -68,18 +68,44 @@ MyRock::MyRock() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glGenerateMipmap(GL_TEXTURE_2D);
 
+
+  // normal map
+  int w2, h2, c2;
+  unsigned char* image2 = stbi_load("assets/MagicRock/StylMagicRocks_NormalOpenGL.png", &w2, &h2, &c2, 4);
+  if (!image2) {
+    std::cout << "ERROR::TEXTURE::" << "Failed to load texture" << "\n";
+    exit(1);
+  }
+
+  unsigned char* tex2 = new unsigned char[w * h * 4];
+  memcpy(tex2, image2, w2 * h2 * 4 * sizeof(unsigned char));
+  stbi_image_free(image2);
+
+  glGenTextures(1, &this->gNorm);
+  glBindTexture(GL_TEXTURE_2D, this->gNorm);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex2);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+
+
   this->dso->setPrimitive(GL_TRIANGLES);
   this->dso->setModelMat(glm::translate(glm::vec3(25.92f, 18.27f, 11.75f)));
   this->dso->setPixelFunctionId(2);
+
 }
 
-void MyRock::render() {
+void MyRock::render(bool isNormalMap) {
   glActiveTexture(SceneManager::Instance()->m_normalTexUnit);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(GL_TEXTURE_2D, this->gNorm);
   glActiveTexture(SceneManager::Instance()->m_albedoTexUnit);
   glBindTexture(GL_TEXTURE_2D, this->gTex);
   glActiveTexture(SceneManager::Instance()->m_elevationTexUnit);
   glBindTexture(GL_TEXTURE_2D, 0);
+  this->dso->setNormalMap(isNormalMap);
   this->dso->update();
 }
 

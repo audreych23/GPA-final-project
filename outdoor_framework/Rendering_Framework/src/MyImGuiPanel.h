@@ -16,9 +16,11 @@ public:
 	void update();
 	void setAvgFPS(const double avgFPS);
 	void setAvgFrameTime(const double avgFrameTime);
+	bool isNormalMap;
 
 private:
 	double m_avgFPS;
 	double m_avgFrameTime;
+	
 };
 

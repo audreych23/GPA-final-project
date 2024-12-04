@@ -21,7 +21,7 @@ class MyRock {
   public:
     MyRock();
     virtual ~MyRock();
-    void render();
+    void render(bool isNormalMap);
     void update(const glm::mat4& viewMat, const glm::vec3& viewPos);
 
     DynamicSceneObject* dso;

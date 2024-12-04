@@ -40,6 +40,8 @@ public:
 	GLuint m_fs_pixelProcessIdHandle;
 	GLuint m_vs_vertexProcessIdHandle;
 
+	GLuint m_isNormalMapHandle;
+
 	GLenum m_albedoTexUnit;
 	GLenum m_normalTexUnit;
 	GLenum m_elevationTexUnit;

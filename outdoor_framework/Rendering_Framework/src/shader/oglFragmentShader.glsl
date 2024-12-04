@@ -9,7 +9,9 @@ layout (location = 0) out vec4 fragColor ;
 
 layout(location = 2) uniform int pixelProcessId;
 layout(location = 4) uniform sampler2D albedoTexture ;
+layout(location = 6) uniform sampler2D normalMap ;
 layout(location = 7) uniform mat4 viewMat;
+layout(location = 20) uniform bool isNormalMap;
 
 const vec3 lightDirWorld = normalize(vec3(0.4, 0.5, 0.8));
 const vec3 Ia = vec3(0.2, 0.2, 0.2);
@@ -44,6 +46,35 @@ vec4 calculateBlinnPhong(vec4 albedo, vec3 normal, vec3 specular, float shinines
     return vec4(finalColor, albedo.a);
 }
 
+vec4 normalBlinnPhong(vec4 albedo, vec3 normal, vec4 normalMap, vec3 specular, float shininess) {
+    // Transform light direction to view space
+    vec3 L = normalize(mat3(viewMat) * lightDirWorld);
+    vec3 V = normalize(-f_viewVertex);
+    vec3 H = normalize(L + V);
+
+    // Start with the mesh normal
+    vec3 N = normalize(normal);
+    
+    // Unpack and blend in the normal map details
+    vec3 normalDetail = normalize(normalMap.rgb * 2.0 - 1.0);
+    // Blend the normal map with the base mesh normal
+    N = normalize(N * 0.75 + normalDetail * 1.25);
+
+    // Ambient
+    vec3 ambient = Ia * albedo.rgb;
+
+    // Diffuse
+    float diff = max(dot(N, L), 0.0);
+    vec3 diffuse = Id * diff * albedo.rgb;
+
+    // Specular
+    float spec = pow(max(dot(N, H), 0.0), shininess);
+    vec3 specularColor = Is * spec * specular;
+
+    vec3 combined = ambient + diffuse + specularColor;
+    return vec4(combined, 1.0);
+}
+
 vec4 withFog(vec4 color){
 	const vec4 FOG_COLOR = vec4(0.0, 0.0, 0.0, 1) ;
 	const float MAX_DIST = 400.0 ;
@@ -61,7 +92,6 @@ vec4 withFog(vec4 color){
 void terrainPass(){
 	vec4 texel = texture(albedoTexture, f_uv.xy) ;
 	vec3 normal = f_viewNormal.xyz;
-
 
 	vec4 litColor = calculateBlinnPhong(texel, normal, vec3(0.0f), 1.0f, true);
 	fragColor = withFog(litColor);
@@ -90,7 +120,13 @@ void airplanePass() {
 
 void rockPass() {
 	vec4 texel = texture(albedoTexture, f_uv.xy) ;
+	vec4 normal = texture(normalMap, f_uv.xy) ;
 	vec4 litColor = calculateBlinnPhong(texel, f_viewNormal, vec3(1.0f), 32.0f, false);
+
+	if (isNormalMap) {
+		litColor = normalBlinnPhong(texel, f_viewNormal, normal, vec3(1.0f), 32.0f);
+	}
+
 	fragColor = withFog(litColor); 
 	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
 	fragColor.a = 1.0;

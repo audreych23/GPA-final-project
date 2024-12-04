@@ -49,7 +49,7 @@ MyRock* m_rock = nullptr;
 INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
-
+bool isNormalMap = true;
 
 
 void updateWhenPlayerProjectionChanged(const float nearDepth, const float farDepth);
@@ -261,7 +261,7 @@ void paintGL(){
 	defaultRenderer->setProjection(playerProjMat);
 	defaultRenderer->renderPass();
 	m_airplane->render();
-	m_rock->render();
+	m_rock->render(isNormalMap);
 
 	// rendering with god view
 	defaultRenderer->setViewport(godViewport[0], godViewport[1], godViewport[2], godViewport[3]);
@@ -269,11 +269,12 @@ void paintGL(){
 	defaultRenderer->setProjection(godProjMat);
 	defaultRenderer->renderPass();
 	m_airplane->render();
-	m_rock->render();
+	m_rock->render(isNormalMap);
 	// ===============================
 
 	ImGui::Begin("My name is window");
 	m_imguiPanel->update();
+	isNormalMap = m_imguiPanel->isNormalMap;
 	ImGui::End();
 
 	ImGui::Render();
