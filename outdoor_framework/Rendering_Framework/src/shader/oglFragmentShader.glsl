@@ -66,8 +66,18 @@ void pureColor(){
 	fragColor = withFog(baseColor) ;
 }
 
+void airplanePass() {
+	vec4 texel = texture(albedoTexture, f_uv.xy) ;
+	vec4 litColor = calculateBlinnPhong(texel) ;
+	fragColor = withFog(litColor); 
+	fragColor.a = 1.0;
+}
+
 void main(){	
-	if(pixelProcessId == 5){
+	if (pixelProcessId == 1) {
+		airplanePass();
+	}
+	else if(pixelProcessId == 5){
 		pureColor() ;
 	}
 	else if(pixelProcessId == 7){

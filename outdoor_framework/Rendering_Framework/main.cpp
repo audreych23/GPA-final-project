@@ -5,8 +5,11 @@
 
 #include "src\ViewFrustumSceneObject.h"
 #include "src\terrain\MyTerrain.h"
+#include "src\airplane\MyAirplane.h"
 #include "src\MyCameraManager.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #pragma comment (lib, "lib-vc2015\\glfw3.lib")
 #pragma comment(lib, "assimp-vc141-mt.lib")
@@ -40,6 +43,7 @@ ShaderProgram* defaultShaderProgram = new ShaderProgram();
 
 ViewFrustumSceneObject* m_viewFrustumSO = nullptr;
 MyTerrain* m_terrain = nullptr;
+MyAirplane* m_airplane = nullptr;
 INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
@@ -182,6 +186,12 @@ bool initializeGL(){
 	m_terrain = new MyTerrain();
 	m_terrain->init(-1); 
 	defaultRenderer->appendTerrainSceneObject(m_terrain->sceneObject());
+	
+	// initialize airplane
+	m_airplane = new MyAirplane(m_myCameraManager);
+	
+	
+	
 	// =================================================================	
 	
 	resize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -246,12 +256,14 @@ void paintGL(){
 	defaultRenderer->setView(playerVM);
 	defaultRenderer->setProjection(playerProjMat);
 	defaultRenderer->renderPass();
+	m_airplane->render();
 
 	// rendering with god view
 	defaultRenderer->setViewport(godViewport[0], godViewport[1], godViewport[2], godViewport[3]);
 	defaultRenderer->setView(godVM);
 	defaultRenderer->setProjection(godProjMat);
 	defaultRenderer->renderPass();
+	m_airplane->render();
 	// ===============================
 
 	ImGui::Begin("My name is window");

@@ -31,6 +31,9 @@
     <Filter Include="Header Files\camera">
       <UniqueIdentifier>{0a4280f5-adfd-41fd-b6da-809606480899}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\airplane">
+      <UniqueIdentifier>{110885a9-6722-4c85-9805-0f6f63ebf64c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -89,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="src\MyCameraManager.cpp">
       <Filter>Source Files\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="src\airplane\MyAirplane.cpp">
+      <Filter>Source Files\airplane</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="src\camera\MyOrbitControl.h">
       <Filter>Header Files\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\airplane\MyAirplane.h">
+      <Filter>Source Files\airplane</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
