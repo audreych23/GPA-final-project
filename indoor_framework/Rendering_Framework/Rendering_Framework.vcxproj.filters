@@ -118,7 +118,10 @@
       <Filter>Source Files\PostProcessing</Filter>
     </ClCompile>
     <ClCompile Include="src\PostProcessing\DeferredShading.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcessing\DirectionalShadowMapping.cpp">
+      <Filter>Source Files\PostProcessing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +174,10 @@
       <Filter>Header Files\PostProcessing</Filter>
     </ClInclude>
     <ClInclude Include="src\PostProcessing\DeferredShading.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\DirectionalShadowMapping.h">
+      <Filter>Header Files\PostProcessing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

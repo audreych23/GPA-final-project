@@ -79,6 +79,14 @@ void DefferedShading() {
     }
 }
 
+float LinearizeDepth(float depth)
+{
+	const float near_plane = 0.1f;
+	const float far_plane = 10f;
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
+}
+
 void main()
 {
 	if (postProcessingEffect == 0) {
@@ -96,5 +104,10 @@ void main()
 	}
 	else if (postProcessingEffect == 2){
 		DefferedShading();
+	} else if (postProcessingEffect == 3) {
+		float depthValue = texture(screenTexture, fs_in.texcoord).r;
+		LinearizeDepth(depthValue);
+		fragColor = vec4(vec3(depthValue), 1.0); // orthographic
+		// fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 	}
 }

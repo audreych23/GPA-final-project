@@ -7,6 +7,7 @@ layout (location = 3) out vec4 diffuseColor;
 layout (location = 4) out vec4 specularColor;
 
 
+layout (location = 4) uniform int postProcessId;
 layout (location = 5) uniform int shadingModelId;
 
 layout (location = 6) uniform vec3 ka;
@@ -18,6 +19,7 @@ layout (location = 11) uniform int hasTexture;
 
 uniform sampler2D modelTexture;
 uniform sampler2D modelTextureNormal;
+uniform sampler2DShadow modelTextureShadow;
 
 in VertexData
 {
@@ -25,6 +27,7 @@ in VertexData
     vec3 L; // eye space light vector
     vec3 H; // eye space halfway vector
     vec3 texCoord;
+	vec4 shadowCoord;
 
 	// for normal mapping
 	vec3 lightDirNormalMapping;
@@ -45,6 +48,65 @@ float linear = 0.7f;
 float quadratic = 0.14f;
 
 const float lightThreshold = 0.5;
+
+/*
+	##################################
+	#   Directional Shadow Mapping   #
+	##################################
+*/
+void RenderIndoorShadow() {
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
+
+	vec4 originalColor = vec4(0.0);
+	if(hasTexture == 0) {
+		originalColor = vec4(kd, 1.0);
+	}
+	else {
+		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+	}
+
+	if (originalColor.a < 0.5) {
+		discard;
+	}
+
+	vec3 ambient = Ia * originalColor.rgb;
+
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * originalColor.rgb;
+
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
+
+	vec3 color = ambient + diffuse + specular;
+
+	// fragColor = vec4(color, originalColor.a);
+	
+	fragColor = textureProj(modelTextureShadow, vertexData.shadowCoord) * vec4(color, originalColor.a);
+}
+
+void RenderTriceShadow() {
+	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(vertexData.lightDirNormalMapping);
+	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+
+	// vec3 R = reflect(-L, N);
+	// actually trice has no texture
+	vec3 ambient = Ia * kd;
+
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * kd;
+
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
+
+	vec3 color = ambient + diffuse + specular;
+
+	// fragColor = vec4(color, 1.0);
+	fragColor = textureProj(modelTextureShadow, vertexData.shadowCoord) * vec4(color, 1.0);
+}
 
 /*
 	##################################
@@ -213,13 +275,20 @@ void RenderLightSphere() {
 }
 
 
-void main(){
- 	if (shadingModelId == 0) {
-		RenderIndoorDeferred();
-	} else if (shadingModelId == 1) {
-		RenderTriceDeferred();
-	} else if (shadingModelId == 2) {
-		discard;
-		//RenderLightSphere();
+void main() {
+	// shadow map does not need any color in fragment
+	if (postProcessId == 0) {
+		return;
+	} else { 
+		if (shadingModelId == 0) {
+			// RenderIndoorDeferred();
+			RenderIndoorShadow();
+		} else if (shadingModelId == 1) {
+			// RenderTriceDeferred();
+			RenderTriceShadow();
+		} else if (shadingModelId == 2) {
+			discard;
+			//RenderLightSphere();
+		}
 	}
 }

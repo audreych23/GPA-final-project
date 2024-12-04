@@ -92,6 +92,9 @@ namespace INANOA {
 
 			this->_deferred_shading = new POST_PROCESSING::DeferredShading();
 			this->_deferred_shading->init(_screen_quad);
+
+			this->_dir_shadow_mapping = new POST_PROCESSING::DirectionalShadowMapping();
+			this->_dir_shadow_mapping->init(_screen_quad);
 		}
 
 
@@ -108,6 +111,7 @@ namespace INANOA {
 		this->_regular_effect->resize(w, h);
 		this->_bloom_effect->resize(w, h);
 		this->_deferred_shading->resize(w, h);
+		this->_dir_shadow_mapping->resize(w, h);
 
 
 		//this->_post_processing->resize(w, h);
@@ -151,17 +155,34 @@ namespace INANOA {
 	
 
 	void RenderingOrderExp::render() {
-		// for post processing effect
-		//this->_post_processing->bindFBO();
-		//this->_regular_effect->bindFBO();
-		//this->_bloom_effect->bindFBO();
-		this->_deferred_shading->bindFBO();
+		// Post Processing Effect
+		{
+			//this->_post_processing->bindFBO();
+			//this->_regular_effect->bindFBO();
+			//this->_bloom_effect->bindFBO();
+			//this->_deferred_shading->bindFBO();
+			this->_dir_shadow_mapping->bindFBO();
+		}
 
 		this->m_renderer->useRenderBaseProgram();
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->m_renderer->clearRenderTarget();
-		const int HW = this->m_frameWidth * 0.5;
+
+		// Directional Shadow Mapping
+		{
+			this->_dir_shadow_mapping->renderLightSpace();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
+			this->indoor->render();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
+			this->trice->render();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
+			this->light_sphere->render();
+
+			this->_dir_shadow_mapping->unbindFBO();
+		}
 
 
 		// =====================================================
@@ -172,19 +193,30 @@ namespace INANOA {
 			m_godCamera->viewOrig()
 		);
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		this->m_renderer->setViewport(0, 0, this->m_frameWidth, this->m_frameHeight);
 
-		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
-		this->indoor->render();
+		//// Directional Shadow Mapping
+		{
+			this->_dir_shadow_mapping->renderShadow();
 
-		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
-		this->trice->render();
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
+			this->indoor->render();
 
-		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
-		this->light_sphere->render();
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
+			this->trice->render();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
+			this->light_sphere->render();
+
+			this->_dir_shadow_mapping->finishRender();
+		}
+
 
 		// use post processing shader program
-		this->_post_processing->usePostProcessingShaderProgram();
+		// this->_post_processing->usePostProcessingShaderProgram();
+		
 		// post_processing
 		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
 		//this->_regular_effect->render();
@@ -194,9 +226,11 @@ namespace INANOA {
 		//this->_bloom_effect->render();
 
 		// deferred shading
-		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
-		//glUniform1i(SHADER_POST_PARAMETER_BINDING::POST_PROCESSING_SUB_ID_LOCATION, static_cast<int>(this->_gui.getDeferredOption()));
-		this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
+		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
+		//this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
+		
+		/*this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DIRECTIONAL_SHADOW_MAPPING);
+		this->_dir_shadow_mapping->renderDebug();*/
 
 		// set camera gui 
 		this->_gui.setLookAt(m_godCamera->lookCenter());

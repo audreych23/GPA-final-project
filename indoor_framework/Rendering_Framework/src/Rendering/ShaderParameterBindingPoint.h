@@ -15,6 +15,7 @@ namespace INANOA {
 		const GLint VIEW_MAT_LOCATION = 1;
 		const GLint PROJ_MAT_LOCATION = 2;
 		const GLint CAMERA_POS_LOCATION = 3;
+		const GLint POST_PROCESSING_SUB_PROCESS_LOCATION = 4;
 		const GLint SHADING_MODEL_ID_LOCATION = 5;
 		const GLint KA_LOCATION = 6;
 		const GLint KD_LOCATION = 7;
@@ -22,6 +23,10 @@ namespace INANOA {
 		const GLint KE_LOCATION = 9;
 		const GLint NS_LOCATION = 10;
 		const GLint HAS_TEXTURE_LOCATION = 11;
+
+		const GLint LIGHT_VIEW_MAT_LOCATION = 12;
+		const GLint LIGHT_PROJ_MAT_LOCATION = 13;
+		const GLint LIGHT_BIAS_MAT_LOCATION = 14;
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {

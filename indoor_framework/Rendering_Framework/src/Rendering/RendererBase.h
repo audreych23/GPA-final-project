@@ -14,6 +14,7 @@ namespace INANOA {
 			LIGHT_SPHERE = 2,
 		};
 
+
 		class RendererBase
 		{
 		public:
