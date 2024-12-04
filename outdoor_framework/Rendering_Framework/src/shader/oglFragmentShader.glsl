@@ -73,9 +73,19 @@ void airplanePass() {
 	fragColor.a = 1.0;
 }
 
+void rockPass() {
+	vec4 texel = texture(albedoTexture, f_uv.xy) ;
+	vec4 litColor = calculateBlinnPhong(texel) ;
+	fragColor = withFog(litColor); 
+	fragColor.a = 1.0;
+}
+
 void main(){	
 	if (pixelProcessId == 1) {
 		airplanePass();
+	}
+	else if (pixelProcessId == 2) {
+		rockPass();
 	}
 	else if(pixelProcessId == 5){
 		pureColor() ;

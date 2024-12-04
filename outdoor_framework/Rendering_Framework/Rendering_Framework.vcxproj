@@ -34,6 +34,7 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\MyCameraManager.cpp" />
     <ClCompile Include="src\MyImGuiPanel.cpp" />
+    <ClCompile Include="src\rock\MyRock.cpp" />
     <ClCompile Include="src\SceneRenderer.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\terrain\MyTerrain.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="src\MyCameraManager.h" />
     <ClInclude Include="src\MyImGuiPanel.h" />
     <ClInclude Include="src\MyPoissonSample.h" />
+    <ClInclude Include="src\rock\MyRock.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\SceneRenderer.h" />
     <ClInclude Include="src\Shader.h" />

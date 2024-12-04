@@ -34,6 +34,9 @@
     <Filter Include="Source Files\airplane">
       <UniqueIdentifier>{110885a9-6722-4c85-9805-0f6f63ebf64c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\rock">
+      <UniqueIdentifier>{55a768c6-4534-4e26-8e00-ba66648d23f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="src\airplane\MyAirplane.cpp">
       <Filter>Source Files\airplane</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rock\MyRock.cpp">
+      <Filter>Source Files\rock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="src\airplane\MyAirplane.h">
       <Filter>Source Files\airplane</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rock\MyRock.h">
+      <Filter>Source Files\rock</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

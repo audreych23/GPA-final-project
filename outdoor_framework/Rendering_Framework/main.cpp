@@ -6,6 +6,7 @@
 #include "src\ViewFrustumSceneObject.h"
 #include "src\terrain\MyTerrain.h"
 #include "src\airplane\MyAirplane.h"
+#include "src\rock\MyRock.h"
 #include "src\MyCameraManager.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -44,6 +45,7 @@ ShaderProgram* defaultShaderProgram = new ShaderProgram();
 ViewFrustumSceneObject* m_viewFrustumSO = nullptr;
 MyTerrain* m_terrain = nullptr;
 MyAirplane* m_airplane = nullptr;
+MyRock* m_rock = nullptr;
 INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
@@ -190,6 +192,8 @@ bool initializeGL(){
 	// initialize airplane
 	m_airplane = new MyAirplane(m_myCameraManager);
 	
+	// initialize rock
+	m_rock = new MyRock();
 	
 	
 	// =================================================================	
@@ -257,6 +261,7 @@ void paintGL(){
 	defaultRenderer->setProjection(playerProjMat);
 	defaultRenderer->renderPass();
 	m_airplane->render();
+	m_rock->render();
 
 	// rendering with god view
 	defaultRenderer->setViewport(godViewport[0], godViewport[1], godViewport[2], godViewport[3]);
@@ -264,6 +269,7 @@ void paintGL(){
 	defaultRenderer->setProjection(godProjMat);
 	defaultRenderer->renderPass();
 	m_airplane->render();
+	m_rock->render();
 	// ===============================
 
 	ImGui::Begin("My name is window");
