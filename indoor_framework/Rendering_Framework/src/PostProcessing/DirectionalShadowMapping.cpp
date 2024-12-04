@@ -22,13 +22,13 @@ namespace INANOA {
 		}
 
 		// to get the depth of the object
-		void DirectionalShadowMapping::renderLightSpace() {
+		void DirectionalShadowMapping::renderLightSpace(float offset) {
 			// use program renderer program while calling this
 			// bind light view and proj matrix
 			glEnable(GL_DEPTH_TEST);
 
-			// not sure what the polygon helper is for
-			openGLPolygonHelper();
+			// for removing shadow acne
+			openGLPolygonHelper(offset);
 
 
 			setDirectionalShadowMappingSubProcess(DirectionalShadowMappingSubProcess::LIGHT_SPACE_RENDER);
@@ -65,10 +65,14 @@ namespace INANOA {
 		}
 
 
-		void DirectionalShadowMapping::openGLPolygonHelper() {
+		void DirectionalShadowMapping::openGLPolygonHelper(float offset) {
 			// this is needed for method first call 
+			if (offset == 0.0f) {
+				glDisable(GL_POLYGON_OFFSET_FILL);
+				return;
+			}
 			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonOffset(4.0f, 4.0f);
+			glPolygonOffset(offset, offset);
 		}
 
 		void DirectionalShadowMapping::resize(int width, int height) {

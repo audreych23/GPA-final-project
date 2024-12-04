@@ -28,13 +28,13 @@ namespace INANOA {
 			
 			void init(ScreenQuad* screen_quad);
 
-			void renderLightSpace();
+			void renderLightSpace(float offset);
 			
 			void renderShadow();
 
 			void renderDebug();
 
-			void openGLPolygonHelper();
+			void openGLPolygonHelper(float offset);
 
 			void resize(int width, int height);
 

@@ -170,13 +170,14 @@ namespace INANOA {
 
 		// Directional Shadow Mapping
 		{
-			this->_dir_shadow_mapping->renderLightSpace();
+			this->_dir_shadow_mapping->renderLightSpace(8.0f);
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
+			this->trice->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
 			this->indoor->render();
 
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
-			this->trice->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render();
@@ -201,11 +202,11 @@ namespace INANOA {
 		{
 			this->_dir_shadow_mapping->renderShadow();
 
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
-			this->indoor->render();
-
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
+			this->indoor->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render();
