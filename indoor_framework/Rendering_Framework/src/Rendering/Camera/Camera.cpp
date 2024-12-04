@@ -170,47 +170,6 @@ namespace INANOA {
 		}
 	}
 
-
-	void Camera::rotateUpDown(const float rad, bool constraint_pitch) {
-		// Calculate the forward vector (view direction)
-		glm::vec3 forwardVec = glm::normalize(this->m_lookCenter - this->m_viewOrg);
-		// Calculate the right axis (perpendicular to forward and up)
-		glm::vec3 rightAxis = glm::normalize(glm::cross(forwardVec, this->m_upVector));
-
-		// Pitch clamp (typically between -89 and 89 degrees)
-		float currentPitch = std::asin(glm::clamp(forwardVec.y, -1.0f, 1.0f));
-		float newPitch = currentPitch + (rad * 0.5f);
-
-		// Clamp the pitch to prevent camera from flipping
-		if (constraint_pitch)
-			newPitch = glm::clamp(newPitch, glm::radians(-89.0f), glm::radians(89.0f));
-		float clampedRad = newPitch - currentPitch;
-
-		// Create a quaternion for the rotation
-		glm::quat q = glm::angleAxis(clampedRad, rightAxis);
-
-		// Apply the rotation to the view origin
-		glm::vec3 newViewOrg = this->m_viewOrg - this->m_lookCenter; // Translate to origin
-		newViewOrg = q * newViewOrg;                                // Rotate
-		this->m_viewOrg = this->m_lookCenter + newViewOrg;          // Translate back
-
-		// Update the camera's matrices
-		//this->update();
-	}
-
-	void Camera::rotateLeftRight(const float rad) {
-		// Calculate the forward vector (view direction)
-		glm::vec3 forwardVec = glm::normalize(this->m_lookCenter - this->m_viewOrg);
-
-		// Create a quaternion for the rotation around the up vector
-		glm::quat q = glm::angleAxis(rad * 0.5f, this->m_upVector);
-
-		// Apply the rotation to the view origin
-		glm::vec3 newViewOrg = this->m_viewOrg - this->m_lookCenter; // Translate to origin
-		newViewOrg = q * newViewOrg;                                // Rotate
-		this->m_viewOrg = this->m_lookCenter + newViewOrg;          // Translate back
-	}
-
 }
 
 

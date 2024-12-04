@@ -17,13 +17,18 @@ out VertexData {
     vec3 halfwayDirNormalMapping;
 } vertexData;
 
+out vec3 f_worldPosition;
+
 layout (location = 0) uniform mat4 modelMat;
 layout (location = 1) uniform mat4 viewMat;
 layout (location = 2) uniform mat4 projMat;
 layout (location = 3) uniform vec3 cameraPosition;
 
+// hard coding this stuff
 // light pos is in world space
-vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
+// vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
+// point light pos is in world space 
+vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 
 void main() {
     // For some reason we do it in world space and it works
@@ -36,7 +41,7 @@ void main() {
 
     vec3 worldLightVector = normalize(lightPosition - worldPosition);
 
-    vec3 worldViewVector = normalize(cameraPosition - worldPosition);
+    vec3 worldViewVector = normalize( - worldPosition);
 
     vec3 worldHalfwayVector = normalize(worldLightVector + worldViewVector);
 
@@ -62,6 +67,8 @@ void main() {
         dot(worldHalfwayVector, worldBitangent),
         dot(worldHalfwayVector, worldNormal)
     ));
+
+    f_worldPosition = worldPosition;
 
     gl_Position = projMat * viewMat * worldVertex;
 }

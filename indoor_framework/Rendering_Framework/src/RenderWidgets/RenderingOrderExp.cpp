@@ -57,8 +57,41 @@ namespace INANOA {
 			this->trice = new MODEL::Trice();
 			this->trice->init(base_model_mat);
 
-			this->_post_processing = new PostProcessing();
-			this->_post_processing->init();
+			this->light_sphere = new MODEL::LightSphere();
+			this->light_sphere->init(base_model_mat);
+
+			//this->_post_processing = new PostProcessing();
+			////this->_post_processing->init();
+			//this->_post_processing->initBloom();
+		}
+
+		// initialize screen quad
+		{
+			this->_screen_quad = new ScreenQuad();
+			_screen_quad->init();
+		}
+
+
+		OPENGL::PostProcessingBase* post_processing = new OPENGL::PostProcessingBase();
+		const std::string vsPostFile = "src\\shader\\vertexShader_ogl_450_fbo.glsl";
+		const std::string fsPostFile = "src\\shader\\fragmentShader_ogl_450_fbo.glsl";
+
+		if (post_processing->init(vsPostFile, fsPostFile, w, h) == false) {
+			return false;
+		}
+
+		this->_post_processing = post_processing;
+		
+		// initialize post processing effect
+		{
+			this->_regular_effect = new POST_PROCESSING::RegularEffect();
+			this->_regular_effect->init(_screen_quad);
+
+			this->_bloom_effect = new POST_PROCESSING::BloomEffect();
+			this->_bloom_effect->init(_screen_quad);
+
+			this->_deferred_shading = new POST_PROCESSING::DeferredShading();
+			this->_deferred_shading->init(_screen_quad);
 		}
 
 
@@ -71,8 +104,18 @@ namespace INANOA {
 		this->m_frameWidth = w;
 		this->m_frameHeight = h;
 
-		this->_post_processing->resize(w, h);
+		// Postprocessing
+		this->_regular_effect->resize(w, h);
+		this->_bloom_effect->resize(w, h);
+		this->_deferred_shading->resize(w, h);
+
+
+		//this->_post_processing->resize(w, h);
+		/*this->_post_processing->resizeBloomColor(w, h);
+		this->_post_processing->resizeBloomBlur(w, h);*/
 	}
+
+
 	void RenderingOrderExp::update() {		
 		// camera update (god)
 		if (_key_map[GLFW_KEY_W]) {
@@ -104,9 +147,15 @@ namespace INANOA {
 
 		m_godCamera->update();
 	}
+
+	
+
 	void RenderingOrderExp::render() {
-		
-		this->_post_processing->bindFBO();
+		// for post processing effect
+		//this->_post_processing->bindFBO();
+		//this->_regular_effect->bindFBO();
+		//this->_bloom_effect->bindFBO();
+		this->_deferred_shading->bindFBO();
 
 		this->m_renderer->useRenderBaseProgram();
 
@@ -124,12 +173,6 @@ namespace INANOA {
 		);
 
 		this->m_renderer->setViewport(0, 0, this->m_frameWidth, this->m_frameHeight);
-		/*this->m_renderer->setShadingModel(OPENGL::ShadingModelType::UNLIT);
-		this->m_viewFrustum->render();
-		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::PROCEDURAL_GRID);
-		this->m_horizontalGround->render();*/
-		//// this is what supposed to happen in a higher level
-		
 
 		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
 		this->indoor->render();
@@ -137,9 +180,23 @@ namespace INANOA {
 		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 		this->trice->render();
 
+		this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
+		this->light_sphere->render();
+
+		// use post processing shader program
+		this->_post_processing->usePostProcessingShaderProgram();
 		// post_processing
-		
-		this->_post_processing->render();
+		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+		//this->_regular_effect->render();
+
+		// bloom
+		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+		//this->_bloom_effect->render();
+
+		// deferred shading
+		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
+		//glUniform1i(SHADER_POST_PARAMETER_BINDING::POST_PROCESSING_SUB_ID_LOCATION, static_cast<int>(this->_gui.getDeferredOption()));
+		this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
 
 		// set camera gui 
 		this->_gui.setLookAt(m_godCamera->lookCenter());

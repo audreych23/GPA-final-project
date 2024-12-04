@@ -8,8 +8,13 @@
 #include <Rendering_Framework/src/Rendering/Camera/Camera.h>
 #include <Rendering_Framework/src/Scene/Indoor.h>
 #include <Rendering_Framework/src/Scene/Trice.h>
-#include <Rendering_Framework/src/Rendering/PostProcessing.h>
+#include <Rendering_Framework/src/Scene/LightSphere.h>
+#include <Rendering_Framework/src/Rendering/PostProcessingBase.h>
 #include <Rendering_Framework/src/RenderWidgets/GUI.h>
+
+#include <Rendering_Framework/src/PostProcessing/RegularEffect.h>
+#include <Rendering_Framework/src/PostProcessing/BloomEffect.h>
+#include <Rendering_Framework/src/PostProcessing/DeferredShading.h>
 //#include "Shader.h"
 
 namespace INANOA {
@@ -20,39 +25,52 @@ namespace INANOA {
 		virtual ~RenderingOrderExp();
 
 	public:
-		bool init(const int w, const int h) ;
-		void resize(const int w, const int h) ;
+		bool init(const int w, const int h);
+		void resize(const int w, const int h);
 		void update();
 		void render();
 
-		void setKeyMap(std::map<int, int>& key_map) { _key_map = key_map;  }
+		void setKeyMap(std::map<int, int>& key_map) { _key_map = key_map; }
 
 		void setMouseOffset(float x, float y) { _x_offset = x; _y_offset = y; }
 	private:
+		// camera
 		Camera* m_playerCamera = nullptr;
 		Camera* m_godCamera = nullptr;
-
-		MODEL::Indoor* indoor = nullptr;
-		MODEL::Trice* trice = nullptr;
 
 		glm::vec3 m_cameraForwardMagnitude;
 		float m_cameraForwardSpeed;
 		float m_cameraRotationSpeed;
 
+		// renderer
+		OPENGL::RendererBase* m_renderer = nullptr;
+
+		// model
+		MODEL::Indoor* indoor = nullptr;
+		MODEL::Trice* trice = nullptr;
+		MODEL::LightSphere* light_sphere = nullptr;
+
+		// screen quad for post processing
+		ScreenQuad* _screen_quad;
+
+		// post processing
+		OPENGL::PostProcessingBase* _post_processing = nullptr;
+
+		POST_PROCESSING::RegularEffect* _regular_effect = nullptr;
+		POST_PROCESSING::BloomEffect* _bloom_effect = nullptr;
+		POST_PROCESSING::DeferredShading* _deferred_shading = nullptr;
+
+		// for screen size viewport
 		int m_frameWidth;
 		int m_frameHeight;
 
-		OPENGL::RendererBase* m_renderer = nullptr;
-
+		// keyboard and mouse support
 		std::map<int, int> _key_map;
 		float _x_offset;
 		float _y_offset;
 
-		PostProcessing* _post_processing = nullptr;
-
+		// gui 
 		GUI _gui;
 	};
 
 }
-
-

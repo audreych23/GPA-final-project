@@ -11,6 +11,7 @@ namespace INANOA {
 		enum class ShadingModelType : int {
 			INDOOR_MODEL = 0,
 			TRICE_MODEL = 1,
+			LIGHT_SPHERE = 2,
 		};
 
 		class RendererBase
