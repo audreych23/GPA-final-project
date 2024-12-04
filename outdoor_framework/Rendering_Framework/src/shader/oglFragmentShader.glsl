@@ -15,9 +15,8 @@ const vec3 lightDirWorld = normalize(vec3(0.4, 0.5, 0.8));
 const vec3 Ia = vec3(0.2, 0.2, 0.2);
 const vec3 Id = vec3(0.64, 0.64, 0.64);
 const vec3 Is = vec3(0.16, 0.16, 0.16);
-const float shininess = 1.0;
 
-vec4 calculateBlinnPhong(vec4 albedo) {
+vec4 calculateBlinnPhong(vec4 albedo, vec3 specular, float shininess) {
     // Transform light direction to view space
     vec3 L = normalize(mat3(viewMat) * lightDirWorld);
     vec3 N = normalize(f_viewNormal);
@@ -31,11 +30,12 @@ vec4 calculateBlinnPhong(vec4 albedo) {
     float diff = max(dot(N, L), 0.0);
     vec3 diffuse = Id * diff * albedo.rgb;
 
-    // Specular
-    vec3 specular = vec3(0.0);
+		// Shininess
+		float spec = pow(max(dot(N, H), 0.0), shininess);
+		vec3 specularuwu = Is * spec * albedo.rgb;
 
     // Combine components
-    vec3 finalColor = ambient + diffuse + specular;
+    vec3 finalColor = ambient + diffuse + specularuwu;
     return vec4(finalColor, albedo.a);
 }
 
@@ -53,11 +53,11 @@ vec4 withFog(vec4 color){
 	return colorWithFog ;
 }
 
-
 void terrainPass(){
 	vec4 texel = texture(albedoTexture, f_uv.xy) ;
-	vec4 litColor = calculateBlinnPhong(texel) ;
-	fragColor = withFog(litColor); 
+	vec4 litColor = calculateBlinnPhong(texel, vec3(0.0f), 1.0f);
+	fragColor = withFog(litColor);
+	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
 	fragColor.a = 1.0;	
 }
 
@@ -68,15 +68,17 @@ void pureColor(){
 
 void airplanePass() {
 	vec4 texel = texture(albedoTexture, f_uv.xy) ;
-	vec4 litColor = calculateBlinnPhong(texel) ;
+	vec4 litColor = calculateBlinnPhong(texel, vec3(1.0f), 32.0f);
 	fragColor = withFog(litColor); 
+	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
 	fragColor.a = 1.0;
 }
 
 void rockPass() {
 	vec4 texel = texture(albedoTexture, f_uv.xy) ;
-	vec4 litColor = calculateBlinnPhong(texel) ;
+	vec4 litColor = calculateBlinnPhong(texel, vec3(1.0f), 32.0f);
 	fragColor = withFog(litColor); 
+	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
 	fragColor.a = 1.0;
 }
 
