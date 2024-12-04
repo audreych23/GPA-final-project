@@ -55,22 +55,18 @@ namespace INANOA {
 			// activate shader program and set it as Directional Shadow maaping
 			// render Depth map to quad for visual debugging
 			// ---------------------------------------------
-			//glDisable(GL_DEPTH_TEST);
+			glDisable(GL_DEPTH_TEST);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, _fbo_texture);
 			_screen_quad->render();
-			//glEnable(GL_DEPTH_TEST);
+			glEnable(GL_DEPTH_TEST);
 		}
 
 
 		void DirectionalShadowMapping::openGLPolygonHelper(float offset) {
 			// this is needed for method first call 
-			if (offset == 0.0f) {
-				glDisable(GL_POLYGON_OFFSET_FILL);
-				return;
-			}
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(offset, offset);
 		}

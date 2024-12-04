@@ -215,8 +215,8 @@ namespace INANOA {
 		}
 
 
-		// use post processing shader program
-		// this->_post_processing->usePostProcessingShaderProgram();
+		//use post processing shader program
+		//this->_post_processing->usePostProcessingShaderProgram();
 		
 		// post_processing
 		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
