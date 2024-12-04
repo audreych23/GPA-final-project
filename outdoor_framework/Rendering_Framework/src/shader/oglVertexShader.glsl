@@ -45,11 +45,11 @@ void terrainProcess(){
 	vec4 normalTex = texture(normalMap, uv.xy) ;
 	// [0, 1] -> [-1, 1]
 	normalTex = normalTex * 2.0 - 1.0 ;
-		
+
 	// transformation	
 	vec4 viewVertex = viewMat * worldV ;
-	vec4 viewNormal = viewMat * vec4(normalTex.rgb, 0) ;	
-	
+	vec4 viewNormal = viewMat * vec4(normalTex.bgr, 0) ;
+
 	f_viewVertex = viewVertex.xyz;
 	f_viewNormal = normalize(viewNormal.xyz) ;
 	f_worldPos = worldV.xyz ;
