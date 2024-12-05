@@ -23,11 +23,11 @@ private:
 	bool m_isNormalMap;
 
 public:
+	GLuint vao() const { return m_vao; } 
 	DynamicSceneObject(const int maxNumVertex, const int maxNumIndex, const bool normalFlag, const bool uvFlag);
 	virtual ~DynamicSceneObject();
 
 	void update();
-
 	float* dataBuffer();
 	unsigned int *indexBuffer();
 
