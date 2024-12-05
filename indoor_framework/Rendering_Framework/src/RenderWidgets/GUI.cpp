@@ -1,7 +1,14 @@
 #include "GUI.h"
 #include <iostream>
 namespace INANOA {
-	GUI::GUI() { _deferredOption = 3; _options = 2; }
+	GUI::GUI() { 
+		_deferredOption = 3; 
+		_options = 2; 
+		
+		_light_pos[0] = 1.87659;
+		_light_pos[1] = 0.4625;
+		_light_pos[2] = 0.103928;
+	}
 
 	GUI::~GUI() {}
 
@@ -33,21 +40,20 @@ namespace INANOA {
 			if (ImGui::RadioButton("Option 5", _deferredOption == 4)) _deferredOption = 4;
 			ImGui::PopStyleVar(2); // Pop
 		}
-		
-
+	
 		/* Input Float of Look At */
 		ImGui::Text("Look At Position");
 		ImGui::Separator();
-		ImGui::InputFloat("Look X", &_look_at[0]);
-		ImGui::InputFloat("Look Y", &_look_at[1]);
-		ImGui::InputFloat("Look Z", &_look_at[2]);
+		ImGui::InputFloat("LX", &_look_at[0], 0.1f, 1.0f, "%.3f");
+		ImGui::InputFloat("LY", &_look_at[1], 0.1f, 1.0f, "%.3f");
+		ImGui::InputFloat("LZ", &_look_at[2], 0.1f, 1.0f, "%.3f");
 
 		/* Input Float of Light Position */
 		ImGui::Text("Light Position");
 		ImGui::Separator();
-		ImGui::InputFloat("Light X", &_light_pos[0]);
-		ImGui::InputFloat("Light Y", &_light_pos[1]);
-		ImGui::InputFloat("Light Z", &_light_pos[2]);
+		ImGui::InputFloat("X", &_light_pos[0], 0.1f, 1.0f, "%.3f");
+		ImGui::InputFloat("Y", &_light_pos[1], 0.1f, 1.0f, "%.3f");
+		ImGui::InputFloat("Z", &_light_pos[2], 0.1f, 1.0f, "%.3f");
 
         /* End */
 		ImGui::End();

@@ -154,11 +154,10 @@ namespace INANOA {
 	}
 
 	void RenderingOrderExp::render() {
+		int curOptions = this->_gui.getOptions();
+		glm::vec3 blinpengPos = this->_gui.getLightPos();
 		// =====================================================
 		// Select PostProcessing
-
-		int curOptions = this->_gui.getOptions();
-
 		switch(curOptions)
 		{
 		case 1:	
@@ -179,12 +178,16 @@ namespace INANOA {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->m_renderer->clearRenderTarget();
 
+		// =====================================================
+		// Lazy Unfirom
+
 		switch (curOptions) {
 		case 1:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::BLOOM_EFFECT));		break;
 		case 2:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::DEFERRED_EFFECT));	break;
 		case 3:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::SHADOW_EFFECT));		break;
 		default:	glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::REGULAR_EFFECT));		break;
 		}
+		glUniform3fv(SHADER_PARAMETER_BINDING::LIGHT_BLOOM_POS, 1, glm::value_ptr(blinpengPos));
 
 		// =====================================================
 		// Directional Shadow Mapping
@@ -201,7 +204,7 @@ namespace INANOA {
 			this->indoor->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
-			this->light_sphere->render();
+			this->light_sphere->render(blinpengPos);
 
 			this->_dir_shadow_mapping->unbindFBO();
 
@@ -234,7 +237,7 @@ namespace INANOA {
 			this->indoor->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
-			this->light_sphere->render();
+			this->light_sphere->render(blinpengPos);
 
 			// Directional Shadow Mapping
 			if (curOptions == 3) {

@@ -23,7 +23,9 @@ namespace INANOA {
 		const GLint KE_LOCATION = 9;
 		const GLint NS_LOCATION = 10;
 		const GLint HAS_TEXTURE_LOCATION = 11;
+
 		const GLint POST_PROCESSING = 20;
+		const GLint LIGHT_BLOOM_POS = 21;
 
 		const GLint LIGHT_VIEW_MAT_LOCATION = 12;
 		const GLint LIGHT_PROJ_MAT_LOCATION = 13;

@@ -16,10 +16,12 @@ namespace INANOA {
 
 			void init(glm::mat4 base);
 
-			void render();
+			void render(glm::vec3 pos);
 
 			const glm::mat4 getModelMat() const { return m_modelMat; }
 		private:
+
+			glm::mat4 m_base;
 			glm::mat4 m_modelMat;
 
 			MODEL::Model* sphere_model = nullptr;

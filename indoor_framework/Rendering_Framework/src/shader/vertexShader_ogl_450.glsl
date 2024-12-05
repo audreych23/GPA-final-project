@@ -31,6 +31,7 @@ layout (location = 13) uniform mat4 lightProjMat;
 layout (location = 14) uniform mat4 lightBiasMat;
 
 layout (location = 20) uniform int PostProcessMain;
+layout (location = 21) uniform vec3 lightBloomPos;
  
 // hard coding this stuff
 // light pos is in world space
@@ -42,6 +43,7 @@ layout (location = 20) uniform int PostProcessMain;
 
 void main() {
     if(PostProcessMain == 3) lightPosition = vec3(-2.845, 2.028, -1.293);
+    else lightPosition = lightBloomPos;
     // For some reason we do it in world space and it works
     vec4 worldVertex = modelMat * vec4(v_vertex, 1.0);
     vec3 worldPosition = worldVertex.xyz;
