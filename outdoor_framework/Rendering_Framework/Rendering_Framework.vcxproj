@@ -28,6 +28,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\airplane\MyAirplane.cpp" />
+    <ClCompile Include="src\bushes_and_buildings\MyBushesAndBuildings.cpp" />
     <ClCompile Include="src\camera\MyCamera.cpp" />
     <ClCompile Include="src\camera\MyOrbitControl.cpp" />
     <ClCompile Include="src\DynamicSceneObject.cpp" />
@@ -52,6 +53,7 @@
     <ClInclude Include="..\externals\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\externals\include\imgui\imstb_truetype.h" />
     <ClInclude Include="src\airplane\MyAirplane.h" />
+    <ClInclude Include="src\bushes_and_buildings\MyBushesAndBuildings.h" />
     <ClInclude Include="src\camera\MyCamera.h" />
     <ClInclude Include="src\camera\MyOrbitControl.h" />
     <ClInclude Include="src\DynamicSceneObject.h" />

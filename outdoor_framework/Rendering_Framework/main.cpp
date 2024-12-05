@@ -7,6 +7,8 @@
 #include "src\terrain\MyTerrain.h"
 #include "src\airplane\MyAirplane.h"
 #include "src\rock\MyRock.h"
+#include "src\bushes_and_buildings\MyBushesAndBuildings.h"
+
 #include "src\MyCameraManager.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -46,6 +48,7 @@ ViewFrustumSceneObject* m_viewFrustumSO = nullptr;
 MyTerrain* m_terrain = nullptr;
 MyAirplane* m_airplane = nullptr;
 MyRock* m_rock = nullptr;
+MyBushesAndBuildings* m_bushesAndBuildings = nullptr;
 INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
@@ -195,6 +198,9 @@ bool initializeGL(){
 	// initialize rock
 	m_rock = new MyRock();
 	
+	// initialize bushes and buildings
+	m_bushesAndBuildings = new MyBushesAndBuildings();
+
 	
 	// =================================================================	
 	
@@ -262,7 +268,8 @@ void paintGL(){
 	defaultRenderer->renderPass();
 	m_airplane->render();
 	m_rock->render(isNormalMap);
-
+	//!BushesAndBuildings will crash,will fix later
+	//m_bushesAndBuildings->render(playerVM, playerProjMat);
 	// rendering with god view
 	defaultRenderer->setViewport(godViewport[0], godViewport[1], godViewport[2], godViewport[3]);
 	defaultRenderer->setView(godVM);
@@ -270,6 +277,7 @@ void paintGL(){
 	defaultRenderer->renderPass();
 	m_airplane->render();
 	m_rock->render(isNormalMap);
+	//m_bushesAndBuildings->render(playerVM, playerProjMat);
 	// ===============================
 
 	ImGui::Begin("My name is window");

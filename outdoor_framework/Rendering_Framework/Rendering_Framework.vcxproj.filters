@@ -37,6 +37,9 @@
     <Filter Include="Source Files\rock">
       <UniqueIdentifier>{55a768c6-4534-4e26-8e00-ba66648d23f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\bushes_and_buildings">
+      <UniqueIdentifier>{8293fdf6-ca69-475c-a23e-77d2c5d97ffe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="src\rock\MyRock.cpp">
       <Filter>Source Files\rock</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bushes_and_buildings\MyBushesAndBuildings.cpp">
+      <Filter>Source Files\bushes_and_buildings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="src\rock\MyRock.h">
       <Filter>Source Files\rock</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bushes_and_buildings\MyBushesAndBuildings.h">
+      <Filter>Source Files\bushes_and_buildings</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
