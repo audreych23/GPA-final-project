@@ -26,6 +26,8 @@ namespace INANOA {
 
 			void bindFBO();
 
+			void unbindFBO();
+
 		private:
 			void setupFBO();
 

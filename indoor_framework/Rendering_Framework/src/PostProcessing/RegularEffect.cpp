@@ -66,6 +66,10 @@ namespace INANOA {
 			glDrawBuffer(GL_COLOR_ATTACHMENT0);
 		}
 
+		void RegularEffect::unbindFBO() {
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		}
+
 		/* private method */
 		void RegularEffect::setupFBO() {
 			glGenFramebuffers(1, &_fbo);
@@ -75,5 +79,6 @@ namespace INANOA {
 			// for first function this is just the screen texture, second function is the original screen texture
 			/*glUniform1i(glGetUniformLocation(regular_fbo_shader->programId(), "screenTexture"), 0);*/
 		}
+
 	}
 }
