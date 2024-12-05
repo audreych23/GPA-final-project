@@ -17,6 +17,7 @@ namespace INANOA {
 			enum class BloomSubProcess : int {
 				BLUR_EFFECT = 0,
 				FINAL_EFFECT = 1,
+				TOON_EFFECT = 2,
 			};
 
 			BloomEffect();
@@ -25,6 +26,8 @@ namespace INANOA {
 			void init(ScreenQuad* screen_quad);
 
 			void render();
+
+			void renderToon();
 
 			void resize(int width, int height);
 
@@ -35,6 +38,8 @@ namespace INANOA {
 			void resizeBloomColor(int width, int height);
 
 			void resizeBloomBlur(int width, int height);
+
+			void resizeToon(int width, int height);
 
 			inline void setBloomSubProcess(const BloomSubProcess type) {
 				glUniform1i(SHADER_POST_PARAMETER_BINDING::POST_PROCESSING_SUB_ID_LOCATION, static_cast<int>(type));
@@ -48,6 +53,10 @@ namespace INANOA {
 			// for gaussian blurring
 			GLuint _fbo_ping_pong[2];
 			GLuint _fbo_texture_ping_pong[2];
+
+			// For Cartoon
+			GLuint _fbo_toon;
+			GLuint _fbo_toon_texture;
 		};
 	}
 }

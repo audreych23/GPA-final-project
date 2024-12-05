@@ -61,9 +61,53 @@ namespace INANOA {
 			glEnable(GL_DEPTH_TEST);
 		}
 
+		void BloomEffect::renderToon() {
+			//if (!_use_postprocessing) return;
+			glDisable(GL_DEPTH_TEST);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			setBloomSubProcess(BloomSubProcess::BLUR_EFFECT);
+
+			bool horizontal = true;
+			bool first_iteration = true;
+			int blur_amount = 10;
+			for (unsigned int i = 0; i < blur_amount; ++i) {
+				glBindFramebuffer(GL_FRAMEBUFFER, _fbo_ping_pong[horizontal]);
+				glUniform1i(SHADER_POST_PARAMETER_BINDING::HORIZONTAL_FLAG_LOCATION, (int)horizontal);
+				glBindTexture(GL_TEXTURE_2D, first_iteration ? _fbo_texture[1] : _fbo_texture_ping_pong[!horizontal]);
+
+				// render Quad 
+				_screen_quad->render();
+
+				horizontal = !horizontal;
+				if (first_iteration) first_iteration = false;
+			}
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo_toon);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			setBloomSubProcess(BloomSubProcess::FINAL_EFFECT);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, _fbo_texture[0]);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, _fbo_texture_ping_pong[!horizontal]);
+			_screen_quad->render();
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			setBloomSubProcess(BloomSubProcess::TOON_EFFECT);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, _fbo_toon_texture);
+			_screen_quad->render();
+			glEnable(GL_DEPTH_TEST);
+		}
+
+
+
 		void BloomEffect::resize(int width, int height) {
 			resizeBloomColor(width, height);
 			resizeBloomBlur(width, height);
+			resizeToon(width, height);
 		}
 
 		void BloomEffect::bindFBO() {
@@ -74,6 +118,7 @@ namespace INANOA {
 		void BloomEffect::setupFBO() {
 			glGenFramebuffers(1, &_fbo);
 			glGenFramebuffers(2, _fbo_ping_pong);
+			glGenFramebuffers(1, &_fbo_toon);
 
 			//glUniform1i(glGetUniformLocation(regular_fbo_shader->programId(), "screenTexture"), 0);
 			//glUniform1i(glGetUniformLocation(regular_fbo_shader->programId(), "blurTexture"), 1);
@@ -141,6 +186,26 @@ namespace INANOA {
 				if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 					std::cout << "Framebuffer not complete!" << std::endl;
 			}
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		}
+
+		void BloomEffect::resizeToon(int width, int height) {
+			glDeleteTextures(1, &_fbo_toon_texture);
+
+			glGenTextures(1, &_fbo_toon_texture);
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo_toon);
+			glBindTexture(GL_TEXTURE_2D, _fbo_toon_texture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _fbo_toon_texture, 0);
+			// also check if framebuffers are complete (no need for depth buffer) idk why
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+				std::cout << "Framebuffer not complete!" << std::endl;
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		}

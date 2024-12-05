@@ -247,9 +247,12 @@ namespace INANOA {
 		switch (curOptions)
 		{
 		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
-		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
 			this->_bloom_effect->render();
+			break;
+		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::CARTOON_EFFECT);
+			this->_bloom_effect->renderToon();
 			break;
 		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);

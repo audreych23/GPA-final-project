@@ -64,6 +64,44 @@ void BloomFinalEffect() {
     fragColor = vec4(hdrColor, 1.0);
 }
 
+void ToonFinalEffect() {
+	/* Convolution of edge detection */
+    const float kernelX[9] = float[9](
+        -1,  0,  1,
+        -2,  0,  2,
+        -1,  0,  1
+    );
+    const float kernelY[9] = float[9](
+        -1, -2, -1,
+         0,  0,  0,
+         1,  2,  1
+    );
+	const float offsetX[9] = float[9](
+		-1, 0, 1,
+		-1, 0, 1,
+		-1, 0, 1
+	);
+    const vec2 offsets[9] = vec2[9](
+        vec2(-1, -1), vec2( 0, -1), vec2( 1, -1),
+        vec2(-1,  0), vec2( 0,  0), vec2( 1,  0),
+        vec2(-1,  1), vec2( 0,  1), vec2( 1,  1)
+    );
+
+	vec2 offset = 1.0 / textureSize(screenTexture, 0);
+
+	float sumx = 0.0;
+    float sumy = 0.0;
+    for (int i = 0; i < 9; i++) {
+        vec3 sampleColor = texture(screenTexture, fs_in.texcoord + offsets[i] * offset).rgb;
+        float grayScale = dot(sampleColor, vec3(0.333));
+        sumx += grayScale * kernelX[i];
+        sumy += grayScale * kernelY[i];
+    }
+
+	float final = sqrt(sumx * sumx + sumy * sumy);
+	fragColor = vec4(vec3(texture(screenTexture, fs_in.texcoord) - final), 1.0);
+}
+
 
 void DefferedShading() {
     if (postSubProcess == 0) {
@@ -108,5 +146,18 @@ void main()
 		float depthValue = texture(screenTexture, fs_in.texcoord).r;
 		float tt = LinearizeDepth(depthValue);
 		fragColor = vec4(vec3(tt), 1.0);
+	}
+	else if(postProcessingEffect == 4){
+		if (postSubProcess == 0) {
+			// blur
+			BloomBlurEffect();
+		} 
+		else if(postSubProcess == 1){
+			BloomFinalEffect();
+		}
+		else {
+			// Toon final bloom
+			ToonFinalEffect();
+		}
 	}
 }
