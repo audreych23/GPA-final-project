@@ -38,7 +38,7 @@ namespace INANOA {
 			this->m_viewPosition = glm::vec4(viewOrg, 1.0f);
 
 			//std::cout << m_viewPosition.x << " " << m_viewPosition.y << " " << m_viewPosition.z << '\n';
-			glUniform3fv(SHADER_PARAMETER_BINDING::CAMERA_POS_LOCATION, 1, &viewOrg[0]);
+			glUniform3fv(SHADER_PARAMETER_BINDING::CAMERA_POS_LOCATION, 1, glm::value_ptr(viewOrg));
 			glUniformMatrix4fv(SHADER_PARAMETER_BINDING::VIEW_MAT_LOCATION, 1, false, glm::value_ptr(this->m_viewMat));
 			glUniformMatrix4fv(SHADER_PARAMETER_BINDING::PROJ_MAT_LOCATION, 1, false, glm::value_ptr(this->m_projMat));
 		}
@@ -50,7 +50,7 @@ namespace INANOA {
 
 		void RendererBase::clearRenderTarget() {
 			static float DEPTH[1] = { 1.0f };
-			static float COLOR[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+			static float COLOR[4] = { 0.19f, 0.19f, 0.19f, 1.0f };
 
 			glClearBufferfv(GL_COLOR, 0, COLOR);
 			glClearBufferfv(GL_DEPTH, 0, DEPTH);

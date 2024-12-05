@@ -7,6 +7,11 @@ uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
 // uniform sampler2D
 
+/// Our light scattering pass texture
+
+/// Indicate where is the light source on the screen (2D position)
+layout (location = 3) uniform vec2 lightPositionOnScreen;
+
 out vec4 fragColor;
 
 in VS_OUT
@@ -99,7 +104,7 @@ void ToonFinalEffect() {
     }
 
 	float final = sqrt(sumx * sumx + sumy * sumy);
-	fragColor = vec4(vec3(texture(screenTexture, fs_in.texcoord) - final), 1.0);
+	fragColor = vec4(vec3(texture(screenTexture, fs_in.texcoord).rgb - final), 1.0);
 }
 
 
@@ -125,6 +130,35 @@ float LinearizeDepth(float depth)
     return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
 }
 
+
+void VolumetricLight()
+{
+	// fragColor = texture2D(blurTexture, fs_in.texcoord);
+	// return;
+	float decay=0.96815;
+	float exposure=0.2;
+	float density=0.926;
+	float weight=0.58767;
+	/// NUM_SAMPLES will describe the rays quality, you can play with
+	int NUM_SAMPLES = 100;
+	vec2 tc = fs_in.texcoord;
+	vec2 deltaTexCoord = (tc - lightPositionOnScreen);
+	deltaTexCoord = deltaTexCoord * 1.0 / float(NUM_SAMPLES) * density;
+	float illuminationDecay = 1.0;
+	vec4 color = texture2D(blurTexture, tc)*0.4;
+	for(int i=0; i < NUM_SAMPLES; i++)
+	{
+		tc = tc - deltaTexCoord;
+		vec4 sampled = texture2D(blurTexture, tc)*0.4;
+		sampled = sampled * illuminationDecay * weight;
+		color = color + sampled;
+		illuminationDecay = illuminationDecay * decay;
+	}
+	vec4 realColor = texture2D(screenTexture, fs_in.texcoord);
+	fragColor = realColor + color;
+	// fragColor = realColor;
+}
+
 void main()
 {	
 	if (postProcessingEffect == 0) {
@@ -147,7 +181,7 @@ void main()
 		float tt = LinearizeDepth(depthValue);
 		fragColor = vec4(vec3(tt), 1.0);
 	}
-	else if(postProcessingEffect == 4){
+	else if (postProcessingEffect == 4){
 		if (postSubProcess == 0) {
 			// blur
 			BloomBlurEffect();
@@ -159,5 +193,7 @@ void main()
 			// Toon final bloom
 			ToonFinalEffect();
 		}
+	} else if (postProcessingEffect == 5) {
+		VolumetricLight();
 	}
 }

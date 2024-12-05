@@ -27,6 +27,7 @@ namespace INANOA {
 		if (ImGui::RadioButton("Deffered",	_options == 2)) _options = 2;
 		if (ImGui::RadioButton("Shadow",	_options == 3)) _options = 3;
 		if (ImGui::RadioButton("Cartoon",	_options == 4)) _options = 4;
+		if (ImGui::RadioButton("Vol Light",	_options == 5)) _options = 5;
 
 		/* Input for Deferred Option */
 		if (_options == 2) {
@@ -48,6 +49,12 @@ namespace INANOA {
 		ImGui::InputFloat("LX", &_look_at[0], 0.1f, 1.0f, "%.3f");
 		ImGui::InputFloat("LY", &_look_at[1], 0.1f, 1.0f, "%.3f");
 		ImGui::InputFloat("LZ", &_look_at[2], 0.1f, 1.0f, "%.3f");
+
+		ImGui::Text("Orig Position");
+		ImGui::Separator();
+		ImGui::InputFloat("OX", &_view_org[0], 0.1f, 1.0f, "%.3f");
+		ImGui::InputFloat("OY", &_view_org[1], 0.1f, 1.0f, "%.3f");
+		ImGui::InputFloat("OZ", &_view_org[2], 0.1f, 1.0f, "%.3f");
 
 		/* Input Float of Light Position */
 		ImGui::Text("Light Position");

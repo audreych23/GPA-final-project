@@ -46,6 +46,7 @@
     <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Scene\Trice.cpp" />
     <ClCompile Include="util_loader.cpp" />
+    <ClCompile Include="src\PostProcessing\VolumetricLights.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\PostProcessing\DirectionalShadowMapping.h" />
@@ -66,6 +67,7 @@
     <ClInclude Include="src\Scene\Mesh.h" />
     <ClInclude Include="src\Scene\Model.h" />
     <ClInclude Include="src\Scene\Trice.h" />
+    <ClInclude Include="src\PostProcessing\VolumetricLights.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>

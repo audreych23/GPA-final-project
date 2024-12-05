@@ -16,6 +16,7 @@
 #include <Rendering_Framework/src/PostProcessing/BloomEffect.h>
 #include <Rendering_Framework/src/PostProcessing/DeferredShading.h>
 #include <Rendering_Framework/src/PostProcessing/DirectionalShadowMapping.h>
+#include <Rendering_Framework/src/PostProcessing/VolumetricLights.h>
 //#include "Shader.h"
 
 namespace INANOA {
@@ -61,6 +62,7 @@ namespace INANOA {
 		POST_PROCESSING::BloomEffect* _bloom_effect = nullptr;
 		POST_PROCESSING::DeferredShading* _deferred_shading = nullptr;
 		POST_PROCESSING::DirectionalShadowMapping* _dir_shadow_mapping = nullptr;
+		POST_PROCESSING::VolumetricLights* _volumetric_light = nullptr;
 
 		// for screen size viewport
 		int m_frameWidth;

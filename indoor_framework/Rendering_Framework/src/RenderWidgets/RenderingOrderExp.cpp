@@ -60,6 +60,8 @@ namespace INANOA {
 			this->light_sphere = new MODEL::LightSphere();
 			this->light_sphere->init(base_model_mat);
 
+			/*this->light_sphere_sun = new MODEL::LightSphere();
+			this->light_sphere_sun->init(base_model_mat);*/
 		}
 
 		// initialize screen quad
@@ -92,6 +94,9 @@ namespace INANOA {
 
 			this->_dir_shadow_mapping = new POST_PROCESSING::DirectionalShadowMapping();
 			this->_dir_shadow_mapping->init(_screen_quad);
+
+			this->_volumetric_light = new POST_PROCESSING::VolumetricLights();
+			this->_volumetric_light->init(_screen_quad);
 		}
 
 
@@ -113,6 +118,7 @@ namespace INANOA {
 		this->_bloom_effect->resize(w, h);
 		this->_deferred_shading->resize(w, h);
 		this->_dir_shadow_mapping->resize(w, h);
+		this->_volumetric_light->resize(w, h);
 
 
 		//this->_post_processing->resize(w, h);
@@ -169,6 +175,11 @@ namespace INANOA {
 			break;
 		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
 			this->_dir_shadow_mapping->bindFBO(); 
+			break;
+		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
+			// hardcoded light pos for 
+			blinpengPos = _volumetric_light->getLightPosition();
+			this->_volumetric_light->bindFBO();
 			break;
 		default: 
 			this->_regular_effect->bindFBO(); 
@@ -265,6 +276,14 @@ namespace INANOA {
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
 			this->_regular_effect->render();
 			break;
+		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
+		{
+			std::vector<float> viewport({ 0, 0, (float) m_frameWidth, (float) m_frameHeight });
+			this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::VOLUMETRIC_LIGHT);
+			this->_volumetric_light->render();
+			break;
+		}
 		default:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
 			this->_regular_effect->render();
@@ -273,8 +292,11 @@ namespace INANOA {
 		// =====================================================
 		// GUI
 		this->_gui.setLookAt(m_godCamera->lookCenter());
+		//this->_gui.setViewOrg(m_godCamera->viewOrig());
 		this->_gui.render();
 		glm::vec3 new_look_at = _gui.getLookAt();
+		//glm::vec3 new_view_orig = _gui.getLookAt();
 		this->m_godCamera->setLookCenter(new_look_at);
+		//this->m_godCamera->setViewOrg(new_view_orig);
 	}
 }

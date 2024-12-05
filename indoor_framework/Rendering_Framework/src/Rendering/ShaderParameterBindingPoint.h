@@ -41,6 +41,7 @@ namespace INANOA {
 		const GLint POST_PROCESSING_SUB_ID_LOCATION = 1;
 		// bloom
 		const GLint HORIZONTAL_FLAG_LOCATION = 2;
+		const GLint LIGHT_POS_SCREEN_LOCATION = 3;
 
 	}
 
@@ -50,6 +51,7 @@ namespace INANOA {
 		const GLint DEFERRED_EFFECT = 2;
 		const GLint SHADOW_EFFECT = 3;
 		const GLint NON_REALISTIC_PHOTO = 4;
+		const GLint VOLUMETRIC_LIGHT = 5;
 
 	}
 }

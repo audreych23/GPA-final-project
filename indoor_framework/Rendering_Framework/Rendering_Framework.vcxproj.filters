@@ -123,6 +123,9 @@
     <ClCompile Include="src\PostProcessing\DirectionalShadowMapping.cpp">
       <Filter>Source Files\PostProcessing</Filter>
     </ClCompile>
+    <ClCompile Include="src\PostProcessing\VolumetricLights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="src\PostProcessing\DirectionalShadowMapping.h">
       <Filter>Header Files\PostProcessing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\VolumetricLights.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

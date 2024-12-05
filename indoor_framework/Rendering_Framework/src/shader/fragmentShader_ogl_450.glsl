@@ -43,14 +43,16 @@ vec3 Ia = vec3(0.1, 0.1, 0.1);
 vec3 Id = vec3(0.7, 0.7, 0.7);
 vec3 Is = vec3(0.2, 0.2, 0.2);
 
-vec3 pointLightPosition = vec3(1.87659, 0.4625 , 0.103928);
+// vec3 lightBloomPos = vec3(1.87659, 0.4625 , 0.103928);
 
 const float quantized = 4.0;
 float constant = 1.0f;
 float linear = 0.7f;
 float quadratic = 0.14f;
 
-const float lightThreshold = 0.5;
+layout (location = 21) uniform vec3 lightBloomPos;
+vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
+const float lightThreshold = 0.9;
 
 /*
 	##################################
@@ -183,7 +185,7 @@ void RenderIndoorToon() {
 	vec3 diffuse = Id * diff * originalColor.rgb;
 	vec3 specular = Is * spec * ks;
 
-	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float pointLightDistance = length(lightBloomPos - f_worldPosition);
 	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
 	ambient *= attenuation;
@@ -222,7 +224,7 @@ void RenderTriceToon() {
 	vec3 diffuse = Id * diff * kd;
 	vec3 specular = Is * spec * ks;
 
-	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float pointLightDistance = length(lightBloomPos - f_worldPosition);
 	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
 	ambient *= attenuation;
@@ -278,15 +280,15 @@ void RenderIndoor() {
 	float diff = max(dot(N, L), 0.0);
 	float spec = pow(max(dot(N, H), 0.0), ns);
 
-	float pointLightDistance = length(pointLightPosition - f_worldPosition);
-	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+	// float pointLightDistance = length(lightBloomPos - f_worldPosition);
+	// float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
 	vec3 diffuse = Id * diff * originalColor.rgb;
 	vec3 specular = Is * spec * ks;
 
-	ambient *= attenuation;
-	diffuse *= attenuation;
-	specular *= attenuation;
+	// ambient *= attenuation;
+	// diffuse *= attenuation;
+	// specular *= attenuation;
 
 	vec3 color = ambient + diffuse + specular;
 
@@ -314,7 +316,7 @@ void RenderTrice() {
 	vec3 specular = Is * spec * ks;
 
 
-	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float pointLightDistance = length(lightBloomPos - f_worldPosition);
 	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
 	ambient *= attenuation;
@@ -346,7 +348,7 @@ void RenderTrice() {
 	float spec = pow(max(dot(N, H), 0.0), ns);
 	vec3 specular = Is * spec * ks;
 
-	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float pointLightDistance = length(lightBloomPos - f_worldPosition);
 	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
 	ambient *= attenuation;
@@ -407,16 +409,13 @@ void main() {
 			if (postProcessId == 0) {
 				// shadow map does not need any color in fragment
 				return;
-			} else { 
+			} else { // render with shadow 
 				if (shadingModelId == 0) {
-					// RenderIndoorDeferred();
 					RenderIndoorShadow();
 				} else if (shadingModelId == 1) {
-					// RenderTriceDeferred();
 					RenderTriceShadow();
 				} else if (shadingModelId == 2) {
 					discard;
-					//RenderLightSphere();
 				}
 			}
 			break;
@@ -429,6 +428,17 @@ void main() {
 				RenderTriceToon();
 			} else if (shadingModelId == 2) {
 				RenderLightSphereToon();
+			}
+			break;
+		}
+	case 5:
+		{
+			if (shadingModelId == 0) {
+				RenderIndoor();
+			} else if (shadingModelId == 1) {
+				RenderTrice();
+			} else if (shadingModelId == 2) {
+				RenderLightSphere();
 			}
 			break;
 		}
