@@ -7,6 +7,9 @@ namespace INANOA {
 	enum class PostProcessingType : int {
 		REGULAR_EFFECT = 0,
 		BLOOM_EFFECT = 1,
+		DEFERRED_EFFECT = 2,
+		SHADOW_MAPPING = 3,
+		TOON_EFFECT = 4
 	};
 
 	class PostProcessing

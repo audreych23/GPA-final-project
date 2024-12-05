@@ -45,6 +45,7 @@ vec3 Is = vec3(0.2, 0.2, 0.2);
 
 vec3 pointLightPosition = vec3(1.87659, 0.4625 , 0.103928);
 
+const float quantized = 4.0;
 float constant = 1.0f;
 float linear = 0.7f;
 float quadratic = 0.14f;
@@ -148,6 +149,109 @@ void RenderTriceDeferred(){
 
 /*
 	##################################
+	#		TOON	  Shading		 #
+	##################################
+*/
+
+void RenderIndoorToon() {
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
+
+	vec4 originalColor = vec4(0.0);
+	if(hasTexture == 0) {
+		originalColor = vec4(kd, 1.0);
+	}
+	else {
+		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+	}
+
+	if (originalColor.a < 0.5) {
+		discard;
+	}
+
+	vec3 ambient = Ia * originalColor.rgb;
+
+	float diff = max(dot(N, L), 0.0);
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	
+
+	/* TOON SHADING MOTHER FATHER */
+	diff = floor(diff * quantized) / quantized;
+	spec = floor(spec * quantized) / quantized;
+	
+	vec3 diffuse = Id * diff * originalColor.rgb;
+	vec3 specular = Is * spec * ks;
+
+	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	vec3 color = ambient + diffuse + specular;
+
+	fragColor = vec4(color, originalColor.a);
+
+	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > lightThreshold)
+		brightColor = vec4(color, originalColor.a);
+	else
+		brightColor = vec4(0.0, 0.0, 0.0, originalColor.a);
+	// fragColor = brightColor;
+}
+
+void RenderTriceToon() {
+	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(vertexData.lightDirNormalMapping);
+	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+
+	// vec3 R = reflect(-L, N);
+	// actually trice has no texture
+	vec3 ambient = Ia * kd;
+
+	float diff = max(dot(N, L), 0.0);
+	float spec = pow(max(dot(N, H), 0.0), ns);
+
+	/* TOON SHADING MOTHER FATHER */
+	diff = floor(diff * quantized) / quantized;
+	spec = floor(spec * quantized) / quantized;
+
+	vec3 diffuse = Id * diff * kd;
+	vec3 specular = Is * spec * ks;
+
+	float pointLightDistance = length(pointLightPosition - f_worldPosition);
+	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	vec3 color = ambient + diffuse + specular;
+
+	fragColor = vec4(color, 1.0);
+
+	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > lightThreshold)
+		brightColor = vec4(color, 1.0);
+	else
+		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+void RenderLightSphereToon() {
+	fragColor = vec4(1.0); // set all 4 vector values to 1.0
+
+	float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > lightThreshold)
+		brightColor = vec4(fragColor.rgb, 1.0);
+	else
+		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+/*
+	##################################
 	#		Regular  Shading		 #
 	##################################
 */
@@ -172,13 +276,13 @@ void RenderIndoor() {
 	vec3 ambient = Ia * originalColor.rgb;
 
 	float diff = max(dot(N, L), 0.0);
-	vec3 diffuse = Id * diff * originalColor.rgb;
-
 	float spec = pow(max(dot(N, H), 0.0), ns);
-	vec3 specular = Is * spec * ks;
 
 	float pointLightDistance = length(pointLightPosition - f_worldPosition);
 	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+
+	vec3 diffuse = Id * diff * originalColor.rgb;
+	vec3 specular = Is * spec * ks;
 
 	ambient *= attenuation;
 	diffuse *= attenuation;
@@ -314,6 +418,17 @@ void main() {
 					discard;
 					//RenderLightSphere();
 				}
+			}
+			break;
+		}
+	case 4:
+		{
+			if (shadingModelId == 0) {
+				RenderIndoorToon();
+			} else if (shadingModelId == 1) {
+				RenderTriceToon();
+			} else if (shadingModelId == 2) {
+				RenderLightSphereToon();
 			}
 			break;
 		}

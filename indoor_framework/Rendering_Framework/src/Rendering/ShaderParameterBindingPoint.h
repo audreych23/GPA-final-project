@@ -49,6 +49,7 @@ namespace INANOA {
 		const GLint BLOOM_EFFECT = 1;
 		const GLint DEFERRED_EFFECT = 2;
 		const GLint SHADOW_EFFECT = 3;
+		const GLint NON_REALISTIC_PHOTO = 4;
 
 	}
 }

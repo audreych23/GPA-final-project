@@ -160,13 +160,14 @@ namespace INANOA {
 		// Select PostProcessing
 		switch(curOptions)
 		{
-		case 1:	
+		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
+		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
 			this->_bloom_effect->bindFBO(); 
 			break;
-		case 2:
+		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
 			this->_deferred_shading->bindFBO(); 
 			break;
-		case 3:
+		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
 			this->_dir_shadow_mapping->bindFBO(); 
 			break;
 		default: 
@@ -181,12 +182,7 @@ namespace INANOA {
 		// =====================================================
 		// Lazy Unfirom
 
-		switch (curOptions) {
-		case 1:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::BLOOM_EFFECT));		break;
-		case 2:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::DEFERRED_EFFECT));	break;
-		case 3:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::SHADOW_EFFECT));		break;
-		default:	glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::REGULAR_EFFECT));		break;
-		}
+		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, curOptions);
 		glUniform3fv(SHADER_PARAMETER_BINDING::LIGHT_BLOOM_POS, 1, glm::value_ptr(blinpengPos));
 
 		// =====================================================
@@ -250,15 +246,16 @@ namespace INANOA {
 		this->_post_processing->usePostProcessingShaderProgram();
 		switch (curOptions)
 		{
-		case 1:
+		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
+		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
 			this->_bloom_effect->render();
 			break;
-		case 2:
+		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
 			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
 			break;
-		case 3:
+		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DIRECTIONAL_SHADOW_MAPPING);
 			this->_dir_shadow_mapping->renderDebug();
 			break;
