@@ -188,7 +188,7 @@ namespace INANOA {
 		// =====================================================
 		// Directional Shadow Mapping
 
-		if(curOptions == 3)
+		if(curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT)
 		{
 			this->_dir_shadow_mapping->renderLightSpace(8.0f);
 
@@ -222,7 +222,9 @@ namespace INANOA {
 		// Render Scene
 		{
 			// Directional Shadow Mapping
-			if (curOptions == 3) {
+			if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
+				this->_regular_effect->bindFBO();
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				this->_dir_shadow_mapping->renderShadow();
 			}
 
@@ -236,7 +238,8 @@ namespace INANOA {
 			this->light_sphere->render(blinpengPos);
 
 			// Directional Shadow Mapping
-			if (curOptions == 3) {
+			if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
+				this->_regular_effect->unbindFBO();
 				this->_dir_shadow_mapping->finishRender();
 			}
 		}
@@ -259,8 +262,8 @@ namespace INANOA {
 			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
 			break;
 		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DIRECTIONAL_SHADOW_MAPPING);
-			this->_dir_shadow_mapping->renderDebug();
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+			this->_regular_effect->render();
 			break;
 		default:
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
