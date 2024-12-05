@@ -1,7 +1,7 @@
 #include "GUI.h"
 #include <iostream>
 namespace INANOA {
-	GUI::GUI() { _deferredOption = 0; }
+	GUI::GUI() { _deferredOption = 3; _options = 2; }
 
 	GUI::~GUI() {}
 
@@ -16,20 +16,24 @@ namespace INANOA {
 		/* CheckBox */
 		ImGui::Text("Options");
 		ImGui::Separator();
-		ImGui::Checkbox("Normal", _options);
-		ImGui::Checkbox("Bloom", _options + 1);
+		if (ImGui::RadioButton("Bloom",		_options == 1)) _options = 1;
+		if (ImGui::RadioButton("Deffered",	_options == 2)) _options = 2;
+		if (ImGui::RadioButton("Shadow",	_options == 3)) _options = 3;
 
 		/* Input for Deferred Option */
-		ImGui::Text("Deferred Option");
-		ImGui::Separator();
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4)); // Push Style
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2)); // Push Style
-		if (ImGui::RadioButton("Option 1", _deferredOption == 0)) _deferredOption = 0;
-		if (ImGui::RadioButton("Option 2", _deferredOption == 1)) _deferredOption = 1;
-		if (ImGui::RadioButton("Option 3", _deferredOption == 2)) _deferredOption = 2;
-		if (ImGui::RadioButton("Option 4", _deferredOption == 3)) _deferredOption = 3;
-		if (ImGui::RadioButton("Option 5", _deferredOption == 4)) _deferredOption = 4;
-		ImGui::PopStyleVar(2); // Pop
+		if (_options == 2) {
+			ImGui::Text("Deferred Option");
+			ImGui::Separator();
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4)); // Push Style
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2)); // Push Style
+			if (ImGui::RadioButton("Option 1", _deferredOption == 0)) _deferredOption = 0;
+			if (ImGui::RadioButton("Option 2", _deferredOption == 1)) _deferredOption = 1;
+			if (ImGui::RadioButton("Option 3", _deferredOption == 2)) _deferredOption = 2;
+			if (ImGui::RadioButton("Option 4", _deferredOption == 3)) _deferredOption = 3;
+			if (ImGui::RadioButton("Option 5", _deferredOption == 4)) _deferredOption = 4;
+			ImGui::PopStyleVar(2); // Pop
+		}
+		
 
 		/* Input Float of Look At */
 		ImGui::Text("Look At Position");

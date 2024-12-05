@@ -88,7 +88,7 @@ float LinearizeDepth(float depth)
 }
 
 void main()
-{
+{	
 	if (postProcessingEffect == 0) {
 		RegularEffect();
 	} 
@@ -107,7 +107,6 @@ void main()
 	} else if (postProcessingEffect == 3) {
 		float depthValue = texture(screenTexture, fs_in.texcoord).r;
 		float tt = LinearizeDepth(depthValue);
-		fragColor = vec4(vec3(tt), 1.0); // orthographic
-		// fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		fragColor = vec4(vec3(tt), 1.0);
 	}
 }

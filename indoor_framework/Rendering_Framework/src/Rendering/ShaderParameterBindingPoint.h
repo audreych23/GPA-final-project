@@ -23,6 +23,7 @@ namespace INANOA {
 		const GLint KE_LOCATION = 9;
 		const GLint NS_LOCATION = 10;
 		const GLint HAS_TEXTURE_LOCATION = 11;
+		const GLint POST_PROCESSING = 20;
 
 		const GLint LIGHT_VIEW_MAT_LOCATION = 12;
 		const GLint LIGHT_PROJ_MAT_LOCATION = 13;
@@ -38,6 +39,14 @@ namespace INANOA {
 		const GLint POST_PROCESSING_SUB_ID_LOCATION = 1;
 		// bloom
 		const GLint HORIZONTAL_FLAG_LOCATION = 2;
+
+	}
+
+	namespace POST_PROCESSING_TYPE {
+		const GLint REGULAR_EFFECT = 0;
+		const GLint BLOOM_EFFECT = 1;
+		const GLint DEFERRED_EFFECT = 2;
+		const GLint SHADOW_EFFECT = 3;
 
 	}
 }

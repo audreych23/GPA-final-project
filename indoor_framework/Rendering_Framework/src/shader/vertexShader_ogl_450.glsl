@@ -29,16 +29,19 @@ layout (location = 4) uniform int postProcessId;
 layout (location = 12) uniform mat4 lightViewMat;
 layout (location = 13) uniform mat4 lightProjMat;
 layout (location = 14) uniform mat4 lightBiasMat;
+
+layout (location = 20) uniform int PostProcessMain;
  
 // hard coding this stuff
 // light pos is in world space
 // vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 // point light pos is in world space (bloom)
-// vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
+ vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 // light position in world space (shadow mapping)
-vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
+//vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 
 void main() {
+    if(PostProcessMain == 3) lightPosition = vec3(-2.845, 2.028, -1.293);
     // For some reason we do it in world space and it works
     vec4 worldVertex = modelMat * vec4(v_vertex, 1.0);
     vec3 worldPosition = worldVertex.xyz;
@@ -81,9 +84,12 @@ void main() {
     gl_Position = projMat * viewMat * worldVertex;
 
     // create depth map
-    if (postProcessId == 0) {
-        gl_Position = lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
-    } else if (postProcessId == 1) {
-        vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+    if(PostProcessMain == 3){
+        if (postProcessId == 0) {
+            gl_Position = lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+        } else if (postProcessId == 1) {
+            vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+        }
     }
+
 }

@@ -17,6 +17,8 @@ layout (location = 9) uniform vec3 ke;
 layout (location = 10) uniform float ns;
 layout (location = 11) uniform int hasTexture;
 
+layout (location = 20) uniform int PostProcessMain;
+
 uniform sampler2D modelTexture;
 uniform sampler2D modelTextureNormal;
 uniform sampler2DShadow modelTextureShadow;
@@ -276,19 +278,59 @@ void RenderLightSphere() {
 
 
 void main() {
-	// shadow map does not need any color in fragment
-	if (postProcessId == 0) {
-		return;
-	} else { 
-		if (shadingModelId == 0) {
-			// RenderIndoorDeferred();
-			RenderIndoorShadow();
-		} else if (shadingModelId == 1) {
-			// RenderTriceDeferred();
-			RenderTriceShadow();
-		} else if (shadingModelId == 2) {
-			discard;
-			//RenderLightSphere();
+	switch(PostProcessMain)
+	{
+	case 1:
+		{
+			if (shadingModelId == 0) {
+				RenderIndoor();
+			} else if (shadingModelId == 1) {
+				RenderTrice();
+			} else if (shadingModelId == 2) {
+				RenderLightSphere();
+			}
+			break;
+		}
+	case 2:
+		{
+			if (shadingModelId == 0) {
+				RenderIndoorDeferred();
+			} else if (shadingModelId == 1) {
+				RenderTriceDeferred();
+			} else if (shadingModelId == 2) {
+				discard;
+			}
+			break;
+		}
+	case 3:
+		{
+			if (postProcessId == 0) {
+				// shadow map does not need any color in fragment
+				return;
+			} else { 
+				if (shadingModelId == 0) {
+					// RenderIndoorDeferred();
+					RenderIndoorShadow();
+				} else if (shadingModelId == 1) {
+					// RenderTriceDeferred();
+					RenderTriceShadow();
+				} else if (shadingModelId == 2) {
+					discard;
+					//RenderLightSphere();
+				}
+			}
+			break;
+		}
+	default:
+		{
+			if (shadingModelId == 0) {
+				RenderIndoor();
+			} else if (shadingModelId == 1) {
+				RenderTrice();
+			} else if (shadingModelId == 2) {
+				RenderLightSphere();
+			}
+			break;
 		}
 	}
 }

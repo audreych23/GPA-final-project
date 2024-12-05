@@ -60,9 +60,6 @@ namespace INANOA {
 			this->light_sphere = new MODEL::LightSphere();
 			this->light_sphere->init(base_model_mat);
 
-			//this->_post_processing = new PostProcessing();
-			////this->_post_processing->init();
-			//this->_post_processing->initBloom();
 		}
 
 		// initialize screen quad
@@ -99,6 +96,10 @@ namespace INANOA {
 
 
 		this->resize(w, h);		
+
+		int maxUniformLocations;
+		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &maxUniformLocations);
+		printf("MAX UNIFORM = %d\n", maxUniformLocations);
 		return true;
 	}
 	void RenderingOrderExp::resize(const int w, const int h) {
@@ -152,55 +153,79 @@ namespace INANOA {
 		m_godCamera->update();
 	}
 
-	
-
 	void RenderingOrderExp::render() {
-		// Post Processing Effect
+		// =====================================================
+		// Select PostProcessing
+
+		int curOptions = this->_gui.getOptions();
+
+		switch(curOptions)
 		{
-			//this->_post_processing->bindFBO();
-			//this->_regular_effect->bindFBO();
-			//this->_bloom_effect->bindFBO();
-			//this->_deferred_shading->bindFBO();
-			this->_dir_shadow_mapping->bindFBO();
-		}
+		case 1:	
+			this->_bloom_effect->bindFBO(); 
+			break;
+		case 2:
+			this->_deferred_shading->bindFBO(); 
+			break;
+		case 3:
+			this->_dir_shadow_mapping->bindFBO(); 
+			break;
+		default: 
+			this->_regular_effect->bindFBO(); 
+			break;
+		} 
 
 		this->m_renderer->useRenderBaseProgram();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->m_renderer->clearRenderTarget();
 
+		switch (curOptions) {
+		case 1:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::BLOOM_EFFECT));		break;
+		case 2:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::DEFERRED_EFFECT));	break;
+		case 3:		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::SHADOW_EFFECT));		break;
+		default:	glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, static_cast<int>(POST_PROCESSING_TYPE::REGULAR_EFFECT));		break;
+		}
+
+		// =====================================================
 		// Directional Shadow Mapping
+
+		if(curOptions == 3)
 		{
 			this->_dir_shadow_mapping->renderLightSpace(8.0f);
 
+			/* Render Object */
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
 			this->indoor->render();
 
-
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render();
 
 			this->_dir_shadow_mapping->unbindFBO();
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
 
 		// =====================================================
-		// god view
+		// View
 		this->m_renderer->setCamera(
 			m_godCamera->projMatrix(),
 			m_godCamera->viewMatrix(),
 			m_godCamera->viewOrig()
 		);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		this->m_renderer->setViewport(0, 0, this->m_frameWidth, this->m_frameHeight);
 
-		//// Directional Shadow Mapping
+		// =====================================================
+		// Render Scene
 		{
-			this->_dir_shadow_mapping->renderShadow();
+			// Directional Shadow Mapping
+			if (curOptions == 3) {
+				this->_dir_shadow_mapping->renderShadow();
+			}
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
@@ -211,29 +236,36 @@ namespace INANOA {
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render();
 
-			this->_dir_shadow_mapping->finishRender();
+			// Directional Shadow Mapping
+			if (curOptions == 3) {
+				this->_dir_shadow_mapping->finishRender();
+			}
 		}
 
-
-		//use post processing shader program
-		//this->_post_processing->usePostProcessingShaderProgram();
-		
-		// post_processing
-		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-		//this->_regular_effect->render();
-
-		// bloom
-		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
-		//this->_bloom_effect->render();
-
-		// deferred shading
-		//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
-		//this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
-		
-		/*this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DIRECTIONAL_SHADOW_MAPPING);
-		this->_dir_shadow_mapping->renderDebug();*/
-
-		// set camera gui 
+		// =====================================================
+		// Render the Post Processing
+		this->_post_processing->usePostProcessingShaderProgram();
+		switch (curOptions)
+		{
+		case 1:
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+			this->_bloom_effect->render();
+			break;
+		case 2:
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
+			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
+			break;
+		case 3:
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DIRECTIONAL_SHADOW_MAPPING);
+			this->_dir_shadow_mapping->renderDebug();
+			break;
+		default:
+			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+			this->_regular_effect->render();
+			break;
+		}
+		// =====================================================
+		// GUI
 		this->_gui.setLookAt(m_godCamera->lookCenter());
 		this->_gui.render();
 		glm::vec3 new_look_at = _gui.getLookAt();
