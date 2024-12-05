@@ -126,28 +126,24 @@ void RenderIndoorDeferred(){
 		if(originalColor.a < 0.5) discard;
 	}
 	vec3 N = normalize(vertexData.N);
-	vec3 H = normalize(vertexData.H);
-	float spec = pow(max(dot(N, H), 0.0), ns);
 	/* Output */
 	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
 	brightColor = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
-	ambientColor = vec4(Ia, 1.0);
+	ambientColor = vec4(ka, 1.0);
 	diffuseColor = vec4(originalColor.rgb, 1.0);
-	specularColor = vec4(Is, 1.0);
+	specularColor = vec4(ks, 1.0);
 }
 
 void RenderTriceDeferred(){
 	/* Init */
 	vec4 originalColor = vec4(kd, 1.0);
 	vec3 N = normalize(vertexData.N);
-	vec3 H = normalize(vertexData.H);
-	float spec = pow(max(dot(N, H), 0.0), ns);
 	/* Output */
 	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
 	brightColor = vec4(vertexData.N, 1.0);
-	ambientColor = vec4(Ia, 1.0);
+	ambientColor = vec4(ka, 1.0);
 	diffuseColor = vec4(originalColor.rgb, 1.0);
-	specularColor = vec4(Is, 1.0);
+	specularColor = vec4(ks, 1.0);
 }
 
 /*
