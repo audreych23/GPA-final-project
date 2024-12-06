@@ -87,8 +87,9 @@ void RenderIndoorShadow() {
 	vec3 color = ambient + diffuse + specular;
 
 	// fragColor = vec4(color, originalColor.a);
-	
-	fragColor = textureProj(modelTextureShadow, vertexData.shadowCoord) * vec4(color, originalColor.a);
+	float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
+	fragColor = lightproj * vec4(color, originalColor.a);
+	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
 }
 
 void RenderTriceShadow() {
@@ -110,7 +111,9 @@ void RenderTriceShadow() {
 	vec3 color = ambient + diffuse + specular;
 
 	// fragColor = vec4(color, 1.0);
-	fragColor = textureProj(modelTextureShadow, vertexData.shadowCoord) * vec4(color, 1.0);
+	float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
+	fragColor = lightproj * vec4(color, 1.0);
+	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
 }
 
 /*
@@ -280,15 +283,15 @@ void RenderIndoor() {
 	float diff = max(dot(N, L), 0.0);
 	float spec = pow(max(dot(N, H), 0.0), ns);
 
-	// float pointLightDistance = length(lightBloomPos - f_worldPosition);
-	// float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
+	float pointLightDistance = length(lightBloomPos - f_worldPosition);
+	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
 	vec3 diffuse = Id * diff * originalColor.rgb;
 	vec3 specular = Is * spec * ks;
 
-	// ambient *= attenuation;
-	// diffuse *= attenuation;
-	// specular *= attenuation;
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
 
 	vec3 color = ambient + diffuse + specular;
 
@@ -372,7 +375,7 @@ void RenderLightSphere() {
 
 	float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 	if(brightness > lightThreshold)
-		brightColor = vec4(fragColor.rgb, 1.0);
+		brightColor = vec4(1.0);
 	else
 		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 	// fragColor = brightColor;
@@ -415,7 +418,7 @@ void main() {
 				} else if (shadingModelId == 1) {
 					RenderTriceShadow();
 				} else if (shadingModelId == 2) {
-					discard;
+					RenderLightSphere();
 				}
 			}
 			break;
@@ -431,17 +434,17 @@ void main() {
 			}
 			break;
 		}
-	case 5:
-		{
-			if (shadingModelId == 0) {
-				RenderIndoor();
-			} else if (shadingModelId == 1) {
-				RenderTrice();
-			} else if (shadingModelId == 2) {
-				RenderLightSphere();
-			}
-			break;
-		}
+	// case 5:
+	// 	{
+	// 		if (shadingModelId == 0) {
+	// 			RenderIndoorShadow();
+	// 		} else if (shadingModelId == 1) {
+	// 			RenderTriceShadow();
+	// 		} else if (shadingModelId == 2) {
+	// 			RenderLightSphere();
+	// 		}
+	// 		break;
+	// 	}
 	default:
 		{
 			if (shadingModelId == 0) {

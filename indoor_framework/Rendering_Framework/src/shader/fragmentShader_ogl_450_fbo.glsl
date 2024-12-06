@@ -135,27 +135,28 @@ void VolumetricLight()
 {
 	// fragColor = texture2D(blurTexture, fs_in.texcoord);
 	// return;
-	float decay=0.96815;
-	float exposure=0.2;
-	float density=0.926;
-	float weight=0.58767;
+	const float decay=0.96815;
+	const float exposure=0.2;
+	const float density=0.926;
+	const float weight=0.58767;
+	const float sample_weight=0.4;
 	/// NUM_SAMPLES will describe the rays quality, you can play with
-	int NUM_SAMPLES = 100;
+	const int NUM_SAMPLES = 100;
 	vec2 tc = fs_in.texcoord;
 	vec2 deltaTexCoord = (tc - lightPositionOnScreen);
 	deltaTexCoord = deltaTexCoord * 1.0 / float(NUM_SAMPLES) * density;
 	float illuminationDecay = 1.0;
-	vec4 color = texture2D(blurTexture, tc)*0.4;
+	vec4 color = texture2D(blurTexture, tc) * sample_weight;
 	for(int i=0; i < NUM_SAMPLES; i++)
 	{
 		tc = tc - deltaTexCoord;
-		vec4 sampled = texture2D(blurTexture, tc)*0.4;
+		vec4 sampled = texture2D(blurTexture, tc) * sample_weight;
 		sampled = sampled * illuminationDecay * weight;
 		color = color + sampled;
 		illuminationDecay = illuminationDecay * decay;
 	}
 	vec4 realColor = texture2D(screenTexture, fs_in.texcoord);
-	fragColor = realColor + color;
+	fragColor = realColor + color * exposure;
 	// fragColor = realColor;
 }
 

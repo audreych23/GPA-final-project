@@ -50,7 +50,7 @@ namespace INANOA {
 
 		void RendererBase::clearRenderTarget() {
 			static float DEPTH[1] = { 1.0f };
-			static float COLOR[4] = { 0.19f, 0.19f, 0.19f, 1.0f };
+			static float COLOR[4] = { 0, 0, 0, 1.0f };
 
 			glClearBufferfv(GL_COLOR, 0, COLOR);
 			glClearBufferfv(GL_DEPTH, 0, DEPTH);

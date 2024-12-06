@@ -27,7 +27,7 @@ namespace INANOA {
 		if (ImGui::RadioButton("Deffered",	_options == 2)) _options = 2;
 		if (ImGui::RadioButton("Shadow",	_options == 3)) _options = 3;
 		if (ImGui::RadioButton("Cartoon",	_options == 4)) _options = 4;
-		if (ImGui::RadioButton("Vol Light",	_options == 5)) _options = 5;
+		//if (ImGui::RadioButton("Vol Light",	_options == 5)) _options = 5;
 
 		/* Input for Deferred Option */
 		if (_options == 2) {

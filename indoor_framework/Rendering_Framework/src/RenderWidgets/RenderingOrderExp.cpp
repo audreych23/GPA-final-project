@@ -164,6 +164,7 @@ namespace INANOA {
 		glm::vec3 blinpengPos = this->_gui.getLightPos();
 		// =====================================================
 		// Select PostProcessing
+		glClearColor(0, 0, 0, 1.0f);
 		switch(curOptions)
 		{
 		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
@@ -174,6 +175,8 @@ namespace INANOA {
 			this->_deferred_shading->bindFBO(); 
 			break;
 		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
+			glClearColor(0.19f, 0.19f, 0.19f, 1.0f);
+			blinpengPos = _volumetric_light->getLightPosition();
 			this->_dir_shadow_mapping->bindFBO(); 
 			break;
 		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
@@ -234,7 +237,7 @@ namespace INANOA {
 		{
 			// Directional Shadow Mapping
 			if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
-				this->_regular_effect->bindFBO();
+				this->_volumetric_light->bindFBO();
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				this->_dir_shadow_mapping->renderShadow();
 			}
@@ -273,9 +276,9 @@ namespace INANOA {
 			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
 			break;
 		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			this->_regular_effect->render();
-			break;
+			//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+			//this->_regular_effect->render();
+			//break;
 		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
 		{
 			std::vector<float> viewport({ 0, 0, (float) m_frameWidth, (float) m_frameHeight });
