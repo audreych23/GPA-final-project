@@ -40,6 +40,7 @@ namespace INANOA {
 			if (ImGui::RadioButton("Option 3", _deferredOption == 2)) _deferredOption = 2;
 			if (ImGui::RadioButton("Option 4", _deferredOption == 3)) _deferredOption = 3;
 			if (ImGui::RadioButton("Option 5", _deferredOption == 4)) _deferredOption = 4;
+			if (ImGui::RadioButton("Option 6", _deferredOption == 5)) _deferredOption = 5;
 			ImGui::PopStyleVar(2); // Pop
 		}
 	

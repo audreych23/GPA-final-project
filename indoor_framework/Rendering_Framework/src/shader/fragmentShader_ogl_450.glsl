@@ -121,6 +121,7 @@ void RenderTriceShadow() {
 	#		Deferred Shading		 #
 	##################################
 */
+
 void RenderIndoorDeferred(){
 	/* Init */
 	vec4 originalColor = vec4(0.0);

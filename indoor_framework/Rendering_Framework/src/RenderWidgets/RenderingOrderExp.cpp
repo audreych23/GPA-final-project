@@ -272,6 +272,7 @@ namespace INANOA {
 			this->_bloom_effect->renderToon();
 			break;
 		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
+			glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr( m_godCamera->projMatrix() ));
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
 			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
 			break;

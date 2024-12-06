@@ -1,4 +1,5 @@
 #include "DeferredShading.h"
+#include <random>
 
 namespace INANOA {
 	namespace POST_PROCESSING {
@@ -10,6 +11,7 @@ namespace INANOA {
 		void DeferredShading::init(ScreenQuad* screen_quad) {
 			_screen_quad = screen_quad;
 			setupFBO();
+			setupSSAO();
 		}
 
 		void DeferredShading::render(DeferredShadingOption option) {
@@ -23,7 +25,9 @@ namespace INANOA {
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
 			}
-			
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, noiseTexture);
+			glUniform3fv(4, ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
 
 			// render Quad 
 			_screen_quad->render();
@@ -60,12 +64,12 @@ namespace INANOA {
 				// Attach Texture to FrameBuffer
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, _fbo_texture[i], 0);
 			}
-
 			// Attachment
-			unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
-			glDrawBuffers(5, attachments);
+			unsigned int attachments[6] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
+			glDrawBuffers(6, attachments);
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
 		}
 
 		void DeferredShading::bindFBO() {
@@ -74,6 +78,48 @@ namespace INANOA {
 
 		void DeferredShading::setupFBO() {
 			glGenFramebuffers(1, &_fbo);
+		}
+
+		static float lerp(float a, float b, float f)
+		{
+			return a + f * (b - a);
+		}
+
+		void DeferredShading::setupSSAO() {
+			/* KERNELLL */
+			std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
+			std::default_random_engine generator;
+			std::vector<glm::vec3> ssaoKernel;
+			for (unsigned int i = 0; i < 64; ++i)
+			{
+				glm::vec3 sample(
+					randomFloats(generator) * 2.0 - 1.0,
+					randomFloats(generator) * 2.0 - 1.0,
+					randomFloats(generator)
+				);
+				sample = glm::normalize(sample);
+				sample *= randomFloats(generator);
+				ssaoKernel.push_back(sample);
+			}
+			/* NOISE SSAO */
+			std::vector<glm::vec3> ssaoNoise;
+			for (unsigned int i = 0; i < 16; i++)
+			{
+				glm::vec3 noise(
+					randomFloats(generator) * 2.0 - 1.0,
+					randomFloats(generator) * 2.0 - 1.0,
+					0.0f);
+				ssaoNoise.push_back(noise);
+			}
+			glGenTextures(1, &noiseTexture);
+			glBindTexture(GL_TEXTURE_2D, noiseTexture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			this->ssaoKernel = ssaoKernel;
+			this->noiseTexture = noiseTexture;
 		}
 	}
 }

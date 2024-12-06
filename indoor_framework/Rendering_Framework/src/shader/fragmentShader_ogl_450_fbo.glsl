@@ -1,16 +1,11 @@
 #version 450 core
 
-uniform sampler2D screenTexture;
-uniform sampler2D blurTexture;
-uniform sampler2D ambientTexture;
-uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
-// uniform sampler2D
-
-/// Our light scattering pass texture
-
-/// Indicate where is the light source on the screen (2D position)
-layout (location = 3) uniform vec2 lightPositionOnScreen;
+layout(binding = 0) uniform sampler2D screenTexture;
+layout(binding = 1) uniform sampler2D blurTexture;
+layout(binding = 2) uniform sampler2D ambientTexture;
+layout(binding = 3) uniform sampler2D diffuseTexture;
+layout(binding = 4) uniform sampler2D specularTexture;
+layout(binding = 5) uniform sampler2D noiseTexture;
 
 out vec4 fragColor;
 
@@ -23,12 +18,52 @@ in VS_OUT
 layout (location = 0) uniform int postProcessingEffect;
 // step by step for different postProcessing 
 layout (location = 1) uniform int postSubProcess;
-
 layout (location = 2) uniform bool horizontal;
+/// Indicate where is the light source on the screen (2D position)
+layout (location = 3) uniform vec2 lightPositionOnScreen;
+layout (location = 4) uniform vec3 samples[64];
+layout (location = 69) uniform mat4 projectionMat;
+
 
 const float exposure = 1.2;
 
 uniform float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);
+
+float CalculateSSAO(){
+	const float radius = 0.5;
+	const float bias = 0.025;
+
+	vec3 fragPos = texture(screenTexture, fs_in.texcoord).rgb;
+    vec3 normal = normalize(texture(blurTexture, fs_in.texcoord).rgb);
+    vec3 randomVec = normalize(texture(noiseTexture, fs_in.texcoord * 4.0).xyz);
+
+    // Create TBN matrix for hemisphere orientation`
+    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
+    vec3 bitangent = cross(normal, tangent);
+    mat3 TBN = mat3(tangent, bitangent, normal);
+
+    // Accumulate SSAO
+    float occlusion = 0.0;
+    for (int i = 0; i < 64; ++i) {
+        // Sample position in tangent space
+        vec3 msample = TBN * samples[i];
+        msample = fragPos + msample * radius;
+
+        // Project sample position into screen space
+        vec4 offset = projectionMat * vec4(msample, 1.0);
+        offset.xyz /= offset.w;
+        offset.xyz = offset.xyz * 0.5 + 0.5;
+
+        float sampleDepth = texture(screenTexture, offset.xy).z;
+
+        // Occlusion check
+        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
+        occlusion += (sampleDepth >= msample.z + bias ? 1.0 : 0.0) * rangeCheck;
+    }
+
+    occlusion = 1.0 - (occlusion / 64.0);
+   	return occlusion;
+}
 
 void RegularEffect() {
 	fragColor = vec4(texture(screenTexture, fs_in.texcoord).xyz, 1.0);
@@ -117,15 +152,19 @@ void DefferedShading() {
         fragColor = vec4(texture(ambientTexture, fs_in.texcoord).xyz, 1.0);
     } else if (postSubProcess == 3) {
         fragColor = vec4(texture(diffuseTexture, fs_in.texcoord).xyz, 1.0);
-    } else { 
+    } else if (postSubProcess == 4){ 
         fragColor = vec4(texture(specularTexture, fs_in.texcoord).xyz, 1.0);
     }
+	else{
+		float ssao = CalculateSSAO();
+		fragColor = vec4(ssao, ssao, ssao, 1.0);
+	}
 }
 
 float LinearizeDepth(float depth)
 {
 	const float near_plane = 0.1f;
-	const float far_plane = 10f;
+	const float far_plane = 10.0f;
     float z = depth * 2.0 - 1.0; // Back to NDC 
     return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
 }
