@@ -31,6 +31,8 @@ public:
 	GLuint m_projMatHandle;
 	GLuint m_terrainVToUVMatHandle;
 
+	GLuint m_renderModeHandle;
+
 
 
 	GLuint m_albedoMapHandle;

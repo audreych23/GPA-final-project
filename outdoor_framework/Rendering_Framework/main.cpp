@@ -53,6 +53,7 @@ INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
 bool isNormalMap = true;
+int renderMode = 0;
 
 
 void updateWhenPlayerProjectionChanged(const float nearDepth, const float farDepth);
@@ -265,6 +266,7 @@ void paintGL(){
 	defaultRenderer->setViewport(playerViewport[0], playerViewport[1], playerViewport[2], playerViewport[3]);
 	defaultRenderer->setView(playerVM);
 	defaultRenderer->setProjection(playerProjMat);
+	defaultRenderer->setRenderMode(renderMode);
 	defaultRenderer->renderPass();
 	m_airplane->render();
 	m_rock->render(isNormalMap);
@@ -274,6 +276,7 @@ void paintGL(){
 	defaultRenderer->setViewport(godViewport[0], godViewport[1], godViewport[2], godViewport[3]);
 	defaultRenderer->setView(godVM);
 	defaultRenderer->setProjection(godProjMat);
+	defaultRenderer->setRenderMode(renderMode);
 	defaultRenderer->renderPass();
 	m_airplane->render();
 	m_rock->render(isNormalMap);
@@ -292,6 +295,7 @@ void paintGL(){
 	if (m_imguiPanel->isTeleport2) {
 		m_myCameraManager->teleport(2);
 	}
+	renderMode = m_imguiPanel->renderMode;
 	ImGui::End();
 
 	ImGui::Render();

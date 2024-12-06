@@ -19,6 +19,7 @@ private:
 	glm::mat4 m_viewMat;
 	int m_frameWidth;
 	int m_frameHeight;	
+	int m_renderMode = 0;
 
 	std::vector<DynamicSceneObject*> m_dynamicSOs;
 	TerrainSceneObject* m_terrainSO = nullptr;
@@ -31,6 +32,7 @@ public:
 	void setProjection(const glm::mat4 &proj);
 	void setView(const glm::mat4 &view);
 	void setViewport(const int x, const int y, const int w, const int h);
+	void setRenderMode(const int mode);
 	void appendDynamicSceneObject(DynamicSceneObject *obj);
 	void appendTerrainSceneObject(TerrainSceneObject* tSO);
 

@@ -26,6 +26,12 @@ void MyImGuiPanel::update() {
 	this->isTeleport1 = ImGui::Button("Teleport 1");
 	this->isTeleport2 = ImGui::Button("Teleport 2");
 
+	ImGui::Combo("Render Mode", &this->renderMode, 
+		"Default\0World Space Vertex\0World Space Normal\0Ambient\0Diffuse\0Specular\0"
+	);
+
+
+
 }
 
 void MyImGuiPanel::setAvgFPS(const double avgFPS){

@@ -19,6 +19,8 @@ void SceneRenderer::renderPass(){
 	glUniformMatrix4fv(manager->m_projMatHandle, 1, false, glm::value_ptr(this->m_projMat));
 	glUniformMatrix4fv(manager->m_viewMatHandle, 1, false, glm::value_ptr(this->m_viewMat));
 
+	glUniform1i(manager->m_renderModeHandle, this->m_renderMode);
+
 	if (this->m_terrainSO != nullptr) {
 		glUniform1i(SceneManager::Instance()->m_vs_vertexProcessIdHandle, SceneManager::Instance()->m_vs_terrainProcess);
 		this->m_terrainSO->update();
@@ -61,6 +63,11 @@ void SceneRenderer::setView(const glm::mat4 &view){
 void SceneRenderer::setViewport(const int x, const int y, const int w, const int h) {
 	glViewport(x, y, w, h);
 }
+
+void SceneRenderer::setRenderMode(const int mode){
+	this->m_renderMode = mode;
+}
+
 void SceneRenderer::appendDynamicSceneObject(DynamicSceneObject *obj){
 	this->m_dynamicSOs.push_back(obj);
 }
@@ -119,6 +126,8 @@ bool SceneRenderer::setUpShader(){
 	manager->m_isNormalMapHandle = 20;
 	manager->m_fs_pureColor = 5;
 	manager->m_fs_terrainPass = 7;
+
+	manager->m_renderModeHandle = 21;
 	
 	return true;
 }

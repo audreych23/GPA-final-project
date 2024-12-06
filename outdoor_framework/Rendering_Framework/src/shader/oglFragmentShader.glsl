@@ -4,6 +4,8 @@ in vec3 f_viewVertex ;
 in vec3 f_uv ;
 in vec3 f_viewNormal;
 in vec3 f_worldPos;
+in vec3 f_worldVertex;
+in vec3 f_worldNormal;
 
 layout (location = 0) out vec4 fragColor ;
 
@@ -12,6 +14,7 @@ layout(location = 4) uniform sampler2D albedoTexture ;
 layout(location = 6) uniform sampler2D normalMap ;
 layout(location = 7) uniform mat4 viewMat;
 layout(location = 20) uniform bool isNormalMap;
+layout(location = 21) uniform int renderMode;
 
 const vec3 lightDirWorld = normalize(vec3(0.4, 0.5, 0.8));
 const vec3 Ia = vec3(0.2, 0.2, 0.2);
@@ -94,12 +97,26 @@ void terrainPass(){
 	vec3 normal = f_viewNormal.xyz;
 
 	vec4 litColor = calculateBlinnPhong(texel, normal, vec3(0.0f), 1.0f, true);
-	fragColor = withFog(litColor);
-	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
-	fragColor.a = 1.0;
+	vec4 fogColor = withFog(litColor);
+	vec4 gammaCorrectedColor = pow(fogColor, vec4(0.5));
 
-	// normal debug
-	// fragColor = vec4(normalize(normal) * 0.5 + 0.5, 1.0);
+	if (renderMode == 1) {
+		vec3 worldVertexColor = normalize(f_worldVertex) * 0.5 + 0.5;
+		fragColor = vec4(worldVertexColor, 1.0);
+	}
+	else if (renderMode == 2) {
+		vec3 worldNormalColor = normalize(f_worldNormal) * 0.5 + 0.5;
+		fragColor = vec4(worldNormalColor, 1.0);
+	}
+	else if (renderMode == 3 || renderMode == 4) {
+		fragColor = vec4(texel.rgb, 1.0);
+	}
+	else if (renderMode == 5) {
+		fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+	else {
+		fragColor = vec4(gammaCorrectedColor.rgb, 1.0);
+	}
 }
 
 void pureColor(){
@@ -114,8 +131,23 @@ void airplanePass() {
 	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
 	fragColor.a = 1.0;
 
-	// normal debug
-	// fragColor = vec4(normalize(f_viewNormal) * 0.5 + 0.5, 1.0);
+	if (renderMode == 1) {
+		vec3 worldVertexColor = normalize(f_worldVertex) * 0.5 + 0.5;
+		fragColor = vec4(worldVertexColor, 1.0);
+	}
+	else if (renderMode == 2) {
+		vec3 worldNormalColor = normalize(f_worldNormal) * 0.5 + 0.5;
+		fragColor = vec4(worldNormalColor, 1.0);
+	}
+	else if (renderMode == 3 || renderMode == 4) {
+		fragColor = vec4(texel.rgb, 1.0);
+	}
+	else if (renderMode == 5) {
+		fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+	}
+	else {
+		fragColor = vec4(fragColor.rgb, 1.0);
+	}
 }
 
 void rockPass() {
@@ -131,11 +163,26 @@ void rockPass() {
 	fragColor.rgb = pow(fragColor.rgb, vec3(0.5));
 	fragColor.a = 1.0;
 
-	// normal debug
-	// fragColor = vec4(normalize(f_viewNormal) * 0.5 + 0.5, 1.0);
+	if (renderMode == 1) {
+		vec3 worldVertexColor = normalize(f_worldVertex) * 0.5 + 0.5;
+		fragColor = vec4(worldVertexColor, 1.0);
+	}
+	else if (renderMode == 2) {
+		vec3 worldNormalColor = normalize(f_worldNormal) * 0.5 + 0.5;
+		fragColor = vec4(worldNormalColor, 1.0);
+	}
+	else if (renderMode == 3 || renderMode == 4) {
+		fragColor = vec4(texel.rgb, 1.0);
+	}
+	else if (renderMode == 5) {
+		fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+	}
+	else {
+		fragColor = vec4(fragColor.rgb, 1.0);
+	}
 }
 
-void main(){	
+void main(){
 	if (pixelProcessId == 1) {
 		airplanePass();
 	}

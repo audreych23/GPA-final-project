@@ -22,6 +22,8 @@ public:
 	bool isTeleport1;
 	bool isTeleport2;
 
+	int renderMode;
+
 private:
 	double m_avgFPS;
 	double m_avgFrameTime;
