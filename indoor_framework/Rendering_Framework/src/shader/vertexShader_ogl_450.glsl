@@ -90,8 +90,8 @@ void main() {
         if (postProcessId == 0) {
             gl_Position = lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
         } else if (postProcessId == 1) {
-            vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+            
         }
-    }
+    }vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
 
 }

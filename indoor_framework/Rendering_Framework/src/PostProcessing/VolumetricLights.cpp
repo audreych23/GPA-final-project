@@ -93,8 +93,8 @@ namespace INANOA {
 			//windowCoordinates.z = (ndc.z + 1.0f) / 2.0f;  // Depth value in [0, 1] range
 			window_coordinates.x /= viewport[2];
 			window_coordinates.y /= viewport[3];
-			/*std::cout << "x" << window_coordinates.x << '\n';
-			std::cout << window_coordinates.y << '\n';*/
+			//std::cout << "x" << window_coordinates.x << '\n';
+			//std::cout << window_coordinates.y << '\n';
 			glUniform2fv(SHADER_POST_PARAMETER_BINDING::LIGHT_POS_SCREEN_LOCATION, 1, glm::value_ptr(window_coordinates));
 		}
 

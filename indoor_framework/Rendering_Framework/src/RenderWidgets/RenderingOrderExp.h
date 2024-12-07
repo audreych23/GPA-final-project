@@ -51,7 +51,7 @@ namespace INANOA {
 		MODEL::Indoor* indoor = nullptr;
 		MODEL::Trice* trice = nullptr;
 		MODEL::LightSphere* light_sphere = nullptr;
-
+		MODEL::LightSphere* sun_sphere = nullptr;
 		// screen quad for post processing
 		ScreenQuad* _screen_quad;
 

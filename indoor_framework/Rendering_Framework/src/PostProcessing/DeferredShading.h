@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+
 #include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
@@ -27,6 +29,8 @@ namespace INANOA {
 
 			void init(ScreenQuad* screen_quad);
 
+			void setupSSAO();
+
 			void render(DeferredShadingOption option);
 
 			void resize(int width, int height);
@@ -43,6 +47,9 @@ namespace INANOA {
 
 			// for color
 			GLuint _fbo, _rbo, _fbo_texture[5];
+			/* SSAO */
+			GLuint noiseTexture;
+			std::vector<glm::vec3> ssaoKernel;
 		};
 	}
 }

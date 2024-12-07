@@ -10,6 +10,19 @@ namespace INANOA {
 			setupFBO();
 		}
 
+		void BloomEffect::renderDeferred(int option) {
+			glDisable(GL_DEPTH_TEST);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			setBloomSubProcess(static_cast<BloomSubProcess>(option));
+			for (int i = 0; i < MAX_BLOOM_COLOR; i++) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
+			}
+			_screen_quad->render();
+			glEnable(GL_DEPTH_TEST);
+		}
+
 		void BloomEffect::render() {
 			//if (!_use_postprocessing) return;
 			glDisable(GL_DEPTH_TEST);
@@ -29,6 +42,8 @@ namespace INANOA {
 			for (unsigned int i = 0; i < blur_amount; ++i) {
 				glBindFramebuffer(GL_FRAMEBUFFER, _fbo_ping_pong[horizontal]);
 				glUniform1i(SHADER_POST_PARAMETER_BINDING::HORIZONTAL_FLAG_LOCATION, (int)horizontal);
+
+				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, first_iteration ? _fbo_texture[1] : _fbo_texture_ping_pong[!horizontal]);
 
 				// render Quad 
@@ -51,11 +66,11 @@ namespace INANOA {
 			glBindTexture(GL_TEXTURE_2D, _fbo_texture[0]);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, _fbo_texture_ping_pong[!horizontal]);
-			//glUniform1i(SHADER_PARAMETER_BINDING::BLOOM_FLAG_LOCATION, (int)bloom);
-			//glUniform1f(SHADER_PAREMTER_BINDING::EXPOSURE_LOCATION, exposure);
-
-			/*glBindVertexArray(_rect_vao);
-			glDrawArrays(GL_TRIANGLES, 0, 6);*/
+			for (int i = 2; i < MAX_BLOOM_COLOR; i++) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
+			}
+		
 			_screen_quad->render();
 
 			glEnable(GL_DEPTH_TEST);
@@ -91,6 +106,10 @@ namespace INANOA {
 			glBindTexture(GL_TEXTURE_2D, _fbo_texture[0]);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, _fbo_texture_ping_pong[!horizontal]);
+			for (int i = 2; i < MAX_BLOOM_COLOR; i++) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
+			}
 			_screen_quad->render();
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -128,7 +147,7 @@ namespace INANOA {
 			// Need To Write 2 Textures to FBO
 			glDeleteRenderbuffers(1, &_rbo);
 			// not sure if im deleting it correcrly
-			glDeleteTextures(2, _fbo_texture);
+			glDeleteTextures(MAX_BLOOM_COLOR, _fbo_texture);
 			//glDeleteTextures(1, &_fbo_texture_bloom[1]);
 
 			// bind framebuffer
@@ -139,9 +158,9 @@ namespace INANOA {
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo);
 
-			glGenTextures(2, _fbo_texture);
+			glGenTextures(MAX_BLOOM_COLOR, _fbo_texture);
 			// Generate Color Texture For fbo
-			for (unsigned int i = 0; i < 2; i++)
+			for (unsigned int i = 0; i < MAX_BLOOM_COLOR; i++)
 			{
 				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
 				glTexImage2D(
@@ -158,8 +177,10 @@ namespace INANOA {
 			}
 
 			// explicitly tell opengl we're rendering to multiple color buffers
-			unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-			glDrawBuffers(2, attachments);
+			unsigned int attachments[MAX_BLOOM_COLOR] = {};
+			for (int i = 0; i < MAX_BLOOM_COLOR; i++) attachments[i] = GL_COLOR_ATTACHMENT0 + i;
+
+			glDrawBuffers(MAX_BLOOM_COLOR, attachments);
 
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 				printf("Error: Framebuffer is not complete!\n");

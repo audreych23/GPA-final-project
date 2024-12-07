@@ -18,19 +18,14 @@ namespace INANOA {
 		ImGui::NewFrame();
 	    ImGui::SetNextWindowPos(ImVec2(10, 10));
 		ImGui::SetNextWindowSize(ImVec2(220, 500));
+
         ImGui::Begin("Settings");
-
-		/* CheckBox */
-		ImGui::Text("Options");
-		ImGui::Separator();
-		if (ImGui::RadioButton("Bloom",		_options == 1)) _options = 1;
-		if (ImGui::RadioButton("Deffered",	_options == 2)) _options = 2;
-		if (ImGui::RadioButton("Shadow",	_options == 3)) _options = 3;
-		if (ImGui::RadioButton("Cartoon",	_options == 4)) _options = 4;
-		//if (ImGui::RadioButton("Vol Light",	_options == 5)) _options = 5;
-
-		/* Input for Deferred Option */
-		if (_options == 2) {
+		ImGui::Checkbox("Directional Light", &directionalEnable);
+		ImGui::Checkbox("Toon Enable", &toonEnable);
+		ImGui::Checkbox("Use Deferred", &deferredEnable);
+		ImGui::Checkbox("Normal Enable", &normalEnable);
+		// Input for Deferred Option 
+		if (deferredEnable) {
 			ImGui::Text("Deferred Option");
 			ImGui::Separator();
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4)); // Push Style
@@ -40,6 +35,7 @@ namespace INANOA {
 			if (ImGui::RadioButton("Option 3", _deferredOption == 2)) _deferredOption = 2;
 			if (ImGui::RadioButton("Option 4", _deferredOption == 3)) _deferredOption = 3;
 			if (ImGui::RadioButton("Option 5", _deferredOption == 4)) _deferredOption = 4;
+			if (ImGui::RadioButton("Option 6", _deferredOption == 5)) _deferredOption = 5;
 			ImGui::PopStyleVar(2); // Pop
 		}
 	

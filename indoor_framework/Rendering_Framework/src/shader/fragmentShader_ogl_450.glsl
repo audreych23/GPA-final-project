@@ -1,10 +1,10 @@
 #version 450 core
 
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 brightColor;
-layout (location = 2) out vec4 ambientColor;
-layout (location = 3) out vec4 diffuseColor;
-layout (location = 4) out vec4 specularColor;
+layout (location = 0) out vec4 outColor1;
+layout (location = 1) out vec4 outColor2;
+layout (location = 2) out vec4 outColor3;
+layout (location = 3) out vec4 outColor4;
+layout (location = 4) out vec4 outColor5;
 
 
 layout (location = 4) uniform int postProcessId;
@@ -19,9 +19,13 @@ layout (location = 11) uniform int hasTexture;
 
 layout (location = 20) uniform int PostProcessMain;
 
-uniform sampler2D modelTexture;
-uniform sampler2D modelTextureNormal;
-uniform sampler2DShadow modelTextureShadow;
+layout (location = 25) uniform bool hasDirectionalLight;
+layout (location = 26) uniform bool hasToon;
+layout (location = 27) uniform bool hasNormal;
+
+layout (binding = 0) uniform sampler2D modelTexture;
+layout (binding = 1) uniform sampler2D modelTextureNormal;
+layout (binding = 2) uniform sampler2DShadow modelTextureShadow;
 
 in VertexData
 {
@@ -86,10 +90,10 @@ void RenderIndoorShadow() {
 
 	vec3 color = ambient + diffuse + specular;
 
-	// fragColor = vec4(color, originalColor.a);
+	// outColor1 = vec4(color, originalColor.a);
 	float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
-	fragColor = lightproj * vec4(color, originalColor.a);
-	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
+	outColor1 = lightproj * vec4(color, originalColor.a);
+	outColor2 = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
 }
 
 void RenderTriceShadow() {
@@ -110,10 +114,10 @@ void RenderTriceShadow() {
 
 	vec3 color = ambient + diffuse + specular;
 
-	// fragColor = vec4(color, 1.0);
+	// outColor1 = vec4(color, 1.0);
 	float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
-	fragColor = lightproj * vec4(color, 1.0);
-	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
+	outColor1 = lightproj * vec4(color, 1.0);
+	outColor2 = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
 }
 
 /*
@@ -121,6 +125,7 @@ void RenderTriceShadow() {
 	#		Deferred Shading		 #
 	##################################
 */
+
 void RenderIndoorDeferred(){
 	/* Init */
 	vec4 originalColor = vec4(0.0);
@@ -133,11 +138,11 @@ void RenderIndoorDeferred(){
 	}
 	vec3 N = normalize(vertexData.N);
 	/* Output */
-	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
-	brightColor = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
-	ambientColor = vec4(ka, 1.0);
-	diffuseColor = vec4(originalColor.rgb, 1.0);
-	specularColor = vec4(ks, 1.0);
+	outColor1 = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
+	outColor2 = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
+	outColor3 = vec4(ka, 1.0);
+	outColor4 = vec4(originalColor.rgb, 1.0);
+	outColor5 = vec4(ks, 1.0);
 }
 
 void RenderTriceDeferred(){
@@ -145,114 +150,11 @@ void RenderTriceDeferred(){
 	vec4 originalColor = vec4(kd, 1.0);
 	vec3 N = normalize(vertexData.N);
 	/* Output */
-	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
-	brightColor = vec4(vertexData.N, 1.0);
-	ambientColor = vec4(ka, 1.0);
-	diffuseColor = vec4(originalColor.rgb, 1.0);
-	specularColor = vec4(ks, 1.0);
-}
-
-/*
-	##################################
-	#		TOON	  Shading		 #
-	##################################
-*/
-
-void RenderIndoorToon() {
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
-
-	vec4 originalColor = vec4(0.0);
-	if(hasTexture == 0) {
-		originalColor = vec4(kd, 1.0);
-	}
-	else {
-		originalColor = texture(modelTexture, vertexData.texCoord.xy);
-	}
-
-	if (originalColor.a < 0.5) {
-		discard;
-	}
-
-	vec3 ambient = Ia * originalColor.rgb;
-
-	float diff = max(dot(N, L), 0.0);
-	float spec = pow(max(dot(N, H), 0.0), ns);
-	
-
-	/* TOON SHADING MOTHER FATHER */
-	diff = floor(diff * quantized) / quantized;
-	spec = floor(spec * quantized) / quantized;
-	
-	vec3 diffuse = Id * diff * originalColor.rgb;
-	vec3 specular = Is * spec * ks;
-
-	float pointLightDistance = length(lightBloomPos - f_worldPosition);
-	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
-
-	ambient *= attenuation;
-	diffuse *= attenuation;
-	specular *= attenuation;
-
-	vec3 color = ambient + diffuse + specular;
-
-	fragColor = vec4(color, originalColor.a);
-
-	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > lightThreshold)
-		brightColor = vec4(color, originalColor.a);
-	else
-		brightColor = vec4(0.0, 0.0, 0.0, originalColor.a);
-	// fragColor = brightColor;
-}
-
-void RenderTriceToon() {
-	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
-	vec3 V = normalize(vertexData.eyeDirNormalMapping);
-	vec3 L = normalize(vertexData.lightDirNormalMapping);
-	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
-
-	// vec3 R = reflect(-L, N);
-	// actually trice has no texture
-	vec3 ambient = Ia * kd;
-
-	float diff = max(dot(N, L), 0.0);
-	float spec = pow(max(dot(N, H), 0.0), ns);
-
-	/* TOON SHADING MOTHER FATHER */
-	diff = floor(diff * quantized) / quantized;
-	spec = floor(spec * quantized) / quantized;
-
-	vec3 diffuse = Id * diff * kd;
-	vec3 specular = Is * spec * ks;
-
-	float pointLightDistance = length(lightBloomPos - f_worldPosition);
-	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
-
-	ambient *= attenuation;
-	diffuse *= attenuation;
-	specular *= attenuation;
-
-	vec3 color = ambient + diffuse + specular;
-
-	fragColor = vec4(color, 1.0);
-
-	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > lightThreshold)
-		brightColor = vec4(color, 1.0);
-	else
-		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
-}
-
-void RenderLightSphereToon() {
-	fragColor = vec4(1.0); // set all 4 vector values to 1.0
-
-	float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > lightThreshold)
-		brightColor = vec4(fragColor.rgb, 1.0);
-	else
-		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+	outColor1 = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
+	outColor2 = vec4(vertexData.N, 1.0);
+	outColor3 = vec4(ka, 1.0);
+	outColor4 = vec4(originalColor.rgb, 1.0);
+	outColor5 = vec4(ks, 1.0);
 }
 
 /*
@@ -283,6 +185,12 @@ void RenderIndoor() {
 	float diff = max(dot(N, L), 0.0);
 	float spec = pow(max(dot(N, H), 0.0), ns);
 
+	/* TOON SHADING MOTHER FATHER */
+	if(hasToon){
+		diff = floor(diff * quantized) / quantized;
+		spec = floor(spec * quantized) / quantized;
+	}
+
 	float pointLightDistance = length(lightBloomPos - f_worldPosition);
 	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
 
@@ -295,14 +203,22 @@ void RenderIndoor() {
 
 	vec3 color = ambient + diffuse + specular;
 
-	fragColor = vec4(color, originalColor.a);
+	// outColor1 = vec4(color, originalColor.a);
 
 	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
 	if(brightness > lightThreshold)
-		brightColor = vec4(color, originalColor.a);
+		outColor2 = vec4(color, originalColor.a);
 	else
-		brightColor = vec4(0.0, 0.0, 0.0, originalColor.a);
-	// fragColor = brightColor;
+		outColor2 = vec4(0.0, 0.0, 0.0, originalColor.a);
+	
+	if(hasDirectionalLight){
+		float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
+		outColor1 = lightproj * vec4(color, originalColor.a);
+		outColor3 = 0.0001 * vec4(1.0) * lightproj;
+	}
+	else{
+		outColor1 = vec4(color, originalColor.a);
+	}
 }
 
 void RenderTrice() {
@@ -327,28 +243,40 @@ void RenderTrice() {
 	specular *= attenuation;
 
 	vec3 color = ambient + diffuse + specular;
-	fragColor = vec4(color, 1.0);
+	outColor1 = vec4(color, 1.0);
 
 			float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
 		if(brightness > 1.0)
-			brightColor = vec4(color, 1.0);
+			outColor2 = vec4(color, 1.0);
 		else
-			brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+			outColor2 = vec4(0.0, 0.0, 0.0, 1.0);
 
 	*/
-	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
-	vec3 V = normalize(vertexData.eyeDirNormalMapping);
-	vec3 L = normalize(vertexData.lightDirNormalMapping);
-	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
+	if(hasNormal){
+		 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+		//vec3 V = normalize(vertexData.eyeDirNormalMapping);
+		 L = normalize(vertexData.lightDirNormalMapping);
+		 H = normalize(vertexData.halfwayDirNormalMapping);
+	}
+
 
 	// vec3 R = reflect(-L, N);
 	// actually trice has no texture
 	vec3 ambient = Ia * kd;
 
 	float diff = max(dot(N, L), 0.0);
-	vec3 diffuse = Id * diff * kd;
-
 	float spec = pow(max(dot(N, H), 0.0), ns);
+	
+	/* TOON SHADING MOTHER FATHER */
+	if(hasToon){
+		diff = floor(diff * quantized) / quantized;
+		spec = floor(spec * quantized) / quantized;
+	}
+
+	vec3 diffuse = Id * diff * kd;
 	vec3 specular = Is * spec * ks;
 
 	float pointLightDistance = length(lightBloomPos - f_worldPosition);
@@ -360,101 +288,77 @@ void RenderTrice() {
 
 	vec3 color = ambient + diffuse + specular;
 
-	fragColor = vec4(color, 1.0);
-
 	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
 	if(brightness > lightThreshold)
-		brightColor = vec4(color, 1.0);
+		outColor2 = vec4(color, 1.0);
 	else
-		brightColor = vec4(0.0, 0.0, 0.0, 1.0); 
-	// fragColor = brightColor;
+		outColor2 = vec4(0.0, 0.0, 0.0, 1.0); 
+	// outColor1 = outColor2;
+	if(hasDirectionalLight){
+		float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
+		outColor1 = lightproj * vec4(color, 1.0);
+		outColor3 = vec4(0.0); //0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
+	}
+	else{
+		outColor1 = vec4(color, 1.0);
+	}
 }
 
 void RenderLightSphere() {
-	fragColor = vec4(1.0); // set all 4 vector values to 1.0
+	outColor1 = vec4(1.0); // set all 4 vector values to 1.0
 
-	float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	float brightness = dot(outColor1.rgb, vec3(0.2126, 0.7152, 0.0722));
 	if(brightness > lightThreshold)
-		brightColor = vec4(1.0);
+		outColor2 = vec4(1.0);
 	else
-		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
-	// fragColor = brightColor;
+		outColor2 = vec4(0.0, 0.0, 0.0, 1.0);
+	outColor3 = vec4(0.0, 0.0, 0.0, 0.0);
+	// outColor1 = outColor2;
+}
+
+void RenderSunSphere(){
+	outColor1 = vec4(1.0); // set all 4 vector values to 1.0
+
+	float brightness = dot(outColor1.rgb, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > lightThreshold)
+		outColor3 = vec4(1.0);
+	else
+		outColor3 = vec4(0.0, 0.0, 0.0, 1.0);
+	outColor2 = vec4(1.0);
+	// outColor1 = outColor2;
+	
 }
 
 
 void main() {
-	switch(PostProcessMain)
-	{
-	case 1:
-		{
-			if (shadingModelId == 0) {
-				RenderIndoor();
-			} else if (shadingModelId == 1) {
-				RenderTrice();
-			} else if (shadingModelId == 2) {
-				RenderLightSphere();
-			}
-			break;
-		}
-	case 2:
-		{
-			if (shadingModelId == 0) {
-				RenderIndoorDeferred();
-			} else if (shadingModelId == 1) {
-				RenderTriceDeferred();
-			} else if (shadingModelId == 2) {
-				discard;
-			}
-			break;
-		}
-	case 3:
-		{
-			if (postProcessId == 0) {
-				// shadow map does not need any color in fragment
-				return;
-			} else { // render with shadow 
-				if (shadingModelId == 0) {
-					RenderIndoorShadow();
-				} else if (shadingModelId == 1) {
-					RenderTriceShadow();
-				} else if (shadingModelId == 2) {
-					RenderLightSphere();
-				}
-			}
-			break;
-		}
-	case 4:
-		{
-			if (shadingModelId == 0) {
-				RenderIndoorToon();
-			} else if (shadingModelId == 1) {
-				RenderTriceToon();
-			} else if (shadingModelId == 2) {
-				RenderLightSphereToon();
-			}
-			break;
-		}
-	// case 5:
-	// 	{
-	// 		if (shadingModelId == 0) {
-	// 			RenderIndoorShadow();
-	// 		} else if (shadingModelId == 1) {
-	// 			RenderTriceShadow();
-	// 		} else if (shadingModelId == 2) {
-	// 			RenderLightSphere();
-	// 		}
-	// 		break;
-	// 	}
-	default:
-		{
-			if (shadingModelId == 0) {
-				RenderIndoor();
-			} else if (shadingModelId == 1) {
-				RenderTrice();
-			} else if (shadingModelId == 2) {
-				RenderLightSphere();
-			}
-			break;
-		}
+	// shadow map does not need any color in fragment
+	if(PostProcessMain == 2) {
+		if (shadingModelId == 0) {
+			RenderIndoorDeferred();
+		} else if (shadingModelId == 1) {
+			RenderTriceDeferred();
+		} else discard;
+		return;
 	}
+	
+	if(PostProcessMain == 3 && postProcessId == 0) {
+		outColor2 = vec4(0.0, 0.0, 0.0, 0.0);
+		outColor3 = vec4(0.0, 0.0, 0.0, 0.0);
+		return;
+	}
+
+	if (shadingModelId == 0) {
+		RenderIndoor();
+	} else if (shadingModelId == 1) {
+		RenderTrice();
+	} else if (shadingModelId == 2) {
+		RenderLightSphere();
+	} else if (shadingModelId == 3) {
+		RenderSunSphere();
+	}
+
+	if(!hasDirectionalLight){
+		outColor3 = vec4(0.0, 0.0, 0.0, 0.0);
+	}
+
 }

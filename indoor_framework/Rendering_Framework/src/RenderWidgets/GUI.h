@@ -24,6 +24,11 @@ namespace INANOA {
 		const int getDeferredOption() const { return _deferredOption; }
 		const int getOptions() const { return _options; }
 
+		const bool getDirectional() const { return directionalEnable; }
+		const bool getToon() const { return toonEnable; }
+		const bool getDeferred() const { return deferredEnable; }
+		const bool getNormal() const { return normalEnable; }
+
 		void setLookAt(glm::vec3& look_at) {
 			_look_at[0] = look_at.x; 
 			_look_at[1] = look_at.y; 
@@ -43,5 +48,10 @@ namespace INANOA {
 		float _light_pos[3] = {};
 
 		int _deferredOption;
+
+		bool directionalEnable;
+		bool toonEnable;
+		bool deferredEnable;
+		bool normalEnable;	
 	};
 }
