@@ -185,6 +185,7 @@ namespace INANOA {
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_TOON, _gui.getToon());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_NORMAL, _gui.getNormal());
+
 		// todo add normal
 
 		// =====================================================
@@ -261,10 +262,15 @@ namespace INANOA {
 		std::vector<float> viewport({ 0, 0, (float)m_frameWidth, (float)m_frameHeight });
 		this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
 		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+
+		// =====================================================
+		// Uniform of the Post Processing
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_TOON, _gui.getToon());
+		glUniform1i(SHADER_PARAMETER_BINDING::HAS_FXAA, _gui.getFXAA());
 
 		if (this->_gui.getDeferred()) {
+			glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr(m_godCamera->projMatrix()));
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
 			this->_bloom_effect->renderDeferred(_gui.getDeferredOption());
 		}
@@ -274,39 +280,7 @@ namespace INANOA {
 		else {
 			this->_bloom_effect->render();
 		}
-		/*
-		switch (curOptions)
-		{
-		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
-			this->_bloom_effect->render();
-			break;
-		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::CARTOON_EFFECT);
-			this->_bloom_effect->renderToon();
-			break;
-		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
-			glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr( m_godCamera->projMatrix() ));
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
-			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
-			break;
-		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
-			//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			//this->_regular_effect->render();
-			//break;
-		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
-		{
-			std::vector<float> viewport({ 0, 0, (float) m_frameWidth, (float) m_frameHeight });
-			this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::VOLUMETRIC_LIGHT);
-			this->_volumetric_light->render();
-			break;
-		}
-		default:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			this->_regular_effect->render();
-			break;
-		}*/
+
 		// =====================================================
 		// GUI
 		this->_gui.setLookAt(m_godCamera->lookCenter());

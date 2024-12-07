@@ -35,52 +35,55 @@ layout (location = 1) uniform int postSubProcess;
 layout (location = 2) uniform bool horizontal;
 /// Indicate where is the light source on the screen (2D position)
 layout (location = 3) uniform vec2 lightPositionOnScreen;
-// layout (location = 4) uniform vec3 samples[64];
 layout (location = 25) uniform bool hasDirectionalLight;
 layout (location = 26) uniform bool hasToon;
+layout (location = 28) uniform bool hasFXAA;
 
 layout (location = 69) uniform mat4 projectionMat;
-
+layout (location = 70) uniform vec3 samples[64];
 
 const float exposure = 1.2;
 
 uniform float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);
 
-// float CalculateSSAO(){
-// 	const float radius = 0.5;
-// 	const float bias = 0.025;
+const vec2 noiseScale = vec2(1344.0 / 4.0, 756.0 / 4.0);
+float CalculateSSAO(){
+	const float radius = 0.5;
+	const float bias = 0.025;
 
-// 	vec3 fragPos = texture(screenTexture, fs_in.texcoord).rgb;
-//     vec3 normal = normalize(texture(blurTexture, fs_in.texcoord).rgb);
-//     vec3 randomVec = normalize(texture(inColor6, fs_in.texcoord * 4.0).xyz);
+	vec3 fragPos = texture(screenTexture, fs_in.texcoord).rgb;
+    vec3 normal = normalize(texture(blurTexture, fs_in.texcoord).rgb);
+    vec3 randomVec = normalize(texture(inColor6, fs_in.texcoord * noiseScale).xyz);
+	// vec3 randomVec = vec3(-0.1, -0.1, 0.0);
 
-//     // Create TBN matrix for hemisphere orientation`
-//     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
-//     vec3 bitangent = cross(normal, tangent);
-//     mat3 TBN = mat3(tangent, bitangent, normal);
+    // Create TBN matrix for hemisphere orientation
+    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
+    vec3 bitangent = cross(normal, tangent);
+    mat3 TBN = mat3(tangent, bitangent, normal);
 
-//     // Accumulate SSAO
-//     float occlusion = 0.0;
-//     for (int i = 0; i < 64; ++i) {
-//         // Sample position in tangent space
-//         vec3 msample = TBN * samples[i];
-//         msample = fragPos + msample * radius;
+    // Accumulate SSAO
+    float occlusion = 0.0;
+    for (int i = 0; i < 64; ++i) {
+        // Sample position in tangent space
+        vec3 msample = TBN * samples[i];
+        msample = fragPos + msample * radius;
 
-//         // Project sample position into screen space
-//         vec4 offset = projectionMat * vec4(msample, 1.0);
-//         offset.xyz /= offset.w;
-//         offset.xyz = offset.xyz * 0.5 + 0.5;
+        // Project sample position into screen space
+        vec4 offset = projectionMat * vec4(msample, 1.0);
+        offset.xyz /= offset.w;
+        offset.xyz = offset.xyz * 0.5 + 0.5;
+		
+        float sampleDepth = texture(screenTexture, offset.xy).z;
 
-//         float sampleDepth = texture(screenTexture, offset.xy).z;
+        // Occlusion check
+        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
+        occlusion += (sampleDepth >= msample.z + bias ? 1.0 : 0.0) * rangeCheck;
+    }
 
-//         // Occlusion check
-//         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
-//         occlusion += (sampleDepth >= msample.z + bias ? 1.0 : 0.0) * rangeCheck;
-//     }
-
-//     occlusion = 1.0 - (occlusion / 64.0);
-//    	return occlusion;
-// }
+    occlusion = 1.0 - (occlusion / 64.0);
+   	return occlusion;
+	// return 1.0;
+}
 
 void RegularEffect() {
 	fragColor = vec4(texture(screenTexture, fs_in.texcoord).xyz, 1.0);
@@ -138,15 +141,51 @@ void BloomBlurEffect() {
 	fragColor = vec4(result, 1.0);
 }
 
+#define FXAA_REDUCE_MIN (1.0/128.0)
+#define FXAA_REDUCE_MUL (1.0/8.0)
+#define FXAA_SPAN_MAX 8.0
+
+vec3 calculateFXAA() {	
+    vec3 luma = vec3(0.299, 0.587, 0.114);
+	vec2 screenResolution = textureSize(screenTexture, 0);
+    float lumaNW = dot(texture(screenTexture, fs_in.texcoord + vec2(-1.0, -1.0) / screenResolution).rgb, luma);
+    float lumaNE = dot(texture(screenTexture, fs_in.texcoord + vec2(1.0, -1.0) / screenResolution).rgb, luma);
+    float lumaSW = dot(texture(screenTexture, fs_in.texcoord + vec2(-1.0, 1.0) / screenResolution).rgb, luma);
+    float lumaSE = dot(texture(screenTexture, fs_in.texcoord + vec2(1.0, 1.0) / screenResolution).rgb, luma);
+    float lumaM = dot(texture(screenTexture, fs_in.texcoord).rgb, luma);
+    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+
+    vec2 dir;
+    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+    dir.y = ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+
+    float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);
+    float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+
+    dir = min(vec2(FXAA_SPAN_MAX, FXAA_SPAN_MAX),
+              max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
+                  dir * rcpDirMin)) / screenResolution;
+
+    vec3 rgbA = 0.5 * (
+        texture(screenTexture, fs_in.texcoord + dir * (1.0 / 3.0 - 0.5)).rgb +
+        texture(screenTexture, fs_in.texcoord + dir * (2.0 / 3.0 - 0.5)).rgb);
+    vec3 rgbB = rgbA * 0.5 + 0.25 * (
+        texture(screenTexture, fs_in.texcoord + dir * 0.5).rgb +
+        texture(screenTexture, fs_in.texcoord - dir * 0.5).rgb);
+
+    return rgbB;
+}
+
 void BloomFinalEffect() {
 	/* BLOOM EFFECT */
 	const float gamma = 2.2;
-    vec3 hdrColor = texture(screenTexture, fs_in.texcoord).rgb;      
+	vec3 hdrColor = texture(screenTexture, fs_in.texcoord).rgb;      
+	if(hasFXAA) hdrColor = calculateFXAA();
     vec3 bloomColor = texture(blurTexture, fs_in.texcoord).rgb;
 	hdrColor += bloomColor; // additive blending
     vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // tone mapping
     result = pow(result, vec3(1.0 / gamma)); // also gamma correct while we're at it      
-	/* */
 	result = hdrColor;
     fragColor = vec4(result, 1.0) + VolumetricLight();
 }
@@ -203,9 +242,9 @@ void DefferedShading() {
         fragColor = vec4(texture(inColor5, fs_in.texcoord).xyz, 1.0);
     }
 	else{
-		//float ssao = CalculateSSAO();
-		//fragColor = vec4(ssao, ssao, ssao, 1.0);
-		fragColor = vec4(1.0);
+		float ssao = CalculateSSAO();
+		fragColor = vec4(ssao, ssao, ssao, 1.0);
+		// fragColor = vec4(1.0);
 	}
 }
 
@@ -221,6 +260,16 @@ void main()
 {	
 	if(postProcessingEffect == 2){
 		DefferedShading();
+		// fragColor = texture(screenTexture, fs_in.texcoord);
+    	// fragColor = vec4(normalize(texture(blurTexture, fs_in.texcoord).rgb), 1.0);
+
+		// fragColor = texture(inColor6, fs_in.texcoord);
+		// int index = int(floor(fs_in.texcoord.x * 64.0));       // Map to range [0, 63]
+
+		// // Fetch the corresponding kernel sample
+		// vec3 kernelSample = samples[index];
+		// fragColor = vec4(kernelSample, 1.0);
+		
 		return;
 	}
 	if (postProcessingEffect == 3) {

@@ -6,7 +6,6 @@ layout (location = 2) out vec4 outColor3;
 layout (location = 3) out vec4 outColor4;
 layout (location = 4) out vec4 outColor5;
 
-
 layout (location = 4) uniform int postProcessId;
 layout (location = 5) uniform int shadingModelId;
 
@@ -151,7 +150,7 @@ void RenderTriceDeferred(){
 	vec3 N = normalize(vertexData.N);
 	/* Output */
 	outColor1 = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
-	outColor2 = vec4(vertexData.N, 1.0);
+	outColor2 = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
 	outColor3 = vec4(ka, 1.0);
 	outColor4 = vec4(originalColor.rgb, 1.0);
 	outColor5 = vec4(ks, 1.0);
@@ -337,7 +336,9 @@ void main() {
 			RenderIndoorDeferred();
 		} else if (shadingModelId == 1) {
 			RenderTriceDeferred();
-		} else discard;
+		} else{
+			discard;
+		} 
 		return;
 	}
 	

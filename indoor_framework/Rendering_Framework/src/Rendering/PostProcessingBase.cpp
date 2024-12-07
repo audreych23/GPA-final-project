@@ -27,6 +27,7 @@ namespace INANOA {
 			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor9"), 8);
 			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor10"), 9);
 			return true;
+
 		}
 
 		void PostProcessingBase::usePostProcessingShaderProgram() {

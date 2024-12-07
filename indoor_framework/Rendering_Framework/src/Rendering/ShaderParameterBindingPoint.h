@@ -34,6 +34,7 @@ namespace INANOA {
 		const GLint HAS_DIRECTIONAL_LIGHT = 25;
 		const GLint HAS_TOON = 26;
 		const GLint HAS_NORMAL = 27;
+		const GLint HAS_FXAA = 28;
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {

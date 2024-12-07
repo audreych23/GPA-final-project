@@ -24,6 +24,7 @@ namespace INANOA {
 		ImGui::Checkbox("Toon Enable", &toonEnable);
 		ImGui::Checkbox("Use Deferred", &deferredEnable);
 		ImGui::Checkbox("Normal Enable", &normalEnable);
+		ImGui::Checkbox("FXAA Enable", &FXAAEnable);
 		// Input for Deferred Option 
 		if (deferredEnable) {
 			ImGui::Text("Deferred Option");
