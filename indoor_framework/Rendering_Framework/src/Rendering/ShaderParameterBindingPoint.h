@@ -30,6 +30,14 @@ namespace INANOA {
 		const GLint LIGHT_VIEW_MAT_LOCATION = 12;
 		const GLint LIGHT_PROJ_MAT_LOCATION = 13;
 		const GLint LIGHT_BIAS_MAT_LOCATION = 14;
+
+		const GLint LIGHT_COLOR = 15;
+
+		// area light special uniform
+		const GLint AREA_LIGHT_VERTICES_0 = 30;
+		const GLint AREA_LIGHT_VERTICES_1 = 31;
+		const GLint AREA_LIGHT_VERTICES_2 = 32;
+		const GLint AREA_LIGHT_VERTICES_3 = 33;
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {

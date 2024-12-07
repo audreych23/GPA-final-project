@@ -62,6 +62,9 @@ namespace INANOA {
 
 			/*this->light_sphere_sun = new MODEL::LightSphere();
 			this->light_sphere_sun->init(base_model_mat);*/
+
+			this->area_light = new MODEL::AreaLightModel();
+			this->area_light->init(glm::vec3(0.8f, 0.6f, 0.0f), base_model_mat);
 		}
 
 		// initialize screen quad
@@ -165,29 +168,29 @@ namespace INANOA {
 		// =====================================================
 		// Select PostProcessing
 		glClearColor(0, 0, 0, 1.0f);
-		switch(curOptions)
-		{
-		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
-		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
-			this->_bloom_effect->bindFBO(); 
-			break;
-		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
-			this->_deferred_shading->bindFBO(); 
-			break;
-		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
-			glClearColor(0.19f, 0.19f, 0.19f, 1.0f);
-			blinpengPos = _volumetric_light->getLightPosition();
-			this->_dir_shadow_mapping->bindFBO(); 
-			break;
-		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
-			// hardcoded light pos for 
-			blinpengPos = _volumetric_light->getLightPosition();
-			this->_volumetric_light->bindFBO();
-			break;
-		default: 
-			this->_regular_effect->bindFBO(); 
-			break;
-		} 
+		//switch(curOptions)
+		//{
+		//case POST_PROCESSING_TYPE::BLOOM_EFFECT:
+		//case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
+		//	this->_bloom_effect->bindFBO(); 
+		//	break;
+		//case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
+		//	this->_deferred_shading->bindFBO(); 
+		//	break;
+		//case POST_PROCESSING_TYPE::SHADOW_EFFECT:
+		//	glClearColor(0.19f, 0.19f, 0.19f, 1.0f);
+		//	blinpengPos = _volumetric_light->getLightPosition();
+		//	this->_dir_shadow_mapping->bindFBO(); 
+		//	break;
+		//case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
+		//	// hardcoded light pos for 
+		//	blinpengPos = _volumetric_light->getLightPosition();
+		//	this->_volumetric_light->bindFBO();
+		//	break;
+		//default: 
+		//	this->_regular_effect->bindFBO(); 
+		//	break;
+		//} 
 
 		this->m_renderer->useRenderBaseProgram();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -196,7 +199,7 @@ namespace INANOA {
 		// =====================================================
 		// Lazy Unfirom
 
-		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, curOptions);
+		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, 5);
 		glUniform3fv(SHADER_PARAMETER_BINDING::LIGHT_BLOOM_POS, 1, glm::value_ptr(blinpengPos));
 
 		// =====================================================
@@ -215,6 +218,9 @@ namespace INANOA {
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render(blinpengPos);
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render();
 
 			this->_dir_shadow_mapping->unbindFBO();
 
@@ -236,11 +242,11 @@ namespace INANOA {
 		// Render Scene
 		{
 			// Directional Shadow Mapping
-			if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
+			/*if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
 				this->_volumetric_light->bindFBO();
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				this->_dir_shadow_mapping->renderShadow();
-			}
+			}*/
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
@@ -251,48 +257,51 @@ namespace INANOA {
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render(blinpengPos);
 
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render();
+
 			// Directional Shadow Mapping
-			if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
+			/*if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
 				this->_regular_effect->unbindFBO();
 				this->_dir_shadow_mapping->finishRender();
-			}
+			}*/
 		}
 
 		// =====================================================
 		// Render the Post Processing
-		this->_post_processing->usePostProcessingShaderProgram();
-		switch (curOptions)
-		{
-		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
-			this->_bloom_effect->render();
-			break;
-		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::CARTOON_EFFECT);
-			this->_bloom_effect->renderToon();
-			break;
-		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
-			glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr( m_godCamera->projMatrix() ));
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
-			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
-			break;
-		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
-			//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			//this->_regular_effect->render();
-			//break;
-		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
-		{
-			std::vector<float> viewport({ 0, 0, (float) m_frameWidth, (float) m_frameHeight });
-			this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::VOLUMETRIC_LIGHT);
-			this->_volumetric_light->render();
-			break;
-		}
-		default:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			this->_regular_effect->render();
-			break;
-		}
+		//this->_post_processing->usePostProcessingShaderProgram();
+		//switch (curOptions)
+		//{
+		//case POST_PROCESSING_TYPE::BLOOM_EFFECT:
+		//	this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+		//	this->_bloom_effect->render();
+		//	break;
+		//case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
+		//	this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::CARTOON_EFFECT);
+		//	this->_bloom_effect->renderToon();
+		//	break;
+		//case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
+		//	glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr( m_godCamera->projMatrix() ));
+		//	this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
+		//	this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
+		//	break;
+		//case POST_PROCESSING_TYPE::SHADOW_EFFECT:
+		//	//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+		//	//this->_regular_effect->render();
+		//	//break;
+		//case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
+		//{
+		//	std::vector<float> viewport({ 0, 0, (float) m_frameWidth, (float) m_frameHeight });
+		//	this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
+		//	this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::VOLUMETRIC_LIGHT);
+		//	this->_volumetric_light->render();
+		//	break;
+		//}
+		//default:
+		//	this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
+		//	this->_regular_effect->render();
+		//	break;
+		//}
 		// =====================================================
 		// GUI
 		this->_gui.setLookAt(m_godCamera->lookCenter());

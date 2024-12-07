@@ -9,6 +9,7 @@
 #include <Rendering_Framework/src/Scene/Indoor.h>
 #include <Rendering_Framework/src/Scene/Trice.h>
 #include <Rendering_Framework/src/Scene/LightSphere.h>
+#include <Rendering_Framework/src/Scene/AreaLightModel.h>
 #include <Rendering_Framework/src/Rendering/PostProcessingBase.h>
 #include <Rendering_Framework/src/RenderWidgets/GUI.h>
 
@@ -51,6 +52,7 @@ namespace INANOA {
 		MODEL::Indoor* indoor = nullptr;
 		MODEL::Trice* trice = nullptr;
 		MODEL::LightSphere* light_sphere = nullptr;
+		MODEL::AreaLightModel* area_light = nullptr;
 
 		// screen quad for post processing
 		ScreenQuad* _screen_quad;

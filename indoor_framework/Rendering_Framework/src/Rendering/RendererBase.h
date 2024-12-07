@@ -12,6 +12,7 @@ namespace INANOA {
 			INDOOR_MODEL = 0,
 			TRICE_MODEL = 1,
 			LIGHT_SPHERE = 2,
+			AREA_LIGHT = 3,
 		};
 
 
