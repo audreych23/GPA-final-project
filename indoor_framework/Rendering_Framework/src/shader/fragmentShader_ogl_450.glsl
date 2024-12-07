@@ -555,15 +555,15 @@ void RenderIndoorAreaLight()
     translatedPoints[3] = areaLightVertices3 + area_light_translate;
 
     // Evaluate LTC shading
-    vec3 diffuse = LTC_Evaluate(N, V, P, mat3(1.0f), translatedPoints, true);
-    vec3 specular = LTC_Evaluate(N, V, P, Minv, translatedPoints, true);
+    vec3 diffuse = LTC_Evaluate(N, V, P, mat3(1.0f), translatedPoints, false);
+    vec3 specular = LTC_Evaluate(N, V, P, Minv, translatedPoints, false);
 
     // GGX BRDF shadowing and Fresnel
     // t2.x: shadowedF90 (F90 normally it should be 1.0)
     // t2.y: Smith function for Geometric Attenuation Term, it is dot(V or L, H).
     specular = specular * (mSpecular * t2.x + (1.0f - mSpecular) * t2.y);
 
-    result = lightColor /* * intensity*/ * vec3(1.0f, 1.0f, 1.0f) * (/*ambient +*/ specular + originalColor.rgb * diffuse);
+    result = lightColor /* * intensity*/  * (/*ambient +*/ Is * specular + originalColor.rgb * diffuse * Id);
 
     fragColor = vec4(ToSRGB(result), 1.0f);
 }
