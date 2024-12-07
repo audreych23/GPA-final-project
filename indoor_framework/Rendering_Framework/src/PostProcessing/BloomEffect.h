@@ -9,6 +9,8 @@
 #include <Rendering_Framework/src/Rendering/ShaderParameterBindingPoint.h>
 #include <Rendering_Framework/src/PostProcessing/ScreenQuad.h>
 
+#define MAX_BLOOM_COLOR 8
+
 namespace INANOA {
 	namespace POST_PROCESSING {
 		class BloomEffect
@@ -26,7 +28,7 @@ namespace INANOA {
 			void init(ScreenQuad* screen_quad);
 
 			void render();
-
+			void renderDeferred(int option);
 			void renderToon();
 
 			void resize(int width, int height);
@@ -48,7 +50,7 @@ namespace INANOA {
 			ScreenQuad* _screen_quad = nullptr;
 
 			// for color
-			GLuint _fbo, _rbo, _fbo_texture[2];
+			GLuint _fbo, _rbo, _fbo_texture[MAX_BLOOM_COLOR];
 
 			// for gaussian blurring
 			GLuint _fbo_ping_pong[2];

@@ -18,10 +18,14 @@ namespace INANOA {
 
 			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "screenTexture"), 0);
 			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "blurTexture"), 1);
-			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "ambientTexture"), 2);
-			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "diffuseTexture"), 3);
-			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "specularTexture"), 4);
-
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor3"), 2);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor4"), 3);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor5"), 4);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor6"), 5);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor7"), 6);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor8"), 7);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor9"), 8);
+			glUniform1i(glGetUniformLocation(m_postProcessShaderProgram->programId(), "inColor10"), 9);
 			return true;
 		}
 

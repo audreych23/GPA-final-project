@@ -30,6 +30,9 @@ namespace INANOA {
 		const GLint LIGHT_VIEW_MAT_LOCATION = 12;
 		const GLint LIGHT_PROJ_MAT_LOCATION = 13;
 		const GLint LIGHT_BIAS_MAT_LOCATION = 14;
+
+		const GLint HAS_DIRECTIONAL_LIGHT = 25;
+		const GLint HAS_TOON = 26;
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {
