@@ -30,12 +30,13 @@ layout (location = 7) uniform mat4 viewMat;
 layout (location = 8) uniform mat4 projMat;
 layout (location = 9) uniform mat4 terrainVToUVMat;
 layout (location = 1) uniform int vertexProcessIdx;
+layout (location = 10) uniform bool isInstanced;
 
 void commonProcess() {
 mat4 finalModelMat = modelMat;
 
     // If this is an instanced draw (bushes or buildings)
-if (vertexProcessIdx == 4) { // New process ID for instanced objects
+if (isInstanced) {
 finalModelMat = instances[gl_InstanceID].modelMatrix;
 }
 

@@ -280,8 +280,9 @@ void MyBushesAndBuildings::performFrustumCulling(
 }
 
 void MyBushesAndBuildings::render(const glm::mat4& viewMat, const glm::mat4& projMat) {
-    // Perform frustum culling
-    performFrustumCulling(viewMat, projMat);
+    // Set isInstanced uniform to true
+    //performFrustumCulling(viewMat, projMat);
+    glUniform1i(10, true);  // location 10 is isInstanced
 
     // Bind the first VAO (assumes all models share the same structure)
     glBindVertexArray(m_sceneObjects[0]->vao());
