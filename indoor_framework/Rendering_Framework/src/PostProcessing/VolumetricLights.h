@@ -29,7 +29,7 @@ namespace INANOA {
 
 			const glm::vec3 getLightPosition() const { return _light_position; };
 
-			void calculateInNDC(glm::mat4 view_mat, glm::mat4 proj_mat, std::vector<float> viewport);
+			void calculateInNDC(glm::mat4 view_mat, glm::mat4 proj_mat, std::vector<float> viewport, glm::vec3 mLightPos);
 		private:
 			void setupFBO();
 

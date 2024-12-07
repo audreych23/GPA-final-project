@@ -22,7 +22,7 @@ namespace INANOA {
 		}
 
 		// to get the depth of the object
-		void DirectionalShadowMapping::renderLightSpace(float offset) {
+		void DirectionalShadowMapping::renderLightSpace(float offset, glm::vec3 pos_orig) {
 			// use program renderer program while calling this
 			// bind light view and proj matrix
 			glEnable(GL_DEPTH_TEST);
@@ -30,6 +30,7 @@ namespace INANOA {
 			// for removing shadow acne
 			openGLPolygonHelper(offset);
 
+			_light_view_mat = glm::lookAt(pos_orig, _light_look_at, glm::vec3(0.0f, 1.0f, 0.0f));
 
 			setDirectionalShadowMappingSubProcess(DirectionalShadowMappingSubProcess::LIGHT_SPACE_RENDER);
 			glUniformMatrix4fv(SHADER_PARAMETER_BINDING::LIGHT_VIEW_MAT_LOCATION, 1, false, glm::value_ptr(_light_view_mat));

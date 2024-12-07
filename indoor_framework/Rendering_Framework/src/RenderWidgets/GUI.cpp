@@ -8,6 +8,10 @@ namespace INANOA {
 		_light_pos[0] = 1.87659;
 		_light_pos[1] = 0.4625;
 		_light_pos[2] = 0.103928;
+
+		_light_dir[0] = -2.845;
+		_light_dir[1] = 2.028;
+		_light_dir[2] = -1.293;
 	}
 
 	GUI::~GUI() {}
@@ -41,27 +45,29 @@ namespace INANOA {
 		}
 	
 		/* Input Float of Look At */
-		ImGui::Text("Look At Position");
-		ImGui::Separator();
-		ImGui::InputFloat("LX", &_look_at[0], 0.1f, 1.0f, "%.3f");
-		ImGui::InputFloat("LY", &_look_at[1], 0.1f, 1.0f, "%.3f");
-		ImGui::InputFloat("LZ", &_look_at[2], 0.1f, 1.0f, "%.3f");
 
-		ImGui::Text("Orig Position");
-		ImGui::Separator();
-		ImGui::InputFloat("OX", &_view_org[0], 0.1f, 1.0f, "%.3f");
-		ImGui::InputFloat("OY", &_view_org[1], 0.1f, 1.0f, "%.3f");
-		ImGui::InputFloat("OZ", &_view_org[2], 0.1f, 1.0f, "%.3f");
+		if (ImGui::CollapsingHeader("Look at Position", ImGuiTreeNodeFlags_None)) {
+			ImGui::InputFloat("LX", &_look_at[0], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("LY", &_look_at[1], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("LZ", &_look_at[2], 0.1f, 1.0f, "%.3f");
+		}
+
+		if (ImGui::CollapsingHeader("Directional Light", ImGuiTreeNodeFlags_None)) {
+			ImGui::InputFloat("DX", &_light_dir[0], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("DY", &_light_dir[1], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("DZ", &_light_dir[2], 0.1f, 1.0f, "%.3f");
+		}
 
 		/* Input Float of Light Position */
-		ImGui::Text("Light Position");
-		ImGui::Separator();
-		ImGui::InputFloat("X", &_light_pos[0], 0.1f, 1.0f, "%.3f");
-		ImGui::InputFloat("Y", &_light_pos[1], 0.1f, 1.0f, "%.3f");
-		ImGui::InputFloat("Z", &_light_pos[2], 0.1f, 1.0f, "%.3f");
+		if (ImGui::CollapsingHeader("Light Bloom Position", ImGuiTreeNodeFlags_None)) {
+			ImGui::InputFloat("X", &_light_pos[0], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("Y", &_light_pos[1], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("Z", &_light_pos[2], 0.1f, 1.0f, "%.3f");
+		}
 
         /* End */
 		ImGui::End();
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}

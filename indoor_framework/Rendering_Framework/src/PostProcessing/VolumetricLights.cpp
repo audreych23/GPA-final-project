@@ -81,8 +81,8 @@ namespace INANOA {
 		}
 
 		// x, y, width, heihtt
-		void VolumetricLights::calculateInNDC(glm::mat4 view_mat, glm::mat4 proj_mat, std::vector<float> viewport) {
-			auto clip_space = proj_mat * view_mat * glm::vec4(_light_position, 1.0);
+		void VolumetricLights::calculateInNDC(glm::mat4 view_mat, glm::mat4 proj_mat, std::vector<float> viewport, glm::vec3 mLightPos) {
+			auto clip_space = proj_mat * view_mat * glm::vec4(mLightPos, 1.0);
 			
 			glm::vec3 ndc = glm::vec3(clip_space) / clip_space.w;
 

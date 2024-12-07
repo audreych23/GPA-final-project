@@ -32,17 +32,19 @@ layout (location = 14) uniform mat4 lightBiasMat;
 
 layout (location = 20) uniform int PostProcessMain;
 layout (location = 21) uniform vec3 lightBloomPos;
+
+layout (location = 30) uniform vec3 directionalPosition;
  
 // hard coding this stuff
 // light pos is in world space
 // vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 // point light pos is in world space (bloom)
- vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
+vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 // light position in world space (shadow mapping)
 //vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 
 void main() {
-    if(PostProcessMain == 3) lightPosition = vec3(-2.845, 2.028, -1.293);
+    if(PostProcessMain == 3) lightPosition = directionalPosition;
     else lightPosition = lightBloomPos;
     // For some reason we do it in world space and it works
     vec4 worldVertex = modelMat * vec4(v_vertex, 1.0);

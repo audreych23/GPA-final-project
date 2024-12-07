@@ -19,7 +19,7 @@ namespace INANOA {
 		const glm::vec3 getLookAt() const { return glm::vec3(_look_at[0], _look_at[1], _look_at[2]); }
 		const glm::vec3 getLightPos() const { return glm::vec3(_light_pos[0], _light_pos[1], _light_pos[2]); }
 		const glm::vec3 getViewOrigin() const { return glm::vec3(_view_org[0], _view_org[1], _view_org[2]); }
-
+		const glm::vec3 getLightDirPos() const { return glm::vec3(_light_dir[0], _light_dir[1], _light_dir[2]); }
 
 		const int getDeferredOption() const { return _deferredOption; }
 		const int getOptions() const { return _options; }
@@ -45,6 +45,7 @@ namespace INANOA {
 	private:
 		int _options;
 		float _look_at[3] = {};
+		float _light_dir[3] = {};
 		float _view_org[3] = {};
 		float _light_pos[3] = {};
 
