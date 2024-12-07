@@ -46,7 +46,7 @@ in VertexData
 	vec3 lightDirNormalMapping;
 	vec3 eyeDirNormalMapping;
 	vec3 halfwayDirNormalMapping;
-} vertexData;
+} f_vertexData;
 
 in vec3 f_worldPosition;
 
@@ -71,16 +71,16 @@ const float lightThreshold = 0.9;
 	##################################
 */
 void RenderIndoorShadow() {
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
+	vec3 N = normalize(f_vertexData.N);
+	vec3 L = normalize(f_vertexData.L);
+	vec3 H = normalize(f_vertexData.H);
 
 	vec4 originalColor = vec4(0.0);
 	if(hasTexture == 0) {
 		originalColor = vec4(kd, 1.0);
 	}
 	else {
-		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+		originalColor = texture(modelTexture, f_vertexData.texCoord.xy);
 	}
 
 	if (originalColor.a < 0.5) {
@@ -98,16 +98,16 @@ void RenderIndoorShadow() {
 	vec3 color = ambient + diffuse + specular;
 
 	// fragColor = vec4(color, originalColor.a);
-	float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
+	float lightproj = textureProj(modelTextureShadow, f_vertexData.shadowCoord);
 	fragColor = lightproj * vec4(color, originalColor.a);
-	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
+	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, f_vertexData.shadowCoord);
 }
 
 void RenderTriceShadow() {
-	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
-	vec3 V = normalize(vertexData.eyeDirNormalMapping);
-	vec3 L = normalize(vertexData.lightDirNormalMapping);
-	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+	vec3 N = normalize(texture(modelTextureNormal, f_vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(f_vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(f_vertexData.lightDirNormalMapping);
+	vec3 H = normalize(f_vertexData.halfwayDirNormalMapping);
 
 	// vec3 R = reflect(-L, N);
 	// actually trice has no texture
@@ -122,9 +122,9 @@ void RenderTriceShadow() {
 	vec3 color = ambient + diffuse + specular;
 
 	// fragColor = vec4(color, 1.0);
-	float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
+	float lightproj = textureProj(modelTextureShadow, f_vertexData.shadowCoord);
 	fragColor = lightproj * vec4(color, 1.0);
-	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
+	brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, f_vertexData.shadowCoord);
 }
 
 /*
@@ -140,13 +140,13 @@ void RenderIndoorDeferred(){
 		originalColor = vec4(kd, 1.0);
 	}
 	else {
-		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+		originalColor = texture(modelTexture, f_vertexData.texCoord.xy);
 		if(originalColor.a < 0.5) discard;
 	}
-	vec3 N = normalize(vertexData.N);
+	vec3 N = normalize(f_vertexData.N);
 	/* Output */
 	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
-	brightColor = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
+	brightColor = vec4(normalize(f_vertexData.N) * 0.5 + 0.5, 1.0);
 	ambientColor = vec4(ka, 1.0);
 	diffuseColor = vec4(originalColor.rgb, 1.0);
 	specularColor = vec4(ks, 1.0);
@@ -155,10 +155,10 @@ void RenderIndoorDeferred(){
 void RenderTriceDeferred(){
 	/* Init */
 	vec4 originalColor = vec4(kd, 1.0);
-	vec3 N = normalize(vertexData.N);
+	vec3 N = normalize(f_vertexData.N);
 	/* Output */
 	fragColor = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
-	brightColor = vec4(vertexData.N, 1.0);
+	brightColor = vec4(f_vertexData.N, 1.0);
 	ambientColor = vec4(ka, 1.0);
 	diffuseColor = vec4(originalColor.rgb, 1.0);
 	specularColor = vec4(ks, 1.0);
@@ -171,16 +171,16 @@ void RenderTriceDeferred(){
 */
 
 void RenderIndoorToon() {
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
+	vec3 N = normalize(f_vertexData.N);
+	vec3 L = normalize(f_vertexData.L);
+	vec3 H = normalize(f_vertexData.H);
 
 	vec4 originalColor = vec4(0.0);
 	if(hasTexture == 0) {
 		originalColor = vec4(kd, 1.0);
 	}
 	else {
-		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+		originalColor = texture(modelTexture, f_vertexData.texCoord.xy);
 	}
 
 	if (originalColor.a < 0.5) {
@@ -220,10 +220,10 @@ void RenderIndoorToon() {
 }
 
 void RenderTriceToon() {
-	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
-	vec3 V = normalize(vertexData.eyeDirNormalMapping);
-	vec3 L = normalize(vertexData.lightDirNormalMapping);
-	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+	vec3 N = normalize(texture(modelTextureNormal, f_vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(f_vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(f_vertexData.lightDirNormalMapping);
+	vec3 H = normalize(f_vertexData.halfwayDirNormalMapping);
 
 	// vec3 R = reflect(-L, N);
 	// actually trice has no texture
@@ -274,16 +274,16 @@ void RenderLightSphereToon() {
 */
 
 void RenderIndoor() {
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
+	vec3 N = normalize(f_vertexData.N);
+	vec3 L = normalize(f_vertexData.L);
+	vec3 H = normalize(f_vertexData.H);
 
 	vec4 originalColor = vec4(0.0);
 	if(hasTexture == 0) {
 		originalColor = vec4(kd, 1.0);
 	}
 	else {
-		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+		originalColor = texture(modelTexture, f_vertexData.texCoord.xy);
 	}
 
 	if (originalColor.a < 0.5) {
@@ -319,9 +319,9 @@ void RenderIndoor() {
 
 void RenderTrice() {
 	/*
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
+	vec3 N = normalize(f_vertexData.N);
+	vec3 L = normalize(f_vertexData.L);
+	vec3 H = normalize(f_vertexData.H);
 	vec3 ambient = Ia * kd;
 
 	float diff = max(dot(N, L), 0.0);
@@ -348,10 +348,10 @@ void RenderTrice() {
 			brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	*/
-	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
-	vec3 V = normalize(vertexData.eyeDirNormalMapping);
-	vec3 L = normalize(vertexData.lightDirNormalMapping);
-	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+	vec3 N = normalize(texture(modelTextureNormal, f_vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(f_vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(f_vertexData.lightDirNormalMapping);
+	vec3 H = normalize(f_vertexData.halfwayDirNormalMapping);
 
 	// vec3 R = reflect(-L, N);
 	// actually trice has no texture
@@ -502,14 +502,14 @@ vec3 ToSRGB(vec3 v)   { return PowVec3(v, 1.0/gamma); }
 void RenderIndoorAreaLight()
 {
 
-	vec3 N = normalize(vertexData.N);
+	vec3 N = normalize(f_vertexData.N);
 
 	vec4 originalColor = vec4(0.0);
 	if(hasTexture == 0) {
 		originalColor = vec4(kd, 1.0);
 	}
 	else {
-		originalColor = texture(modelTexture, vertexData.texCoord.xy);
+		originalColor = texture(modelTexture, f_vertexData.texCoord.xy);
 	}
 
 	if (originalColor.a < 0.5) {

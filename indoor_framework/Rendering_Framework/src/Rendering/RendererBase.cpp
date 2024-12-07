@@ -13,8 +13,10 @@ namespace INANOA {
 		}
 		RendererBase::~RendererBase() {}
 
-		bool RendererBase::init(const std::string& vsResource, const std::string& fsResource, const int width, const int height) {
-			this->m_shaderProgram = ShaderProgram::createShaderProgram(vsResource, fsResource);
+		bool RendererBase::init(const std::string& vsResource, const std::string& fsResource, 
+			const std::string& gsResource, const int width, const int height) {
+
+			this->m_shaderProgram = ShaderProgram::createShaderProgram(vsResource, fsResource, gsResource, true);
 			if (this->m_shaderProgram == nullptr) {
 				return false;
 			}

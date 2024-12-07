@@ -21,7 +21,8 @@ namespace INANOA {
 		INANOA::OPENGL::RendererBase* renderer = new INANOA::OPENGL::RendererBase();
 		const std::string vsFile = "src\\shader\\vertexShader_ogl_450.glsl";
 		const std::string fsFile = "src\\shader\\fragmentShader_ogl_450.glsl";
-		if (renderer->init(vsFile, fsFile, w, h) == false) {
+		const std::string gsFile = "src\\shader\\geometryShader_ogl_450.glsl";
+		if (renderer->init(vsFile, fsFile, gsFile, w, h) == false) {
 			return false;
 		}
 
@@ -77,8 +78,8 @@ namespace INANOA {
 		OPENGL::PostProcessingBase* post_processing = new OPENGL::PostProcessingBase();
 		const std::string vsPostFile = "src\\shader\\vertexShader_ogl_450_fbo.glsl";
 		const std::string fsPostFile = "src\\shader\\fragmentShader_ogl_450_fbo.glsl";
-
-		if (post_processing->init(vsPostFile, fsPostFile, w, h) == false) {
+		const std::string gsPostFile = "src\\shader\\geometryShader_ogl_450_fbo.glsl";
+		if (post_processing->init(vsPostFile, fsPostFile, gsPostFile, w, h) == false) {
 			return false;
 		}
 

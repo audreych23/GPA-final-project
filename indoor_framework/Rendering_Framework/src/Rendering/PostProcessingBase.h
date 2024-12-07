@@ -30,7 +30,7 @@ namespace INANOA {
 			PostProcessingBase& operator=(const PostProcessingBase&) = delete;
 
 		public:
-			bool init(const std::string& vsResource, const std::string& fsResource, const int width, const int height);
+			bool init(const std::string& vsResource, const std::string& fsResource, const std::string& gsResource, const int width, const int height);
 			//void resize(const int w, const int h);
 
 			void usePostProcessingShaderProgram();

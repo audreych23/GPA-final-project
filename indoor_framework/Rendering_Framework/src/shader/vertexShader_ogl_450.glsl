@@ -16,9 +16,9 @@ out VertexData {
 	vec3 lightDirNormalMapping;
 	vec3 eyeDirNormalMapping;
     vec3 halfwayDirNormalMapping;
-} vertexData;
+} g_vertexData;
 
-out vec3 f_worldPosition;
+out vec3 g_worldPosition;
 
 layout (location = 0) uniform mat4 modelMat;
 layout (location = 1) uniform mat4 viewMat;
@@ -58,30 +58,30 @@ void main() {
 
     vec3 worldHalfwayVector = normalize(worldLightVector + worldViewVector);
 
-    vertexData.N = worldNormal;
-    vertexData.L = worldLightVector;
-    vertexData.H = worldHalfwayVector;
-    vertexData.texCoord = v_texCoord;
+    g_vertexData.N = worldNormal;
+    g_vertexData.L = worldLightVector;
+    g_vertexData.H = worldHalfwayVector;
+    g_vertexData.texCoord = v_texCoord;
 
-    vertexData.lightDirNormalMapping = normalize(vec3(
+    g_vertexData.lightDirNormalMapping = normalize(vec3(
         dot(worldLightVector, worldTangent),
         dot(worldLightVector, worldBitangent),
         dot(worldLightVector, worldNormal)
     ));
 
-    vertexData.eyeDirNormalMapping = normalize(vec3(
+    g_vertexData.eyeDirNormalMapping = normalize(vec3(
         dot(worldViewVector, worldTangent),
         dot(worldViewVector, worldBitangent),
         dot(worldViewVector, worldNormal)
     ));
 
-    vertexData.halfwayDirNormalMapping = normalize(vec3(
+    g_vertexData.halfwayDirNormalMapping = normalize(vec3(
         dot(worldHalfwayVector, worldTangent),
         dot(worldHalfwayVector, worldBitangent),
         dot(worldHalfwayVector, worldNormal)
     ));
 
-    f_worldPosition = worldPosition;
+    g_worldPosition = worldPosition;
 
     gl_Position = projMat * viewMat * worldVertex;
 
@@ -90,7 +90,7 @@ void main() {
         if (postProcessId == 0) {
             gl_Position = lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
         } else if (postProcessId == 1) {
-            vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+            g_vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
         }
     }
 

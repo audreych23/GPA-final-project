@@ -14,7 +14,7 @@ namespace INANOA {
 		enum class ShaderProgramStatus {
 			READY,
 			PROGRAM_ID_READY,
-			NULL_VERTEX_SHADER, NULL_FRAGMENT_SHADER,
+			NULL_VERTEX_SHADER, NULL_FRAGMENT_SHADER, NULL_GEOMETRY_SHADER,
 			NULL_VERTEX_SHADER_FRAGMENT_SHADER
 		};
 
@@ -65,7 +65,7 @@ namespace INANOA {
 		public:
 			bool init();
 			bool attachShader(const Shader* shader);
-			ShaderProgramStatus checkStatus();
+			ShaderProgramStatus checkStatus(bool has_gs);
 			void linkProgram();
 			
 		public:
@@ -103,11 +103,16 @@ namespace INANOA {
 			bool m_vsReady = false;
 			bool m_fsReady = false;
 			bool m_csReady = false;
+			bool m_gsReady = false;
 
 			ShaderProgramStatus m_shaderProgramStatus;
 
 		public:
-			static ShaderProgram* createShaderProgram(const std::string& vsResource, const std::string& fsResource);
+			static ShaderProgram* createShaderProgram(
+				const std::string& vsResource,
+				const std::string& fsResource,
+				const std::string& gsResource = "",
+				bool has_gs = false);
 			static ShaderProgram* createShaderProgramForComputeShader(const std::string& csResource);
 		};
 	}

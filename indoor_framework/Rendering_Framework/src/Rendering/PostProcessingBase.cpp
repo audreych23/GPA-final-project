@@ -6,9 +6,9 @@ namespace INANOA {
 		PostProcessingBase::PostProcessingBase() {}
 		PostProcessingBase::~PostProcessingBase() {}
 
-		bool PostProcessingBase::init(const std::string& vsResource, const std::string& fsResource, const int width, const int height) {
+		bool PostProcessingBase::init(const std::string& vsResource, const std::string& fsResource, const std::string& gsResource, const int width, const int height) {
 			this->m_postProcessShaderProgram = OPENGL::ShaderProgram::
-				createShaderProgram(vsResource, fsResource);
+				createShaderProgram(vsResource, fsResource, gsResource, true);
 
 			if (this->m_postProcessShaderProgram == nullptr) {
 				return false;

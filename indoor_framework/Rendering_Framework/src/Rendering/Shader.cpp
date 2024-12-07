@@ -82,6 +82,7 @@ namespace INANOA {
 			this->m_shaderProgramStatus = ShaderProgramStatus::NULL_VERTEX_SHADER_FRAGMENT_SHADER;
 			this->m_vsReady = false;
 			this->m_fsReady = false;
+			this->m_gsReady = false;
 			this->m_csReady = false;
 		}
 		ShaderProgram::~ShaderProgram() {}
@@ -111,16 +112,20 @@ namespace INANOA {
 			else if (shader->shaderType() == GL_FRAGMENT_SHADER) {
 				this->m_fsReady = true;
 			}
+			else if (shader->shaderType() == GL_GEOMETRY_SHADER) {
+				this->m_gsReady = true;
+			}
 			else if (shader->shaderType() == GL_COMPUTE_SHADER) {
 				this->m_csReady = true;
 			}
 			return true;
 		}
-		ShaderProgramStatus ShaderProgram::checkStatus() {
+		ShaderProgramStatus ShaderProgram::checkStatus(bool has_gs) {
 			// compute shader program
 			if (this->m_csReady == true) {
 				this->m_shaderProgramStatus = ShaderProgramStatus::READY;
 			}
+
 			// render program
 			else if (this->m_vsReady == false && this->m_fsReady == false) {
 				this->m_shaderProgramStatus = ShaderProgramStatus::NULL_VERTEX_SHADER_FRAGMENT_SHADER;
@@ -130,6 +135,9 @@ namespace INANOA {
 			}
 			else if (this->m_fsReady == false) {
 				this->m_shaderProgramStatus = ShaderProgramStatus::NULL_FRAGMENT_SHADER;
+			}
+			else if (has_gs && this->m_gsReady == false) {
+				this->m_shaderProgramStatus = ShaderProgramStatus::NULL_GEOMETRY_SHADER;
 			}
 			else {
 				this->m_shaderProgramStatus = ShaderProgramStatus::READY;
@@ -193,7 +201,11 @@ namespace INANOA {
 		}
 
 		// ======================================
-		ShaderProgram* ShaderProgram::createShaderProgram(const std::string& vsResource, const std::string& fsResource) {
+		ShaderProgram* ShaderProgram::createShaderProgram(
+			const std::string& vsResource, 
+			const std::string& fsResource,
+			const std::string& gsResource,
+			bool has_gs) {
 			Shader* vsShader = new Shader(GL_VERTEX_SHADER);
 			vsShader->createShaderFromFile(vsResource);
 			if (vsShader->status() != ShaderStatus::READY) {
@@ -209,12 +221,26 @@ namespace INANOA {
 				return nullptr;
 			}
 
+			Shader* gsShader = nullptr;
+			if (has_gs) {
+				gsShader = new Shader(GL_GEOMETRY_SHADER);
+				gsShader->createShaderFromFile(gsResource);
+				if (gsShader->status() != ShaderStatus::READY) {
+					std::cout << "GS: " << gsShader->shaderInfoLog() << "\n";
+					return nullptr;
+				}
+			}
+
 			// shader program
 			ShaderProgram* shaderProgram = new ShaderProgram();
 			shaderProgram->init();
 			shaderProgram->attachShader(vsShader);
+			if (has_gs) {
+				shaderProgram->attachShader(gsShader);
+			}
 			shaderProgram->attachShader(fsShader);
-			shaderProgram->checkStatus();
+
+			shaderProgram->checkStatus(has_gs);
 			if (shaderProgram->status() != ShaderProgramStatus::READY) {
 				return nullptr;
 			}
@@ -222,6 +248,9 @@ namespace INANOA {
 
 			delete vsShader;
 			delete fsShader;
+			if (has_gs) {
+				delete gsShader;
+			}
 
 			return shaderProgram;
 		}
@@ -238,7 +267,7 @@ namespace INANOA {
 			ShaderProgram* shaderProgram = new ShaderProgram();
 			shaderProgram->init();
 			shaderProgram->attachShader(csShader);
-			shaderProgram->checkStatus();
+			shaderProgram->checkStatus(false);
 			if (shaderProgram->status() != ShaderProgramStatus::READY) {
 				return nullptr;
 			}
