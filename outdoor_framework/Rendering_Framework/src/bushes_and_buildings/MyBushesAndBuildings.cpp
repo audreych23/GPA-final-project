@@ -9,15 +9,16 @@
 
 // Struct for indirect draw commands
 struct DrawElementsIndirectCommand {
-    GLuint vertexCount;
-    GLuint instanceCount;
-    GLuint firstIndex;
-    GLuint baseVertex;
-    GLuint baseInstance;
+    GLuint count;           // Number of indices to draw
+    GLuint instanceCount;   // Number of instances to draw
+    GLuint firstIndex;      // Starting index in the index buffer
+    GLint baseVertex;       // Base vertex in the vertex buffer
+    GLuint baseInstance;    // Base instance for instanced draws
 };
 
-MyBushesAndBuildings::MyBushesAndBuildings()
-    : m_instanceSSBO(0), m_indirectBuffer(0) {
+MyBushesAndBuildings::MyBushesAndBuildings() 
+    : m_instanceSSBO(0), m_indirectBuffer(0), m_visibleInstanceBuffer(0) {
+    
     const std::vector<std::string> modelFiles = {
         "assets/grassB.obj",
         "assets/bush01_lod2.obj",
@@ -49,12 +50,14 @@ MyBushesAndBuildings::MyBushesAndBuildings()
     const std::vector<float> boundingSphereRadii = { 1.4f, 3.4f, 2.6f, 8.5f, 10.2f };
 
     std::vector<DrawElementsIndirectCommand> drawCommands;
+    std::vector<InstanceData> allInstanceData;
 
     GLuint baseInstance = 0;
     for (size_t i = 0; i < modelFiles.size(); ++i) {
-        // Load the model
+        // Load model
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(modelFiles[i], aiProcess_Triangulate | aiProcess_FlipUVs);
+        const aiScene* scene = importer.ReadFile(modelFiles[i], 
+            aiProcess_Triangulate | aiProcess_FlipUVs);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
             std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -62,10 +65,15 @@ MyBushesAndBuildings::MyBushesAndBuildings()
         }
 
         aiMesh* mesh = scene->mMeshes[0];
-        DynamicSceneObject* dso = new DynamicSceneObject(mesh->mNumVertices, mesh->mNumFaces * 3, false, true);
+        
+        // Create and setup DynamicSceneObject
+        DynamicSceneObject* dso = new DynamicSceneObject(
+            mesh->mNumVertices, mesh->mNumFaces * 3, false, true);
+        
         float* databuffer = dso->dataBuffer();
         unsigned int* indexbuffer = dso->indexBuffer();
 
+        // Fill vertex data
         for (unsigned int j = 0; j < mesh->mNumVertices; j++) {
             aiVector3D pos = mesh->mVertices[j];
             aiVector3D texCoord = mesh->mTextureCoords[0][j];
@@ -77,6 +85,7 @@ MyBushesAndBuildings::MyBushesAndBuildings()
             databuffer[j * 6 + 5] = 0.0f;
         }
 
+        // Fill index data
         for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
             for (unsigned int k = 0; k < 3; k++) {
                 indexbuffer[j * 3 + k] = mesh->mFaces[j].mIndices[k];
@@ -90,31 +99,46 @@ MyBushesAndBuildings::MyBushesAndBuildings()
         // Load texture
         GLuint textureID;
         int width, height, channels;
-        unsigned char* image = stbi_load(textureFiles[i].c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        unsigned char* image = stbi_load(textureFiles[i].c_str(), 
+            &width, &height, &channels, STBI_rgb_alpha);
+        
         if (!image) {
-            std::cerr << "ERROR::TEXTURE::Failed to load texture: " << textureFiles[i] << std::endl;
+            std::cerr << "Failed to load texture: " << textureFiles[i] << std::endl;
             continue;
         }
 
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, 
+            GL_UNSIGNED_BYTE, image);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        
         stbi_image_free(image);
-
         m_textures.push_back(textureID);
 
-        // Load sample data
-        MyPoissonSample* sampleData = MyPoissonSample::fromFile(sampleFiles[i]);
+        // Load and process instance data
+        MyPoissonSample* sampleData = MyPoissonSample::fromFile(sampleFiles[i].c_str());
         if (!sampleData) {
-            std::cerr << "ERROR::SAMPLE::Failed to load sample file: " << sampleFiles[i] << std::endl;
+            std::cerr << "Failed to load sample file: " << sampleFiles[i] << std::endl;
             continue;
         }
 
+        // Create draw command
+        DrawElementsIndirectCommand cmd{
+            static_cast<GLuint>(mesh->mNumFaces * 3),  // count
+            static_cast<GLuint>(sampleData->m_numSample), // instanceCount
+            0,                    // firstIndex
+            0,                    // baseVertex
+            baseInstance          // baseInstance
+        };
+        drawCommands.push_back(cmd);
+
+        // Process instance data
         for (int j = 0; j < sampleData->m_numSample; ++j) {
             glm::vec3 position(
                 sampleData->m_positions[j * 3 + 0],
@@ -126,103 +150,137 @@ MyBushesAndBuildings::MyBushesAndBuildings()
                 sampleData->m_radians[j * 3 + 1],
                 sampleData->m_radians[j * 3 + 2]
             );
-            glm::mat4 modelMatrix = glm::translate(position) * glm::toMat4(glm::quat(rotation));
 
-            InstanceData instance = { modelMatrix, boundingSphereCenters[i], boundingSphereRadii[i] };
-            m_instanceData.push_back(instance);
+            glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position) *
+                glm::toMat4(glm::quat(rotation));
+
+            InstanceData instance{
+                modelMatrix,
+                boundingSphereCenters[i],
+                boundingSphereRadii[i]
+            };
+            allInstanceData.push_back(instance);
         }
 
-        delete sampleData; // Free sample data after processing
-
-        // Prepare draw command
-        DrawElementsIndirectCommand cmd = {
-            mesh->mNumFaces * 3,  // vertexCount
-            static_cast<GLuint>(sampleData->m_numSample), // instanceCount
-            0,                    // firstIndex
-            0,                    // baseVertex
-            baseInstance           // baseInstance
-        };
-        drawCommands.push_back(cmd);
         baseInstance += sampleData->m_numSample;
+        delete sampleData;
     }
 
-    // Load indirect draw buffer
-    glGenBuffers(1, &m_indirectBuffer);
-    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, drawCommands.size() * sizeof(DrawElementsIndirectCommand), drawCommands.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-
-    createSSBO();
-}
-
-void MyBushesAndBuildings::createSSBO() {
+    // Create and initialize buffers
     glGenBuffers(1, &m_instanceSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(InstanceData) * m_instanceData.size(), m_instanceData.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        sizeof(InstanceData) * allInstanceData.size(),
+        allInstanceData.data(), GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    std::cout << "SSBO Data Size: " << m_instanceData.size() * sizeof(InstanceData) << " bytes" << std::endl;
+
+    glGenBuffers(1, &m_indirectBuffer);
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+    glBufferData(GL_DRAW_INDIRECT_BUFFER, 
+        sizeof(DrawElementsIndirectCommand) * drawCommands.size(),
+        drawCommands.data(), GL_STATIC_DRAW);
+
+    // Create buffer for visible instances
+    glGenBuffers(1, &m_visibleInstanceBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleInstanceBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        sizeof(InstanceData) * allInstanceData.size(),
+        nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_visibleInstanceBuffer);
+
+    m_instanceData = allInstanceData;
+    std::cout << "Initialized with " << allInstanceData.size() << " total instances" << std::endl;
 }
 
-void MyBushesAndBuildings::performFrustumCulling(const glm::mat4& viewMat, const glm::mat4& projMat) {
+void MyBushesAndBuildings::performFrustumCulling(
+    const glm::mat4& viewMat, const glm::mat4& projMat) {
+    
     glm::mat4 viewProj = projMat * viewMat;
+    std::vector<InstanceData> visibleInstances;
 
-    // Define frustum planes
-    struct Plane {
+    // Extract frustum planes
+    struct FrustumPlane {
         glm::vec3 normal;
         float distance;
     };
-    Plane frustumPlanes[6];
+    std::vector<FrustumPlane> planes(6);
 
-    auto extractPlane = [&](int index, const glm::vec4& row1, const glm::vec4& row2) {
-        glm::vec4 plane = row1 + (index % 2 == 0 ? row2 : -row2);
-        float length = glm::length(glm::vec3(plane));
-        return Plane{ glm::vec3(plane) / length, plane.w / length };
-    };
+    // Extract planes from view-projection matrix
+    // Left plane
+    planes[0].normal.x = viewProj[0][3] + viewProj[0][0];
+    planes[0].normal.y = viewProj[1][3] + viewProj[1][0];
+    planes[0].normal.z = viewProj[2][3] + viewProj[2][0];
+    planes[0].distance = viewProj[3][3] + viewProj[3][0];
 
-    // Extract frustum planes from the view-projection matrix
-    const glm::vec4& row0 = viewProj[0];
-    const glm::vec4& row1 = viewProj[1];
-    const glm::vec4& row2 = viewProj[2];
-    const glm::vec4& row3 = viewProj[3];
-    frustumPlanes[0] = extractPlane(0, row3, row0); // Left
-    frustumPlanes[1] = extractPlane(1, row3, row0); // Right
-    frustumPlanes[2] = extractPlane(2, row3, row1); // Bottom
-    frustumPlanes[3] = extractPlane(3, row3, row1); // Top
-    frustumPlanes[4] = extractPlane(4, row3, row2); // Near
-    frustumPlanes[5] = extractPlane(5, row3, row2); // Far
+    // Right plane
+    planes[1].normal.x = viewProj[0][3] - viewProj[0][0];
+    planes[1].normal.y = viewProj[1][3] - viewProj[1][0];
+    planes[1].normal.z = viewProj[2][3] - viewProj[2][0];
+    planes[1].distance = viewProj[3][3] - viewProj[3][0];
 
-    // Collect visible instances
-    std::vector<InstanceData> visibleInstances;
+    // Bottom plane
+    planes[2].normal.x = viewProj[0][3] + viewProj[0][1];
+    planes[2].normal.y = viewProj[1][3] + viewProj[1][1];
+    planes[2].normal.z = viewProj[2][3] + viewProj[2][1];
+    planes[2].distance = viewProj[3][3] + viewProj[3][1];
+
+    // Top plane
+    planes[3].normal.x = viewProj[0][3] - viewProj[0][1];
+    planes[3].normal.y = viewProj[1][3] - viewProj[1][1];
+    planes[3].normal.z = viewProj[2][3] - viewProj[2][1];
+    planes[3].distance = viewProj[3][3] - viewProj[3][1];
+
+    // Near plane
+    planes[4].normal.x = viewProj[0][3] + viewProj[0][2];
+    planes[4].normal.y = viewProj[1][3] + viewProj[1][2];
+    planes[4].normal.z = viewProj[2][3] + viewProj[2][2];
+    planes[4].distance = viewProj[3][3] + viewProj[3][2];
+
+    // Far plane
+    planes[5].normal.x = viewProj[0][3] - viewProj[0][2];
+    planes[5].normal.y = viewProj[1][3] - viewProj[1][2];
+    planes[5].normal.z = viewProj[2][3] - viewProj[2][2];
+    planes[5].distance = viewProj[3][3] - viewProj[3][2];
+
+    // Normalize all planes
+    for (auto& plane : planes) {
+        float length = glm::length(plane.normal);
+        plane.normal /= length;
+        plane.distance /= length;
+    }
+
+    // Test each instance against the frustum
     for (const auto& instance : m_instanceData) {
-        glm::vec3 worldCenter = glm::vec3(instance.modelMatrix * glm::vec4(instance.boundingSphereCenter, 1.0f));
-        bool isInside = true;
-
-        for (const auto& plane : frustumPlanes) {
+        glm::vec3 worldCenter = glm::vec3(
+            instance.modelMatrix * glm::vec4(instance.boundingSphereCenter, 1.0f));
+        
+        bool isVisible = true;
+        for (const auto& plane : planes) {
             float distance = glm::dot(plane.normal, worldCenter) + plane.distance;
             if (distance < -instance.boundingSphereRadius) {
-                isInside = false;
+                isVisible = false;
                 break;
             }
         }
 
-        if (isInside) {
+        if (isVisible) {
             visibleInstances.push_back(instance);
         }
     }
 
-    // Update the SSBO with only visible instances
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(InstanceData) * visibleInstances.size(), visibleInstances.data());
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    // Update visible instance buffer
+    if (!visibleInstances.empty()) {
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleInstanceBuffer);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+            sizeof(InstanceData) * visibleInstances.size(),
+            visibleInstances.data());
+    }
 
-    std::cout << "Frustum Culling: Visible Instances = " << visibleInstances.size() << std::endl;
+    std::cout << "Visible instances: " << visibleInstances.size() << std::endl;
 }
 
-
 void MyBushesAndBuildings::render(const glm::mat4& viewMat, const glm::mat4& projMat) {
-
-    // Perform frustum culling and update SSBO with culled instances
+    // Perform frustum culling
     performFrustumCulling(viewMat, projMat);
 
     // Bind the first VAO (assumes all models share the same structure)
@@ -234,17 +292,20 @@ void MyBushesAndBuildings::render(const glm::mat4& viewMat, const glm::mat4& pro
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_textures[i]);
 
-        // Perform an indirect draw call, limited to the visible instances
-        std::cout << "Indirect Draw Call: Scene Objects = " << m_sceneObjects.size() << std::endl;
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, nullptr, m_sceneObjects.size(), 0);
-        std::cout << "Indirect Draw Completed for Texture: " << i << std::endl;
+        // Perform indirect draw
+        glMultiDrawElementsIndirect(
+            GL_TRIANGLES,
+            GL_UNSIGNED_INT,
+            (void*)(i * sizeof(DrawElementsIndirectCommand)),
+            1,
+            0
+        );
     }
 
     // Clean up
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
     glBindVertexArray(0);
 }
-
 
 MyBushesAndBuildings::~MyBushesAndBuildings() {
     for (auto* dso : m_sceneObjects) {
@@ -262,5 +323,9 @@ MyBushesAndBuildings::~MyBushesAndBuildings() {
 
     if (m_indirectBuffer) {
         glDeleteBuffers(1, &m_indirectBuffer);
+    }
+
+    if (m_visibleInstanceBuffer) {
+        glDeleteBuffers(1, &m_visibleInstanceBuffer);
     }
 }
