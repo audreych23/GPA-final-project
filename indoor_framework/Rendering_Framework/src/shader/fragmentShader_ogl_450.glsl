@@ -21,6 +21,7 @@ layout (location = 20) uniform int PostProcessMain;
 
 layout (location = 25) uniform bool hasDirectionalLight;
 layout (location = 26) uniform bool hasToon;
+layout (location = 27) uniform bool hasNormal;
 
 layout (binding = 0) uniform sampler2D modelTexture;
 layout (binding = 1) uniform sampler2D modelTextureNormal;
@@ -251,10 +252,16 @@ void RenderTrice() {
 			outColor2 = vec4(0.0, 0.0, 0.0, 1.0);
 
 	*/
-	vec3 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
-	vec3 V = normalize(vertexData.eyeDirNormalMapping);
-	vec3 L = normalize(vertexData.lightDirNormalMapping);
-	vec3 H = normalize(vertexData.halfwayDirNormalMapping);
+	vec3 N = normalize(vertexData.N);
+	vec3 L = normalize(vertexData.L);
+	vec3 H = normalize(vertexData.H);
+	if(hasNormal){
+		 N = normalize(texture(modelTextureNormal, vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+		//vec3 V = normalize(vertexData.eyeDirNormalMapping);
+		 L = normalize(vertexData.lightDirNormalMapping);
+		 H = normalize(vertexData.halfwayDirNormalMapping);
+	}
+
 
 	// vec3 R = reflect(-L, N);
 	// actually trice has no texture

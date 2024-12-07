@@ -184,6 +184,8 @@ namespace INANOA {
 		glUniform3fv(SHADER_PARAMETER_BINDING::LIGHT_BLOOM_POS, 1, glm::value_ptr(blinpengPos));
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_TOON, _gui.getToon());
+		glUniform1i(SHADER_PARAMETER_BINDING::HAS_NORMAL, _gui.getNormal());
+		// todo add normal
 
 		// =====================================================
 		// Directional Shadow Mapping

@@ -23,7 +23,7 @@ namespace INANOA {
 		ImGui::Checkbox("Directional Light", &directionalEnable);
 		ImGui::Checkbox("Toon Enable", &toonEnable);
 		ImGui::Checkbox("Use Deferred", &deferredEnable);
-
+		ImGui::Checkbox("Normal Enable", &normalEnable);
 		// Input for Deferred Option 
 		if (deferredEnable) {
 			ImGui::Text("Deferred Option");
