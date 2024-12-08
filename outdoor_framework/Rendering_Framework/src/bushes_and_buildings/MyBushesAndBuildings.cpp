@@ -72,7 +72,7 @@ MyBushesAndBuildings::MyBushesAndBuildings()
         
         float* databuffer = dso->dataBuffer();
         unsigned int* indexbuffer = dso->indexBuffer();
-
+        dso->setPixelFunctionId(4);
         // Fill vertex data
         for (unsigned int j = 0; j < mesh->mNumVertices; j++) {
             aiVector3D pos = mesh->mVertices[j];
@@ -281,7 +281,7 @@ void MyBushesAndBuildings::performFrustumCulling(
 
 void MyBushesAndBuildings::render(const glm::mat4& viewMat, const glm::mat4& projMat) {
     // Set isInstanced uniform to true
-    //performFrustumCulling(viewMat, projMat);
+    performFrustumCulling(viewMat, projMat);
     glUniform1i(10, true);  // location 10 is isInstanced
 
     // Bind the first VAO (assumes all models share the same structure)
