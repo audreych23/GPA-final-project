@@ -1,10 +1,10 @@
 #include "GUI.h"
 #include <iostream>
 namespace INANOA {
-	GUI::GUI() { 
-		_deferredOption = 3; 
-		_options = 2; 
-		
+	GUI::GUI() {
+		_deferredOption = 3;
+		_options = 2;
+
 		_light_pos[0] = 1.87659;
 		_light_pos[1] = 0.4625;
 		_light_pos[2] = 0.103928;
@@ -13,9 +13,19 @@ namespace INANOA {
 		_light_dir[1] = 2.028;
 		_light_dir[2] = -1.293;
 
-		translatePos[0] = 1.0f; 
+		translatePos[0] = 1.0f;
 		translatePos[1] = 0.5f;
 		translatePos[2] = -0.5f;
+
+		_view_org[0] = 4.0f;
+		_view_org[1] = 1.0f;
+		_view_org[2] = -1.5f;
+
+		_look_at[0] = 4.0f;
+		_look_at[1] = 1.0f;
+		_look_at[2] = -1.5f;
+
+		prev = glm::vec3(_view_org[0], _view_org[1], _view_org[2]);
 	}
 
 	GUI::~GUI() {}
@@ -52,10 +62,14 @@ namespace INANOA {
 	
 		/* Input Float of Look At */
 
-		if (ImGui::CollapsingHeader("Look at Position", ImGuiTreeNodeFlags_None)) {
+		if (ImGui::CollapsingHeader("Camera Position", ImGuiTreeNodeFlags_None)) {
 			ImGui::InputFloat("LX", &_look_at[0], 0.1f, 1.0f, "%.3f");
 			ImGui::InputFloat("LY", &_look_at[1], 0.1f, 1.0f, "%.3f");
 			ImGui::InputFloat("LZ", &_look_at[2], 0.1f, 1.0f, "%.3f");
+			ImGui::Separator();
+			ImGui::InputFloat("VX", &_view_org[0], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("VY", &_view_org[1], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("VZ", &_view_org[2], 0.1f, 1.0f, "%.3f");
 		}
 
 		if (ImGui::CollapsingHeader("Area Position", ImGuiTreeNodeFlags_None)) {

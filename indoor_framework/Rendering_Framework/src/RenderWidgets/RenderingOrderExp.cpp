@@ -168,6 +168,9 @@ namespace INANOA {
 		glm::vec3 sunPos = this->_gui.getLightDirPos();
 		glm::vec3 areaTranslate = this->_gui.getTranslate();
 		glm::mat4 areaRotation = this->_gui.getRotation();
+		
+		glm::vec3 camTranslate = this->_gui.getCamT();
+		m_godCamera->translateLookCenterAndViewOrg(camTranslate);
 
 		// =====================================================
 		// Select PostProcessing
@@ -293,7 +296,7 @@ namespace INANOA {
 		// =====================================================
 		// GUI
 		this->_gui.setLookAt(m_godCamera->lookCenter());
-		//this->_gui.setViewOrg(m_godCamera->viewOrig());
+		this->_gui.setViewOrg(m_godCamera->viewOrig());
 		this->_gui.render();
 		glm::vec3 new_look_at = _gui.getLookAt();
 		//glm::vec3 new_view_orig = _gui.getLookAt();

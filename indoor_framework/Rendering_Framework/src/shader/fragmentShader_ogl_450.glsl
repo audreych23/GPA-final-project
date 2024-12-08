@@ -337,15 +337,13 @@ void RenderIndoor() {
 	
 	if(hasDirectionalLight){
 		float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
-		outColor1 = lightproj * vec4(color, originalColor.a);
+		// outColor1 = lightproj * vec4(color, originalColor.a);
 		dirOut = lightproj * vec4(color, originalColor.a).rgb;
 		outColor3 = 0.0001 * vec4(1.0) * lightproj;
 	}
 	else{
-		outColor1 = vec4(color, originalColor.a);
+		// outColor1 = vec4(color, originalColor.a);
 	}
-
-	
 
 	if(hasAreaLight){
 	/* ===================== Area Light ======================== */
@@ -402,36 +400,6 @@ void RenderIndoor() {
 }
 
 void RenderTrice() {
-	/*
-	vec3 N = normalize(vertexData.N);
-	vec3 L = normalize(vertexData.L);
-	vec3 H = normalize(vertexData.H);
-	vec3 ambient = Ia * kd;
-
-	float diff = max(dot(N, L), 0.0);
-	vec3 diffuse = Id * diff * kd;
-
-	float spec = pow(max(dot(N, H), 0.0), ns);
-	vec3 specular = Is * spec * ks;
-
-
-	float pointLightDistance = length(lightBloomPos - f_worldPosition);
-	float attenuation = 1.0 / (constant + linear * pointLightDistance + quadratic * (pointLightDistance * pointLightDistance));
-
-	ambient *= attenuation;
-	diffuse *= attenuation;
-	specular *= attenuation;
-
-	vec3 color = ambient + diffuse + specular;
-	outColor1 = vec4(color, 1.0);
-
-			float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-		if(brightness > 1.0)
-			outColor2 = vec4(color, 1.0);
-		else
-			outColor2 = vec4(0.0, 0.0, 0.0, 1.0);
-
-	*/
 	vec3 N = normalize(vertexData.N);
 	vec3 L = normalize(vertexData.L);
 	vec3 H = normalize(vertexData.H);
@@ -441,7 +409,6 @@ void RenderTrice() {
 		 L = normalize(vertexData.lightDirNormalMapping);
 		 H = normalize(vertexData.halfwayDirNormalMapping);
 	}
-
 
 	// vec3 R = reflect(-L, N);
 	// actually trice has no texture
@@ -468,6 +435,10 @@ void RenderTrice() {
 
 	vec3 color = ambient + diffuse + specular;
 
+	vec3 bloomOut = color;
+	vec3 dirOut = vec3(0.0);
+	vec3 areaOut = vec3(0.0);
+
 	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
 	if(brightness > lightThreshold)
 		outColor2 = vec4(color, 1.0);
@@ -476,12 +447,67 @@ void RenderTrice() {
 	// outColor1 = outColor2;
 	if(hasDirectionalLight){
 		float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
-		outColor1 = lightproj * vec4(color, 1.0);
+		//outColor1 = lightproj * vec4(color, 1.0);
+		dirOut = lightproj * vec4(color, 1.0).rgb;
 		outColor3 = vec4(0.0); //0.0001 * vec4(1.0) * textureProj(modelTextureShadow, vertexData.shadowCoord);
 	}
 	else{
-		outColor1 = vec4(color, 1.0);
+		//outColor1 = vec4(color, 1.0);
 	}
+
+	
+	if(hasAreaLight){
+	/* ===================== Area Light ======================== */
+		vec3 mSpecular = ToLinear(vec3(0.23f, 0.23f, 0.23f)); // mDiffuse
+		vec3 ambient = Ia * kd;
+
+		vec3 result = vec3(0.0f);
+
+		vec3 V = normalize(cameraPosition - f_worldPosition);
+		vec3 P = f_worldPosition;
+		float dotNV = clamp(dot(N, V), 0.0f, 1.0f);
+
+		// use roughness and sqrt(1-cos_theta) to sample M_texture
+		// gpt : Roughness = sqrt(1.0 - Ns / maxNs)
+		float roughness = sqrt(1.0 - ns / 1000);
+		vec2 uv = vec2(roughness, sqrt(1.0f - dotNV));
+		uv = uv * LUT_SCALE + LUT_BIAS;
+
+		// get 4 parameters for inverse_M
+		vec4 t1 = texture(LTC1, uv);
+
+		// Get 2 parameters for Fresnel calculation
+		vec4 t2 = texture(LTC2, uv);
+
+		mat3 Minv = mat3(
+			vec3(t1.x, 0, t1.y),
+			vec3(  0,  1,    0),
+			vec3(t1.z, 0, t1.w)
+		);
+
+		// translate light source for testing
+		vec3 translatedPoints[4];
+		translatedPoints[0] = (area_light_rotation * vec4(areaLightVertices0, 1.0)).rgb + area_light_translate;
+		translatedPoints[1] = (area_light_rotation * vec4(areaLightVertices1, 1.0)).rgb + area_light_translate;
+		translatedPoints[2] = (area_light_rotation * vec4(areaLightVertices2, 1.0)).rgb + area_light_translate;
+		translatedPoints[3] = (area_light_rotation * vec4(areaLightVertices3, 1.0)).rgb + area_light_translate;
+
+		// Evaluate LTC shading
+		vec3 diffuse = LTC_Evaluate(N, V, P, mat3(1.0f), translatedPoints, false);
+		vec3 specular = LTC_Evaluate(N, V, P, Minv, translatedPoints, false);
+
+		// GGX BRDF shadowing and Fresnel
+		// t2.x: shadowedF90 (F90 normally it should be 1.0)
+		// t2.y: Smith function for Geometric Attenuation Term, it is dot(V or L, H).
+		specular = specular * (mSpecular * t2.x + (1.0f - mSpecular) * t2.y);
+
+		result = areaLightColor /* * intensity*/  * (/*ambient +*/ Is * specular + kd * diffuse * Id);
+
+		areaOut = ToSRGB(result);//vec4(ToSRGB(result), 1.0f).rgb;
+	/* ==================== End of Area Light ================== */
+	}
+
+	outColor1 = vec4((bloomOut + dirOut + areaOut), 1.0);
 }
 
 

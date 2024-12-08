@@ -22,6 +22,14 @@ namespace INANOA {
 		const glm::vec3 getLightDirPos() const { return glm::vec3(_light_dir[0], _light_dir[1], _light_dir[2]); }
 		const glm::vec3 getTranslate() const { return glm::vec3(translatePos[0], translatePos[1], translatePos[2]); }
 		const glm::mat4 getRotation() const { return glm::rotate(glm::mat4(1.0), glm::radians(areaRotation), glm::vec3(0.0f, 1.0f, 0.0f));}
+		
+		glm::vec3 getCamT() {
+			glm::vec3 cur = glm::vec3(_view_org[0], _view_org[1], _view_org[2]);
+			glm::vec3 t = cur - prev;
+			prev = cur;
+
+			return t;
+		}
 
 		const int getDeferredOption() const { return _deferredOption; }
 		const int getOptions() const { return _options; }
@@ -33,19 +41,31 @@ namespace INANOA {
 		const bool getFXAA() const { return FXAAEnable; }
 		const bool getAreaLight() const { return areaLightEnable; }
 
+		bool changeView();
+
+		bool a = false;
 		void setLookAt(glm::vec3& look_at) {
 			_look_at[0] = look_at.x; 
 			_look_at[1] = look_at.y; 
 			_look_at[2] = look_at.z;
+			a = true;
 		}
 
 		void setViewOrg(glm::vec3& view_org) {
 			_view_org[0] = view_org.x;
 			_view_org[1] = view_org.y;
 			_view_org[2] = view_org.z;
+
+			if (a) {
+				prev = glm::vec3(_view_org[0], _view_org[1], _view_org[2]);
+				a = false;
+			}
 		}
 
 	private:
+
+		glm::vec3 prev;
+
 		int _options;
 		float _look_at[3] = {};
 		float _light_dir[3] = {};
