@@ -41,9 +41,8 @@ namespace INANOA {
 			this->m_base = base;
 		}
 
-		void AreaLightModel::render() {
-			this->m_model_mat = glm::mat4(1.0);
-			this->m_model_mat = glm::translate(m_model_mat, glm::vec3(1.0f, 0.5f, -0.5f));
+		void AreaLightModel::render(glm::vec3 translateVec, glm::mat4 rotate) {
+			this->m_model_mat =  glm::translate(glm::mat4(1.0), translateVec) * rotate;
 			this->m_model_mat = m_model_mat * m_base;
 
 			// bind light colour

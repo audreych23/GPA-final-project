@@ -166,6 +166,8 @@ namespace INANOA {
 		int curOptions = this->_gui.getOptions();
 		glm::vec3 blinpengPos = this->_gui.getLightPos();
 		glm::vec3 sunPos = this->_gui.getLightDirPos();
+		glm::vec3 areaTranslate = this->_gui.getTranslate();
+		glm::mat4 areaRotation = this->_gui.getRotation();
 
 		// =====================================================
 		// Select PostProcessing
@@ -184,6 +186,8 @@ namespace INANOA {
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_NORMAL, _gui.getNormal());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_AREA_LIGHT, _gui.getAreaLight());
 		glUniform3fv(SHADER_PARAMETER_BINDING::DIRECTIONAL_LIGHT_POS, 1, glm::value_ptr(sunPos));
+		glUniform3fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_POS, 1, glm::value_ptr(areaTranslate));
+		glUniformMatrix4fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_ROT, 1, GL_FALSE, glm::value_ptr(areaRotation));
 
 		// =====================================================
 		// Directional Shadow Mapping
@@ -196,7 +200,7 @@ namespace INANOA {
 
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
-			this->area_light->render();
+			this->area_light->render(areaTranslate, areaRotation);
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
@@ -240,7 +244,7 @@ namespace INANOA {
 
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
-			this->area_light->render();
+			this->area_light->render(areaTranslate, areaRotation);
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();

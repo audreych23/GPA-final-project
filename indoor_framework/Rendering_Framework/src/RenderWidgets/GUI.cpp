@@ -12,6 +12,10 @@ namespace INANOA {
 		_light_dir[0] = -2.845;
 		_light_dir[1] = 2.028;
 		_light_dir[2] = -1.293;
+
+		translatePos[0] = 1.0f; 
+		translatePos[1] = 0.5f;
+		translatePos[2] = -0.5f;
 	}
 
 	GUI::~GUI() {}
@@ -52,6 +56,13 @@ namespace INANOA {
 			ImGui::InputFloat("LX", &_look_at[0], 0.1f, 1.0f, "%.3f");
 			ImGui::InputFloat("LY", &_look_at[1], 0.1f, 1.0f, "%.3f");
 			ImGui::InputFloat("LZ", &_look_at[2], 0.1f, 1.0f, "%.3f");
+		}
+
+		if (ImGui::CollapsingHeader("Area Position", ImGuiTreeNodeFlags_None)) {
+			ImGui::InputFloat("AX", &translatePos[0], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("AY", &translatePos[1], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("AZ", &translatePos[2], 0.1f, 1.0f, "%.3f");
+			ImGui::InputFloat("Rotate", &areaRotation, 1.0f, 10.0f, "%.3f");
 		}
 
 		if (ImGui::CollapsingHeader("Directional Light", ImGuiTreeNodeFlags_None)) {

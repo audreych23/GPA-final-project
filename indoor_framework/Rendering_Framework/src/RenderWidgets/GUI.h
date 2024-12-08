@@ -4,7 +4,7 @@
 #include <imgui\imgui_impl_glfw.h>
 #include <imgui\imgui_impl_opengl3.h>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <glm/mat4x4.hpp>
 #include <vector>
 
 namespace INANOA {
@@ -20,6 +20,8 @@ namespace INANOA {
 		const glm::vec3 getLightPos() const { return glm::vec3(_light_pos[0], _light_pos[1], _light_pos[2]); }
 		const glm::vec3 getViewOrigin() const { return glm::vec3(_view_org[0], _view_org[1], _view_org[2]); }
 		const glm::vec3 getLightDirPos() const { return glm::vec3(_light_dir[0], _light_dir[1], _light_dir[2]); }
+		const glm::vec3 getTranslate() const { return glm::vec3(translatePos[0], translatePos[1], translatePos[2]); }
+		const glm::mat4 getRotation() const { return glm::rotate(glm::mat4(1.0), glm::radians(areaRotation), glm::vec3(0.0f, 1.0f, 0.0f));}
 
 		const int getDeferredOption() const { return _deferredOption; }
 		const int getOptions() const { return _options; }
@@ -49,6 +51,7 @@ namespace INANOA {
 		float _light_dir[3] = {};
 		float _view_org[3] = {};
 		float _light_pos[3] = {};
+		float translatePos[3] = {};
 
 		int _deferredOption;
 
@@ -58,5 +61,6 @@ namespace INANOA {
 		bool normalEnable;	
 		bool FXAAEnable;
 		bool areaLightEnable;
+		float areaRotation;
 	};
 }

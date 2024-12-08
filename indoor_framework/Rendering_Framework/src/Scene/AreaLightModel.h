@@ -21,7 +21,7 @@ namespace INANOA {
 
 			void init(glm::vec3 light_color, glm::mat4 base);
 
-			void render();
+			void render(glm::vec3 translateVec, glm::mat4 rotate);
 
 		private:
 			struct LTCMatrices {

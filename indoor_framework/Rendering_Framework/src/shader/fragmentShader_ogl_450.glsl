@@ -6,6 +6,7 @@ layout (location = 2) out vec4 outColor3;
 layout (location = 3) out vec4 outColor4;
 layout (location = 4) out vec4 outColor5;
 
+layout (location = 0) uniform mat4 modelMat;
 layout (location = 3) uniform vec3 cameraPosition;
 layout (location = 4) uniform int postProcessId;
 layout (location = 5) uniform int shadingModelId;
@@ -29,6 +30,9 @@ layout (location = 32) uniform vec3 areaLightVertices1;
 layout (location = 33) uniform vec3 areaLightVertices2;
 layout (location = 34) uniform vec3 areaLightVertices3;
 layout (location = 35) uniform bool hasAreaLight;
+
+layout (location = 40) uniform vec3 area_light_translate;
+layout (location = 41) uniform mat4 area_light_rotation;
 
 uniform sampler2D modelTexture;
 uniform sampler2D modelTextureNormal;
@@ -373,12 +377,11 @@ void RenderIndoor() {
 		);
 
 		// translate light source for testing
-		vec3 area_light_translate = vec3(1.0f, 0.5f, -0.5f);
 		vec3 translatedPoints[4];
-		translatedPoints[0] = areaLightVertices0 + area_light_translate;
-		translatedPoints[1] = areaLightVertices1 + area_light_translate;
-		translatedPoints[2] = areaLightVertices2 + area_light_translate;
-		translatedPoints[3] = areaLightVertices3 + area_light_translate;
+		translatedPoints[0] = (area_light_rotation * vec4(areaLightVertices0, 1.0)).rgb + area_light_translate;
+		translatedPoints[1] = (area_light_rotation * vec4(areaLightVertices1, 1.0)).rgb + area_light_translate;
+		translatedPoints[2] = (area_light_rotation * vec4(areaLightVertices2, 1.0)).rgb + area_light_translate;
+		translatedPoints[3] = (area_light_rotation * vec4(areaLightVertices3, 1.0)).rgb + area_light_translate;
 
 		// Evaluate LTC shading
 		vec3 diffuse = LTC_Evaluate(N, V, P, mat3(1.0f), translatedPoints, false);
@@ -395,11 +398,7 @@ void RenderIndoor() {
 	/* ==================== End of Area Light ================== */
 	}
 
-	// 	vec3 bloomOut = color;
-	// vec3 dirOut = vec3(0.0);
-	// vec3 areaOut = vec3(0.0);
-
-	outColor1 = vec4((bloomOut + dirOut + areaOut) / 3.0, 1.0);
+	outColor1 = vec4((bloomOut + dirOut + areaOut), 1.0);
 }
 
 void RenderTrice() {
