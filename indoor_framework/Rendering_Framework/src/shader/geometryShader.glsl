@@ -23,8 +23,8 @@ void main()
             if(face == 1) gl_Position = shadowMatrices1 * FragPos;
             if(face == 2) gl_Position = shadowMatrices2 * FragPos;
             if(face == 3) gl_Position = shadowMatrices3 * FragPos;
-            if(face == 5) gl_Position = shadowMatrices4 * FragPos;
-            if(face == 6) gl_Position = shadowMatrices5 * FragPos;
+            if(face == 4) gl_Position = shadowMatrices4 * FragPos;
+            if(face == 5) gl_Position = shadowMatrices5 * FragPos;
             EmitVertex();
         }    
         EndPrimitive();
