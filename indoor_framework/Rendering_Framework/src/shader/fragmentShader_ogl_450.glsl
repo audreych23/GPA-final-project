@@ -319,6 +319,10 @@ void RenderIndoor() {
 
 	vec3 color = ambient + diffuse + specular;
 
+	vec3 bloomOut = color;
+	vec3 dirOut = vec3(0.0);
+	vec3 areaOut = vec3(0.0);
+
 	// outColor1 = vec4(color, originalColor.a);
 
 	float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
@@ -330,11 +334,14 @@ void RenderIndoor() {
 	if(hasDirectionalLight){
 		float lightproj = textureProj(modelTextureShadow, vertexData.shadowCoord);
 		outColor1 = lightproj * vec4(color, originalColor.a);
+		dirOut = lightproj * vec4(color, originalColor.a).rgb;
 		outColor3 = 0.0001 * vec4(1.0) * lightproj;
 	}
 	else{
 		outColor1 = vec4(color, originalColor.a);
 	}
+
+	
 
 	if(hasAreaLight){
 	/* ===================== Area Light ======================== */
@@ -384,9 +391,15 @@ void RenderIndoor() {
 
 		result = areaLightColor /* * intensity*/  * (/*ambient +*/ Is * specular + originalColor.rgb * diffuse * Id);
 
-		outColor1 = vec4(ToSRGB(result), 1.0f);
+		areaOut = ToSRGB(result);//vec4(ToSRGB(result), 1.0f).rgb;
 	/* ==================== End of Area Light ================== */
 	}
+
+	// 	vec3 bloomOut = color;
+	// vec3 dirOut = vec3(0.0);
+	// vec3 areaOut = vec3(0.0);
+
+	outColor1 = vec4((bloomOut + dirOut + areaOut) / 3.0, 1.0);
 }
 
 void RenderTrice() {
