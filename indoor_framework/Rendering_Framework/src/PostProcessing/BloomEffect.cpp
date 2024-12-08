@@ -23,13 +23,15 @@ namespace INANOA {
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
 			}
-
+/*
 			glActiveTexture(GL_TEXTURE5);
 			glBindTexture(GL_TEXTURE_2D, noiseTexture);
 			glUniform3fv(70, 64, glm::value_ptr(ssaoKernel[0]));
-
+			*/
 			_screen_quad->render();
 			glEnable(GL_DEPTH_TEST);
+
+
 		}
 
 		void BloomEffect::render() {

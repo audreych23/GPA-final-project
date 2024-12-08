@@ -360,7 +360,12 @@ void RenderIndoor() {
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	vec3 color = ambient + diffuse + specular;
+	// vec3 color = ambient + diffuse + specular;
+
+	float shadow = ShadowCalculation(f_worldPosition);
+	vec3 color = vec3(
+		(ambient + (1.0 - shadow) * (diffuse + specular)) * originalColor.rgb
+	);
 
 	vec3 bloomOut = color;
 	vec3 dirOut = vec3(0.0);
@@ -434,12 +439,16 @@ void RenderIndoor() {
 		areaOut = ToSRGB(result);//vec4(ToSRGB(result), 1.0f).rgb;
 	/* ==================== End of Area Light ================== */
 	}
-	float shadow = ShadowCalculation(f_worldPosition);
-	outColor1 = vec4(
-		(ambient + (1.0 - shadow) * (diffuse + specular)) * originalColor.rgb,
-		1.0
-	);
-	// outColor1 = vec4((bloomOut + dirOut + areaOut), 1.0);
+	
+	vec3 total = (bloomOut + dirOut + areaOut);
+	// float shadow = ShadowCalculation(f_worldPosition);
+	// outColor1 = vec4(
+	// 	(ambient + (1.0 - shadow) * (diffuse + specular)) * originalColor.rgb,
+	// 	1.0
+	// );
+	
+	
+	outColor1 = vec4(total, 1.0);
 }
 
 void RenderTrice() {
@@ -605,8 +614,7 @@ void main() {
 		outColor3 = vec4(0.0, 0.0, 0.0, 0.0);
 		return;
 	}
-
-
+	
 	if (shadingModelId == 0) {
 		RenderIndoor();
 	} else if (shadingModelId == 1) {

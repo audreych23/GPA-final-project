@@ -27,6 +27,7 @@ namespace INANOA {
 			return false;
 		}
 
+
 		const std::string vsFileG = "src\\shader\\vertexDepth.glsl";
 		const std::string fsFileG = "src\\shader\\fragmentDepth.glsl";
 		const std::string gsFileG = "src\\shader\\geometryShader.glsl";
@@ -38,6 +39,7 @@ namespace INANOA {
 		this->m_renderer = renderer;
 
 		// camera constructor for the god camera 
+		m_renderer->useRenderBaseProgram();
 		this->m_godCamera = new Camera(glm::vec3(4.0f, 1.0f, -1.5f), glm::vec3(3.0f, 3.0f, -1.5f), 
 			glm::vec3(0.0f, 1.0f, 0.0f), 5.0f, 45.0f, 0.1f, 100.0f);
 		// update camera projection matrix (call glm::perspecctive)
@@ -271,7 +273,8 @@ namespace INANOA {
 				this->_bloom_effect->bindFBO();
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				this->_dir_shadow_mapping->renderShadow();
-			}
+				this->pointLightShadow->attachTexture();
+			};
 
 			if(this->_gui.getDeferred()) glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::DEFERRED_EFFECT);
 			else glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::BLOOM_EFFECT);
