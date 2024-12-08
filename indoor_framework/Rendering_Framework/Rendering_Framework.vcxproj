@@ -26,6 +26,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\PostProcessing\PointLightShadow.cpp" />
     <ClCompile Include="src\Scene\AreaLightModel.cpp" />
     <ClCompile Include="src\PostProcessing\DirectionalShadowMapping.cpp" />
     <ClCompile Include="src\PostProcessing\DeferredShading.cpp" />
@@ -50,6 +51,7 @@
     <ClCompile Include="src\PostProcessing\VolumetricLights.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\PostProcessing\PointLightShadow.h" />
     <ClInclude Include="src\Scene\AreaLightModel.h" />
     <ClInclude Include="src\PostProcessing\DirectionalShadowMapping.h" />
     <ClInclude Include="src\PostProcessing\DeferredShading.h" />
@@ -71,6 +73,9 @@
     <ClInclude Include="src\Scene\Model.h" />
     <ClInclude Include="src\Scene\Trice.h" />
     <ClInclude Include="src\PostProcessing\VolumetricLights.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader\geometryShader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>

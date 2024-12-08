@@ -13,6 +13,28 @@ namespace INANOA {
 		}
 		RendererBase::~RendererBase() {}
 
+		bool RendererBase::init(const std::string& vsResource, const std::string& fsResource, const std::string& gsResource, const int width, const int height) {
+			this->m_shaderProgram = ShaderProgram::createShaderProgramWithGeometryShader(vsResource, fsResource, gsResource);
+			if (this->m_shaderProgram == nullptr) {
+				return false;
+			}
+
+			this->m_shaderProgram->useProgram();
+
+			/* added for textureBinding
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTexture"), 0);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTextureNormal"), 1);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTextureShadow"), 2);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC1"), 3);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC2"), 4);*/
+
+			// API setting
+			glEnable(GL_DEPTH_TEST);
+			glLineWidth(2.0f);
+
+			return true;
+		}
+
 		bool RendererBase::init(const std::string& vsResource, const std::string& fsResource, const int width, const int height) {
 			this->m_shaderProgram = ShaderProgram::createShaderProgram(vsResource, fsResource);
 			if (this->m_shaderProgram == nullptr) {
@@ -27,6 +49,7 @@ namespace INANOA {
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTextureShadow"), 2);
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC1"), 3);
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC2"), 4);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "depthMap"), 5);
 
 			// API setting
 			glEnable(GL_DEPTH_TEST);

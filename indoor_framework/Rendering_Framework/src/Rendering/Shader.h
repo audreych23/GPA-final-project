@@ -109,6 +109,11 @@ namespace INANOA {
 		public:
 			static ShaderProgram* createShaderProgram(const std::string& vsResource, const std::string& fsResource);
 			static ShaderProgram* createShaderProgramForComputeShader(const std::string& csResource);
+			static ShaderProgram* createShaderProgramWithGeometryShader(
+				const std::string& vsResource,
+				const std::string& fsResource,
+				const std::string& gsResource
+			);
 		};
 	}
 	

@@ -19,12 +19,22 @@ namespace INANOA {
 
 	bool RenderingOrderExp::init(const int w, const int h) {
 		INANOA::OPENGL::RendererBase* renderer = new INANOA::OPENGL::RendererBase();
+		INANOA::OPENGL::RendererBase* renderer2 = new INANOA::OPENGL::RendererBase();
+
 		const std::string vsFile = "src\\shader\\vertexShader_ogl_450.glsl";
 		const std::string fsFile = "src\\shader\\fragmentShader_ogl_450.glsl";
 		if (renderer->init(vsFile, fsFile, w, h) == false) {
 			return false;
 		}
 
+		const std::string vsFileG = "src\\shader\\vertexDepth.glsl";
+		const std::string fsFileG = "src\\shader\\fragmentDepth.glsl";
+		const std::string gsFileG = "src\\shader\\geometryShader.glsl";
+		if (renderer2->init(vsFileG, fsFileG, gsFileG, w, h) == false) {
+			return false;
+		}
+
+		this->m_geometryRenderer = renderer2;
 		this->m_renderer = renderer;
 
 		// camera constructor for the god camera 
@@ -104,6 +114,9 @@ namespace INANOA {
 			this->_volumetric_light = new POST_PROCESSING::VolumetricLights();
 			this->_volumetric_light->init(_screen_quad);
 
+			this->pointLightShadow = new POST_PROCESSING::PointLightShadow();
+			this->pointLightShadow->init();
+
 			glm::mat4 base_model_mat = this->indoor->getModelMat();
 		}
 
@@ -173,7 +186,25 @@ namespace INANOA {
 		m_godCamera->translateLookCenterAndViewOrg(camTranslate);
 
 		// =====================================================
-		// Select PostProcessing
+		// Point Light Mapping
+
+		this->m_geometryRenderer->useRenderBaseProgram();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		this->m_renderer->clearRenderTarget();
+
+		{
+			this->pointLightShadow->bind(blinpengPos);
+
+			this->trice->render();
+			this->indoor->render();
+
+			this->pointLightShadow->unbind();
+		}
+
+
+		// =====================================================
+		// Basic Pipeline
+
 		glClearColor(0.19f, 0.19f, 0.19f, 1.0f);
 		this->m_renderer->useRenderBaseProgram();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -192,16 +223,16 @@ namespace INANOA {
 		glUniform3fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_POS, 1, glm::value_ptr(areaTranslate));
 		glUniformMatrix4fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_ROT, 1, GL_FALSE, glm::value_ptr(areaRotation));
 
+
 		// =====================================================
 		// Directional Shadow Mapping
 
 		{
 			this->_dir_shadow_mapping->bindFBO();
 			this->_dir_shadow_mapping->renderLightSpace(8.0f, sunPos);
+			this->pointLightShadow->attachTexture();
 
 			/* Render Object */
-
-
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
 			this->area_light->render(areaTranslate, areaRotation);
 

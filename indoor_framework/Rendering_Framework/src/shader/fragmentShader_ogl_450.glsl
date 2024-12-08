@@ -39,6 +39,7 @@ uniform sampler2D modelTextureNormal;
 uniform sampler2DShadow modelTextureShadow;
 uniform sampler2D LTC1;
 uniform sampler2D LTC2;
+uniform samplerCube depthMap;
 
 in VertexData
 {
@@ -69,8 +70,46 @@ float quadratic = 0.14f;
 const vec3 areaLightColor = vec3(0.8, 0.6, 0.0);
 
 layout (location = 21) uniform vec3 lightBloomPos;
-vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 const float lightThreshold = 0.9;
+
+/*
+	##################################
+	#   POINT LIGHT SHADOW FUNCTION HELPER   #
+	##################################
+*/
+
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+
+float ShadowCalculation(vec3 fragPos)
+{
+    vec3 fragToLight = fragPos - lightBloomPos;
+
+    float currentDepth = length(fragToLight);
+
+    float shadow = 0.0;
+    float bias = 0.15;
+    int samples = 20;
+    float viewDistance = length(cameraPosition - fragPos);
+    float diskRadius = (1.0 + (viewDistance / 10.0)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= 10.0;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);
+        
+    return shadow;
+}
 
 
 /*
@@ -395,8 +434,12 @@ void RenderIndoor() {
 		areaOut = ToSRGB(result);//vec4(ToSRGB(result), 1.0f).rgb;
 	/* ==================== End of Area Light ================== */
 	}
-
-	outColor1 = vec4((bloomOut + dirOut + areaOut), 1.0);
+	float shadow = ShadowCalculation(f_worldPosition);
+	outColor1 = vec4(
+		(ambient + (1.0 - shadow) * (diffuse + specular)) * originalColor.rgb,
+		1.0
+	);
+	// outColor1 = vec4((bloomOut + dirOut + areaOut), 1.0);
 }
 
 void RenderTrice() {
@@ -562,6 +605,7 @@ void main() {
 		outColor3 = vec4(0.0, 0.0, 0.0, 0.0);
 		return;
 	}
+
 
 	if (shadingModelId == 0) {
 		RenderIndoor();

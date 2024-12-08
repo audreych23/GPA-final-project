@@ -248,6 +248,69 @@ namespace INANOA {
 
 			return shaderProgram;
 		}
+		ShaderProgram* ShaderProgram::createShaderProgramWithGeometryShader(
+			const std::string& vsResource,
+			const std::string& fsResource,
+			const std::string& gsResource) {
+
+			// Create vertex shader
+			Shader* vsShader = new Shader(GL_VERTEX_SHADER);
+			vsShader->createShaderFromFile(vsResource);
+			if (vsShader->status() != ShaderStatus::READY) {
+				std::cout << "VS: " << vsShader->shaderInfoLog() << "\n";
+				delete vsShader;
+				return nullptr;
+			}
+
+			// Create fragment shader
+			Shader* fsShader = new Shader(GL_FRAGMENT_SHADER);
+			fsShader->createShaderFromFile(fsResource);
+			if (fsShader->status() != ShaderStatus::READY) {
+				std::cout << "FS: " << fsShader->shaderInfoLog() << "\n";
+				delete vsShader;
+				delete fsShader;
+				return nullptr;
+			}
+
+			// Create geometry shader
+			Shader* gsShader = new Shader(GL_GEOMETRY_SHADER);
+			gsShader->createShaderFromFile(gsResource);
+			if (gsShader->status() != ShaderStatus::READY) {
+				std::cout << "GS: " << gsShader->shaderInfoLog() << "\n";
+				delete vsShader;
+				delete fsShader;
+				delete gsShader;
+				return nullptr;
+			}
+
+			// Create shader program
+			ShaderProgram* shaderProgram = new ShaderProgram();
+			shaderProgram->init();
+			shaderProgram->attachShader(vsShader);
+			shaderProgram->attachShader(fsShader);
+			shaderProgram->attachShader(gsShader);
+
+			// Check program status
+			shaderProgram->checkStatus();
+			if (shaderProgram->status() != ShaderProgramStatus::READY) {
+				std::cout << "Shader program is not ready.\n";
+				delete vsShader;
+				delete fsShader;
+				delete gsShader;
+				delete shaderProgram;
+				return nullptr;
+			}
+
+			// Link the program
+			shaderProgram->linkProgram();
+
+			// Clean up shaders (they are no longer needed after linking)
+			delete vsShader;
+			delete fsShader;
+			delete gsShader;
+
+			return shaderProgram;
+		}
 	}
 }
 

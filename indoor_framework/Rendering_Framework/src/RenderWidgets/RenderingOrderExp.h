@@ -18,6 +18,8 @@
 #include <Rendering_Framework/src/PostProcessing/DeferredShading.h>
 #include <Rendering_Framework/src/PostProcessing/DirectionalShadowMapping.h>
 #include <Rendering_Framework/src/PostProcessing/VolumetricLights.h>
+#include <Rendering_Framework/src/PostProcessing/PointLightShadow.h>
+
 //#include "Shader.h"
 
 namespace INANOA {
@@ -47,6 +49,7 @@ namespace INANOA {
 
 		// renderer
 		OPENGL::RendererBase* m_renderer = nullptr;
+		OPENGL::RendererBase* m_geometryRenderer = nullptr;
 
 		// model
 		MODEL::Indoor* indoor = nullptr;
@@ -65,7 +68,7 @@ namespace INANOA {
 		POST_PROCESSING::DeferredShading* _deferred_shading = nullptr;
 		POST_PROCESSING::DirectionalShadowMapping* _dir_shadow_mapping = nullptr;
 		POST_PROCESSING::VolumetricLights* _volumetric_light = nullptr;
-
+		POST_PROCESSING::PointLightShadow* pointLightShadow = nullptr;
 		// for screen size viewport
 		int m_frameWidth;
 		int m_frameHeight;
