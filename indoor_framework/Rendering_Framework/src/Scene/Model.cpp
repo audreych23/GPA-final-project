@@ -11,7 +11,13 @@ namespace INANOA {
 
 		void Model::render() {
 			for (unsigned int i = 0; i < _meshes.size(); ++i) {
-				//if (i != 39) continue; // for debug
+				//if (i == 34) continue; --> Floor
+				if (i == 34) {
+					glUniform1i(28, true);
+				}
+				else {
+					glUniform1i(28, false);
+				}
 				_meshes[i].render();
 			}
 		}

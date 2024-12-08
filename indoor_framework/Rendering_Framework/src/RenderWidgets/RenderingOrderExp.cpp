@@ -63,6 +63,9 @@ namespace INANOA {
 			this->sun_sphere = new MODEL::LightSphere();
 			this->sun_sphere->init(base_model_mat);
 
+			this->area_light = new MODEL::AreaLightModel();
+			this->area_light->init(glm::vec3(0.8f, 0.6f, 0.0f), base_model_mat);
+
 			/*this->light_sphere_sun = new MODEL::LightSphere();
 			this->light_sphere_sun->init(base_model_mat);*/
 		}
@@ -100,6 +103,8 @@ namespace INANOA {
 
 			this->_volumetric_light = new POST_PROCESSING::VolumetricLights();
 			this->_volumetric_light->init(_screen_quad);
+
+			glm::mat4 base_model_mat = this->indoor->getModelMat();
 		}
 
 
@@ -177,6 +182,7 @@ namespace INANOA {
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_TOON, _gui.getToon());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_NORMAL, _gui.getNormal());
+		glUniform1i(SHADER_PARAMETER_BINDING::HAS_AREA_LIGHT, _gui.getAreaLight());
 		glUniform3fv(SHADER_PARAMETER_BINDING::DIRECTIONAL_LIGHT_POS, 1, glm::value_ptr(sunPos));
 
 		// =====================================================
@@ -187,6 +193,11 @@ namespace INANOA {
 			this->_dir_shadow_mapping->renderLightSpace(8.0f, sunPos);
 
 			/* Render Object */
+
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render();
+
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
 
@@ -226,6 +237,10 @@ namespace INANOA {
 
 			if(this->_gui.getDeferred()) glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::DEFERRED_EFFECT);
 			else glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::BLOOM_EFFECT);
+
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render();
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();

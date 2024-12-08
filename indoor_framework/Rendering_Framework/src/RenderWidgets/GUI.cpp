@@ -29,6 +29,8 @@ namespace INANOA {
 		ImGui::Checkbox("Use Deferred", &deferredEnable);
 		ImGui::Checkbox("Normal Enable", &normalEnable);
 		ImGui::Checkbox("FXAA Enable", &FXAAEnable);
+		ImGui::Checkbox("Area Light Enable", &areaLightEnable);
+
 		// Input for Deferred Option 
 		if (deferredEnable) {
 			ImGui::Text("Deferred Option");

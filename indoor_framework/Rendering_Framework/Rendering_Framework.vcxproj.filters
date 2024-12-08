@@ -126,6 +126,9 @@
     <ClCompile Include="src\PostProcessing\VolumetricLights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\AreaLightModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -183,6 +186,12 @@
       <Filter>Header Files\PostProcessing</Filter>
     </ClInclude>
     <ClInclude Include="src\PostProcessing\VolumetricLights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\LTCMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\AreaLightModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

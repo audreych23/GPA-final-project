@@ -1,15 +1,13 @@
 #version 450 core
 
-uniform sampler2D screenTexture;
-uniform sampler2D blurTexture;
-uniform sampler2D inColor3;
-uniform sampler2D inColor4;
-uniform sampler2D inColor5;
-uniform sampler2D inColor6;
-uniform sampler2D inColor7;
-uniform sampler2D inColor8;
-uniform sampler2D inColor9;
-uniform sampler2D inColor10;
+layout(binding = 0) uniform sampler2D screenTexture;
+layout(binding = 1) uniform sampler2D blurTexture;
+layout(binding = 2) uniform sampler2D inColor3;
+layout(binding = 3) uniform sampler2D inColor4;
+layout(binding = 4) uniform sampler2D inColor5;
+layout(binding = 5) uniform sampler2D inColor6;
+layout(binding = 6) uniform sampler2D inColor7;
+layout(binding = 7) uniform sampler2D inColor8;
 // layout(binding = 0) uniform sampler2D screenTexture;
 // layout(binding = 1) uniform sampler2D blurTexture;
 // layout(binding = 2) uniform sampler2D inColor3;

@@ -11,7 +11,7 @@
 #include <Rendering_Framework/src/Rendering/ShaderParameterBindingPoint.h>
 #include <Rendering_Framework/src/PostProcessing/ScreenQuad.h>
 
-#define MAX_BLOOM_COLOR 8
+#define MAX_BLOOM_COLOR 6
 
 namespace INANOA {
 	namespace POST_PROCESSING {

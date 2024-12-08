@@ -29,6 +29,7 @@ namespace INANOA {
 		const bool getDeferred() const { return deferredEnable; }
 		const bool getNormal() const { return normalEnable; }
 		const bool getFXAA() const { return FXAAEnable; }
+		const bool getAreaLight() const { return areaLightEnable; }
 
 		void setLookAt(glm::vec3& look_at) {
 			_look_at[0] = look_at.x; 
@@ -56,5 +57,6 @@ namespace INANOA {
 		bool deferredEnable;
 		bool normalEnable;	
 		bool FXAAEnable;
+		bool areaLightEnable;
 	};
 }
