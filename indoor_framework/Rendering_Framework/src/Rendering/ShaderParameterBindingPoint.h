@@ -31,9 +31,22 @@ namespace INANOA {
 		const GLint LIGHT_PROJ_MAT_LOCATION = 13;
 		const GLint LIGHT_BIAS_MAT_LOCATION = 14;
 
+		const GLint AREA_LIGHT_VERTICES_0 = 31;
+		const GLint AREA_LIGHT_VERTICES_1 = 32;
+		const GLint AREA_LIGHT_VERTICES_2 = 33;
+		const GLint AREA_LIGHT_VERTICES_3 = 34;
+
 		const GLint HAS_DIRECTIONAL_LIGHT = 25;
 		const GLint HAS_TOON = 26;
 		const GLint HAS_NORMAL = 27;
+		const GLint HAS_FXAA = 28;
+		const GLint IS_METAL = 29;
+
+		const GLint HAS_AREA_LIGHT = 35;
+
+		const GLint DIRECTIONAL_LIGHT_POS = 30;
+		const GLint AREA_LIGHT_POS = 40;
+		const GLint AREA_LIGHT_ROT = 41;
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {

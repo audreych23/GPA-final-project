@@ -63,6 +63,9 @@ namespace INANOA {
 			this->sun_sphere = new MODEL::LightSphere();
 			this->sun_sphere->init(base_model_mat);
 
+			this->area_light = new MODEL::AreaLightModel();
+			this->area_light->init(glm::vec3(0.8f, 0.6f, 0.0f), base_model_mat);
+
 			/*this->light_sphere_sun = new MODEL::LightSphere();
 			this->light_sphere_sun->init(base_model_mat);*/
 		}
@@ -100,6 +103,8 @@ namespace INANOA {
 
 			this->_volumetric_light = new POST_PROCESSING::VolumetricLights();
 			this->_volumetric_light->init(_screen_quad);
+
+			glm::mat4 base_model_mat = this->indoor->getModelMat();
 		}
 
 
@@ -122,11 +127,6 @@ namespace INANOA {
 		this->_deferred_shading->resize(w, h);
 		this->_dir_shadow_mapping->resize(w, h);
 		this->_volumetric_light->resize(w, h);
-
-
-		//this->_post_processing->resize(w, h);
-		/*this->_post_processing->resizeBloomColor(w, h);
-		this->_post_processing->resizeBloomBlur(w, h);*/
 	}
 
 
@@ -165,11 +165,13 @@ namespace INANOA {
 	void RenderingOrderExp::render() {
 		int curOptions = this->_gui.getOptions();
 		glm::vec3 blinpengPos = this->_gui.getLightPos();
-		glm::vec3 sunPos = _volumetric_light->getLightPosition();
+		glm::vec3 sunPos = this->_gui.getLightDirPos();
+		glm::vec3 areaTranslate = this->_gui.getTranslate();
+		glm::mat4 areaRotation = this->_gui.getRotation();
 		
-		bool enableNormal = true; // Todo: change based on GUI
-		bool enableDirection = true;
-		bool enableToon = false;
+		glm::vec3 camTranslate = this->_gui.getCamT();
+		m_godCamera->translateLookCenterAndViewOrg(camTranslate);
+
 		// =====================================================
 		// Select PostProcessing
 		glClearColor(0.19f, 0.19f, 0.19f, 1.0f);
@@ -178,23 +180,31 @@ namespace INANOA {
 		this->m_renderer->clearRenderTarget();
 
 		// =====================================================
-		// Lazy Uniform
+		// Lazy Uniform for Basic Pipeline
 
 		glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::SHADOW_EFFECT);
 		glUniform3fv(SHADER_PARAMETER_BINDING::LIGHT_BLOOM_POS, 1, glm::value_ptr(blinpengPos));
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_TOON, _gui.getToon());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_NORMAL, _gui.getNormal());
-		// todo add normal
+		glUniform1i(SHADER_PARAMETER_BINDING::HAS_AREA_LIGHT, _gui.getAreaLight());
+		glUniform3fv(SHADER_PARAMETER_BINDING::DIRECTIONAL_LIGHT_POS, 1, glm::value_ptr(sunPos));
+		glUniform3fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_POS, 1, glm::value_ptr(areaTranslate));
+		glUniformMatrix4fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_ROT, 1, GL_FALSE, glm::value_ptr(areaRotation));
 
 		// =====================================================
 		// Directional Shadow Mapping
 
 		{
 			this->_dir_shadow_mapping->bindFBO();
-			this->_dir_shadow_mapping->renderLightSpace(8.0f);
+			this->_dir_shadow_mapping->renderLightSpace(8.0f, sunPos);
 
 			/* Render Object */
+
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render(areaTranslate, areaRotation);
+
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
 
@@ -205,13 +215,12 @@ namespace INANOA {
 			this->light_sphere->render(blinpengPos);
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::SUN_SPHERE);
-			this->sun_sphere->render(sunPos);
+			this->sun_sphere->render(sunPos * glm::vec3(5.0, 2.5, 5.0));
 
 			this->_dir_shadow_mapping->unbindFBO();
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
-
 
 		// =====================================================
 		// View
@@ -236,6 +245,10 @@ namespace INANOA {
 			if(this->_gui.getDeferred()) glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::DEFERRED_EFFECT);
 			else glUniform1i(SHADER_PARAMETER_BINDING::POST_PROCESSING, POST_PROCESSING_TYPE::BLOOM_EFFECT);
 
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render(areaTranslate, areaRotation);
+
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
 
@@ -246,7 +259,7 @@ namespace INANOA {
 			this->light_sphere->render(blinpengPos);
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::SUN_SPHERE);
-			this->sun_sphere->render(sunPos);
+			this->sun_sphere->render(sunPos * glm::vec3(5.0, 2.5, 5.0));
 
 			// Directional Shadow Mapping
 			{
@@ -259,12 +272,17 @@ namespace INANOA {
 		// Render the Post Processing
 		this->_post_processing->usePostProcessingShaderProgram();
 		std::vector<float> viewport({ 0, 0, (float)m_frameWidth, (float)m_frameHeight });
-		this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
+		this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport, sunPos * glm::vec3(5.0, 2.5, 5.0));
 		this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
+
+		// =====================================================
+		// Uniform of the Post Processing
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_TOON, _gui.getToon());
+		glUniform1i(SHADER_PARAMETER_BINDING::HAS_FXAA, _gui.getFXAA());
 
 		if (this->_gui.getDeferred()) {
+			glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr(m_godCamera->projMatrix()));
 			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
 			this->_bloom_effect->renderDeferred(_gui.getDeferredOption());
 		}
@@ -274,43 +292,11 @@ namespace INANOA {
 		else {
 			this->_bloom_effect->render();
 		}
-		/*
-		switch (curOptions)
-		{
-		case POST_PROCESSING_TYPE::BLOOM_EFFECT:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::BLOOM_EFFECT);
-			this->_bloom_effect->render();
-			break;
-		case POST_PROCESSING_TYPE::NON_REALISTIC_PHOTO:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::CARTOON_EFFECT);
-			this->_bloom_effect->renderToon();
-			break;
-		case POST_PROCESSING_TYPE::DEFERRED_EFFECT:
-			glUniformMatrix4fv(69, 1, GL_FALSE, glm::value_ptr( m_godCamera->projMatrix() ));
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::DEFERRED_SHADING);
-			this->_deferred_shading->render(static_cast<POST_PROCESSING::DeferredShading::DeferredShadingOption>(_gui.getDeferredOption()));
-			break;
-		case POST_PROCESSING_TYPE::SHADOW_EFFECT:
-			//this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			//this->_regular_effect->render();
-			//break;
-		case POST_PROCESSING_TYPE::VOLUMETRIC_LIGHT:
-		{
-			std::vector<float> viewport({ 0, 0, (float) m_frameWidth, (float) m_frameHeight });
-			this->_volumetric_light->calculateInNDC(m_godCamera->viewMatrix(), m_godCamera->projMatrix(), viewport);
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::VOLUMETRIC_LIGHT);
-			this->_volumetric_light->render();
-			break;
-		}
-		default:
-			this->_post_processing->setPostProcessingType(OPENGL::PostProcessingType::REGULAR_EFFECT);
-			this->_regular_effect->render();
-			break;
-		}*/
+
 		// =====================================================
 		// GUI
 		this->_gui.setLookAt(m_godCamera->lookCenter());
-		//this->_gui.setViewOrg(m_godCamera->viewOrig());
+		this->_gui.setViewOrg(m_godCamera->viewOrig());
 		this->_gui.render();
 		glm::vec3 new_look_at = _gui.getLookAt();
 		//glm::vec3 new_view_orig = _gui.getLookAt();

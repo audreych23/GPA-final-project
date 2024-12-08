@@ -1,4 +1,5 @@
 #include "BloomEffect.h"
+#include <random>
 
 namespace INANOA {
 	namespace POST_PROCESSING {
@@ -7,18 +8,26 @@ namespace INANOA {
 
 		void BloomEffect::init(ScreenQuad* screen_quad) {
 			_screen_quad = screen_quad;
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			setupSSAO();
 			setupFBO();
 		}
 
 		void BloomEffect::renderDeferred(int option) {
 			glDisable(GL_DEPTH_TEST);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glClear(GL_DEPTH_BUFFER_BIT);
+			//glClear(GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			setBloomSubProcess(static_cast<BloomSubProcess>(option));
-			for (int i = 0; i < MAX_BLOOM_COLOR; i++) {
+			for (int i = 0; i < 5; i++) {
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, _fbo_texture[i]);
 			}
+
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, noiseTexture);
+			glUniform3fv(70, 64, glm::value_ptr(ssaoKernel[0]));
+
 			_screen_quad->render();
 			glEnable(GL_DEPTH_TEST);
 		}
@@ -229,6 +238,53 @@ namespace INANOA {
 				std::cout << "Framebuffer not complete!" << std::endl;
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		}
+
+		static float lerp(float a, float b, float f)
+		{
+			return a + f * (b - a);
+		}
+
+		void BloomEffect::setupSSAO() {
+			/* KERNELLL */
+			std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
+			std::default_random_engine generator;
+			std::vector<glm::vec3> ssaoKernel;
+			for (unsigned int i = 0; i < 64; ++i)
+			{
+				glm::vec3 sample(
+					randomFloats(generator) * 2.0 - 1.0, 
+					randomFloats(generator) * 2.0 - 1.0, 
+					randomFloats(generator)
+				);
+				sample = glm::normalize(sample);
+				sample *= randomFloats(generator);
+				float scale = float(i) / 64.0f;
+
+				// scale samples s.t. they're more aligned to center of kernel
+				scale = lerp(0.1f, 1.0f, scale * scale);
+				sample *= scale;
+
+				ssaoKernel.push_back(sample);
+			}
+
+			/* NOISE SSAO */
+			std::vector<glm::vec3> ssaoNoise;
+			for (unsigned int i = 0; i < 16; i++)
+			{
+				glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f);
+				ssaoNoise.push_back(noise);
+			}
+			glGenTextures(1, &noiseTexture);
+			glBindTexture(GL_TEXTURE_2D, noiseTexture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			this->ssaoKernel = ssaoKernel;
+			this->noiseTexture = noiseTexture;
 		}
 	}
 }

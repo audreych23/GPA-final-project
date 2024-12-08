@@ -28,7 +28,7 @@ namespace INANOA {
 			
 			void init(ScreenQuad* screen_quad);
 
-			void renderLightSpace(float offset);
+			void renderLightSpace(float offset, glm::vec3 pos_orig);
 			
 			void renderShadow();
 

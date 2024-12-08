@@ -25,6 +25,9 @@ namespace INANOA {
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTexture"), 0);
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTextureNormal"), 1);
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "modelTextureShadow"), 2);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC1"), 3);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC2"), 4);
+
 			// API setting
 			glEnable(GL_DEPTH_TEST);
 			glLineWidth(2.0f);

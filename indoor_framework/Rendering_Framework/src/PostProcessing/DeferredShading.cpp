@@ -27,7 +27,7 @@ namespace INANOA {
 			}
 			glActiveTexture(GL_TEXTURE5);
 			glBindTexture(GL_TEXTURE_2D, noiseTexture);
-			glUniform3fv(4, ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
+			glUniform3fv(70, ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
 
 			// render Quad 
 			_screen_quad->render();
@@ -99,15 +99,19 @@ namespace INANOA {
 				);
 				sample = glm::normalize(sample);
 				sample *= randomFloats(generator);
+
+				//sample = glm::vec3(1.0, 1.0, 1.0);
 				ssaoKernel.push_back(sample);
+
+				std::cout << sample[0] << " " << sample[1] << " " << sample[2] << '\n';
 			}
 			/* NOISE SSAO */
 			std::vector<glm::vec3> ssaoNoise;
 			for (unsigned int i = 0; i < 16; i++)
 			{
 				glm::vec3 noise(
-					randomFloats(generator) * 2.0 - 1.0,
-					randomFloats(generator) * 2.0 - 1.0,
+					randomFloats(generator),// * 2.0 - 1.0,
+					randomFloats(generator),// * 2.0 - 1.0,
 					0.0f);
 				ssaoNoise.push_back(noise);
 			}

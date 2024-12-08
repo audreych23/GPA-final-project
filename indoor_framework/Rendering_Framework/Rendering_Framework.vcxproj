@@ -26,6 +26,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Scene\AreaLightModel.cpp" />
     <ClCompile Include="src\PostProcessing\DirectionalShadowMapping.cpp" />
     <ClCompile Include="src\PostProcessing\DeferredShading.cpp" />
     <ClCompile Include="src\PostProcessing\ScreenQuad.cpp" />
@@ -49,6 +50,7 @@
     <ClCompile Include="src\PostProcessing\VolumetricLights.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\AreaLightModel.h" />
     <ClInclude Include="src\PostProcessing\DirectionalShadowMapping.h" />
     <ClInclude Include="src\PostProcessing\DeferredShading.h" />
     <ClInclude Include="src\PostProcessing\ScreenQuad.h" />
@@ -64,6 +66,7 @@
     <ClInclude Include="src\Rendering\Shader.h" />
     <ClInclude Include="src\Rendering\ShaderParameterBindingPoint.h" />
     <ClInclude Include="src\RenderWidgets\RenderingOrderExp.h" />
+    <ClInclude Include="src\Scene\LTCMatrix.h" />
     <ClInclude Include="src\Scene\Mesh.h" />
     <ClInclude Include="src\Scene\Model.h" />
     <ClInclude Include="src\Scene\Trice.h" />

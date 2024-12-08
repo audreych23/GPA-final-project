@@ -13,6 +13,7 @@ namespace INANOA {
 			TRICE_MODEL = 1,
 			LIGHT_SPHERE = 2,
 			SUN_SPHERE = 3,
+			AREA_LIGHT = 4,
 		};
 
 

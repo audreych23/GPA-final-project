@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+
 #include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
@@ -9,7 +11,7 @@
 #include <Rendering_Framework/src/Rendering/ShaderParameterBindingPoint.h>
 #include <Rendering_Framework/src/PostProcessing/ScreenQuad.h>
 
-#define MAX_BLOOM_COLOR 8
+#define MAX_BLOOM_COLOR 6
 
 namespace INANOA {
 	namespace POST_PROCESSING {
@@ -30,6 +32,8 @@ namespace INANOA {
 			void render();
 			void renderDeferred(int option);
 			void renderToon();
+
+			void setupSSAO();
 
 			void resize(int width, int height);
 
@@ -59,6 +63,10 @@ namespace INANOA {
 			// For Cartoon
 			GLuint _fbo_toon;
 			GLuint _fbo_toon_texture;
+
+			// SSAO
+			GLuint noiseTexture;
+			std::vector<glm::vec3> ssaoKernel;
 		};
 	}
 }
