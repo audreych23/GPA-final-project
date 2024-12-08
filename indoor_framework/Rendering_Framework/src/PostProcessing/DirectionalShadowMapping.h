@@ -63,6 +63,7 @@ namespace INANOA {
 			// light parameters
 			int SHADOW_WIDTH = 1024;
 			int SHADOW_HEIGHT = 1024;
+
 			glm::vec3 _light_look_at;
 			glm::vec3 _light_orig;
 			float _light_near;

@@ -19,6 +19,7 @@ layout (location = 10) uniform float ns;
 layout (location = 11) uniform int hasTexture;
 
 layout (location = 20) uniform int PostProcessMain;
+layout (location = 21) uniform vec3 lightBloomPos;
 
 layout (location = 15) uniform vec3 lightColor;
 
@@ -27,12 +28,16 @@ layout (location = 31) uniform vec3 areaLightVertices1;
 layout (location = 32) uniform vec3 areaLightVertices2;
 layout (location = 33) uniform vec3 areaLightVertices3;
 
+layout (location = 46) uniform float pointShadowFarPlane;
+
 uniform sampler2D modelTexture;
 uniform sampler2D modelTextureNormal;
 uniform sampler2DShadow modelTextureShadow;
 
 uniform sampler2D LTC1;
 uniform sampler2D LTC2;
+
+uniform samplerCube modelTextureShadowPoint;
 
 in VertexData
 {
@@ -61,9 +66,155 @@ float constant = 1.0f;
 float linear = 0.7f;
 float quadratic = 0.14f;
 
-layout (location = 21) uniform vec3 lightBloomPos;
 vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 const float lightThreshold = 0.9;
+
+/*
+	##################################
+	#      Point Shadow Mapping      #
+	##################################
+*/
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float ShadowCalculation(vec3 fragPos)
+{
+    // get vector between fragment position and light position
+    vec3 fragToLight = fragPos - lightBloomPos;
+    // use the fragment to light vector to sample from the depth map    
+    // float closestDepth = texture(depthMap, fragToLight).r;
+    // it is currently in linear range between [0,1], let's re-transform it back to original depth value
+    // closestDepth *= far_plane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // test for shadows
+    // float bias = 0.05; // we use a much larger bias since depth is now in [near_plane, far_plane] range
+    // float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+    // PCF
+    // float shadow = 0.0;
+    // float bias = 0.05; 
+    // float samples = 4.0;
+    // float offset = 0.1;
+    // for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+    // {
+        // for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+        // {
+            // for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+            // {
+                // float closestDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r; // use lightdir to lookup cubemap
+                // closestDepth *= far_plane;   // Undo mapping [0;1]
+                // if(currentDepth - bias > closestDepth)
+                    // shadow += 1.0;
+            // }
+        // }
+    // }
+    // shadow /= (samples * samples * samples);
+    float shadow = 0.0;
+    float bias = 0.15;
+    int samples = 20;
+    float viewDistance = length(cameraPosition - fragPos);
+    float diskRadius = (1.0 + (viewDistance / pointShadowFarPlane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(modelTextureShadowPoint, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= pointShadowFarPlane;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);
+        
+    // display closestDepth as debug (to visualize depth cubemap)
+    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+        
+    return shadow;
+}
+
+void RenderIndoorShadowPoint() {
+	vec3 N = normalize(f_vertexData.N);
+	vec3 L = normalize(f_vertexData.L);
+	vec3 H = normalize(f_vertexData.H);
+
+	vec4 originalColor = vec4(0.0);
+	if(hasTexture == 0) {
+		originalColor = vec4(kd, 1.0);
+	}
+	else {
+		originalColor = texture(modelTexture, f_vertexData.texCoord.xy);
+	}
+
+	if (originalColor.a < 0.5) {
+		discard;
+	}
+
+	vec3 ambient = Ia * originalColor.rgb;
+
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * originalColor.rgb;
+
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
+
+	// vec3 color = ambient + diffuse + specular;
+
+	// fragColor = vec4(color, originalColor.a);
+	float shadow = ShadowCalculation(f_worldPosition);
+	// float lightproj = textureProj(modelTextureShadow, f_vertexData.shadowCoord);
+	vec3 lighting = (ambient + (1.0 - shadow) * diffuse + (1.0 - shadow) * specular);
+	fragColor = vec4(lighting, originalColor.a);
+	// brightColor = 0.0001 * vec4(1.0) * textureProj(modelTextureShadow, f_vertexData.shadowCoord);
+}
+
+void RenderTriceShadowPoint() {
+	vec3 N = normalize(texture(modelTextureNormal, f_vertexData.texCoord.xy).rgb * 2.0 - vec3(1.0));
+	vec3 V = normalize(f_vertexData.eyeDirNormalMapping);
+	vec3 L = normalize(f_vertexData.lightDirNormalMapping);
+	vec3 H = normalize(f_vertexData.halfwayDirNormalMapping);
+
+	// vec3 R = reflect(-L, N);
+	// actually trice has no texture
+	vec3 ambient = Ia * kd;
+
+	float diff = max(dot(N, L), 0.0);
+	vec3 diffuse = Id * diff * kd;
+
+	float spec = pow(max(dot(N, H), 0.0), ns);
+	vec3 specular = Is * spec * ks;
+
+	// vec3 color = ambient + diffuse + specular;
+
+	// fragColor = vec4(color, 1.0);
+	float shadow = ShadowCalculation(f_worldPosition);
+	// float lightproj = textureProj(modelTextureShadow, f_vertexData.shadowCoord);
+	vec3 lighting = (ambient + (1.0 - shadow) * diffuse + (1.0 - shadow) * specular);
+	fragColor = vec4(lighting, 1.0);
+}
+
+void getPointShadowDepthIndoor() {
+	float lightDistance = length(f_worldPosition.xyz - lightBloomPos);
+    
+    // map to [0;1] range by dividing by far_plane
+    lightDistance = lightDistance / pointShadowFarPlane;
+    
+    // write this as modified depth
+    gl_FragDepth = lightDistance;
+}
+
+void getPointShadowDepthTrice() {
+	float lightDistance = length(f_worldPosition.xyz - lightBloomPos);
+    
+    // map to [0;1] range by dividing by far_plane
+    lightDistance = lightDistance / pointShadowFarPlane;
+    
+    // write this as modified depth
+    gl_FragDepth = lightDistance;
+
+}
 
 /*
 	##################################
@@ -633,6 +784,33 @@ void main() {
 				discard;
 			} else if (shadingModelId == 3) {
 				RenderAreaLight();
+			}
+			break;
+		}
+	case 6:
+		{	
+			if (postProcessId == 0) {
+				if (shadingModelId == 0) {
+					getPointShadowDepthIndoor();
+				} else if (shadingModelId == 1) {
+					getPointShadowDepthTrice();
+				} else if (shadingModelId == 2) {
+					discard;
+				} else {
+					discard;
+				}
+			} else {
+				if (shadingModelId == 0) {
+					RenderIndoorShadowPoint();
+				} else if (shadingModelId == 1) {
+					RenderTriceShadowPoint();
+				} else if (shadingModelId == 2) {
+					RenderLightSphere();
+					// discard;
+				} else if (shadingModelId == 3) {
+					// RenderIndoorShadowPoint();
+					discard;
+				}
 			}
 			break;
 		}

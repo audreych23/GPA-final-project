@@ -38,6 +38,17 @@ namespace INANOA {
 		const GLint AREA_LIGHT_VERTICES_1 = 31;
 		const GLint AREA_LIGHT_VERTICES_2 = 32;
 		const GLint AREA_LIGHT_VERTICES_3 = 33;
+
+		// point shadow special uniform
+		const GLint LIGHT_VIEW_MAT_LOCATION_0 = 40;
+		const GLint LIGHT_VIEW_MAT_LOCATION_1 = 41;
+		const GLint LIGHT_VIEW_MAT_LOCATION_2 = 42;
+		const GLint LIGHT_VIEW_MAT_LOCATION_3 = 43;
+		const GLint LIGHT_VIEW_MAT_LOCATION_4 = 44;
+		const GLint LIGHT_VIEW_MAT_LOCATION_5 = 45;
+
+		const GLint POINT_SHADOW_FAR_PLANE = 46;
+
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {

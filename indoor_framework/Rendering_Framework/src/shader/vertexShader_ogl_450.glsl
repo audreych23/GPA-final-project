@@ -37,7 +37,7 @@ layout (location = 21) uniform vec3 lightBloomPos;
 // light pos is in world space
 // vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 // point light pos is in world space (bloom)
- vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
+vec3 lightPosition = vec3(1.87659, 0.4625 , 0.103928);
 // light position in world space (shadow mapping)
 //vec3 lightPosition = vec3(-2.845, 2.028, -1.293);
 
@@ -92,6 +92,10 @@ void main() {
         } else if (postProcessId == 1) {
             g_vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
         }
+    } else if (PostProcessMain == 6) {
+        if (postProcessId == 0) {
+            gl_Position = modelMat * vec4(v_vertex, 1.0);
+        } 
     }
 
 }

@@ -101,6 +101,9 @@ namespace INANOA {
 
 			this->_volumetric_light = new POST_PROCESSING::VolumetricLights();
 			this->_volumetric_light->init(_screen_quad);
+
+			this->_point_shadow = new POST_PROCESSING::PointShadow();
+			this->_point_shadow->init(_screen_quad);
 		}
 
 
@@ -123,6 +126,7 @@ namespace INANOA {
 		this->_deferred_shading->resize(w, h);
 		this->_dir_shadow_mapping->resize(w, h);
 		this->_volumetric_light->resize(w, h);
+		this->_point_shadow->resize(w, h);
 
 
 		//this->_post_processing->resize(w, h);
@@ -192,6 +196,7 @@ namespace INANOA {
 		//	this->_regular_effect->bindFBO(); 
 		//	break;
 		//} 
+		this->_point_shadow->bindFBO();
 
 		this->m_renderer->useRenderBaseProgram();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -206,9 +211,9 @@ namespace INANOA {
 		// =====================================================
 		// Directional Shadow Mapping
 
-		if(curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT)
-		{
-			this->_dir_shadow_mapping->renderLightSpace(8.0f);
+		/*if(curOptions == POST_PROCESSING_TYPE::POINT_SHADOW)
+		{*/
+			this->_point_shadow->renderLightSpace(8.0f);
 
 			/* Render Object */
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
@@ -220,13 +225,13 @@ namespace INANOA {
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render(blinpengPos);
 
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
-			this->area_light->render();
+			/*this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render();*/
 
-			this->_dir_shadow_mapping->unbindFBO();
+			this->_point_shadow->unbindFBO();
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
+		//}
 
 
 		// =====================================================
@@ -249,6 +254,9 @@ namespace INANOA {
 				this->_dir_shadow_mapping->renderShadow();
 			}*/
 
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			this->_point_shadow->renderShadow();
+
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
 
@@ -258,9 +266,11 @@ namespace INANOA {
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
 			this->light_sphere->render(blinpengPos);
 
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
-			this->area_light->render();
+			/*this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render();*/
+			
 
+			this->_point_shadow->finishRender();
 			// Directional Shadow Mapping
 			/*if (curOptions == POST_PROCESSING_TYPE::SHADOW_EFFECT) {
 				this->_regular_effect->unbindFBO();

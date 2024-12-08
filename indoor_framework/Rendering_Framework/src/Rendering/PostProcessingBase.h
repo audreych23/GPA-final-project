@@ -17,6 +17,7 @@ namespace INANOA {
 			DIRECTIONAL_SHADOW_MAPPING = 3,
 			CARTOON_EFFECT = 4,
 			VOLUMETRIC_LIGHT = 5,
+			POINT_SHADOW = 6
 		};		
 		
 		class PostProcessingBase
