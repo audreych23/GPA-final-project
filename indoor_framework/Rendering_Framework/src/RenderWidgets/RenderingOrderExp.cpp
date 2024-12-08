@@ -224,7 +224,7 @@ namespace INANOA {
 		glUniform3fv(SHADER_PARAMETER_BINDING::DIRECTIONAL_LIGHT_POS, 1, glm::value_ptr(sunPos));
 		glUniform3fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_POS, 1, glm::value_ptr(areaTranslate));
 		glUniformMatrix4fv(SHADER_PARAMETER_BINDING::AREA_LIGHT_ROT, 1, GL_FALSE, glm::value_ptr(areaRotation));
-
+		glUniform1i(SHADER_PARAMETER_BINDING::HAS_POINT_SHADOW, _gui.getPointShadow());
 
 		// =====================================================
 		// Directional Shadow Mapping

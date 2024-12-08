@@ -33,6 +33,7 @@ layout (location = 35) uniform bool hasAreaLight;
 
 layout (location = 40) uniform vec3 area_light_translate;
 layout (location = 41) uniform mat4 area_light_rotation;
+layout (location = 42) uniform bool hasPointShadow;
 
 uniform sampler2D modelTexture;
 uniform sampler2D modelTextureNormal;
@@ -360,10 +361,11 @@ void RenderIndoor() {
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	// vec3 color = ambient + diffuse + specular;
+	vec3 color = ambient + diffuse + specular;
 
 	float shadow = ShadowCalculation(f_worldPosition);
-	vec3 color = vec3(
+	if(hasPointShadow)
+	color = vec3(
 		(ambient + (1.0 - shadow) * (diffuse + specular)) * originalColor.rgb
 	);
 
@@ -486,6 +488,12 @@ void RenderTrice() {
 	specular *= attenuation;
 
 	vec3 color = ambient + diffuse + specular;
+
+	float shadow = ShadowCalculation(f_worldPosition);
+	if(hasPointShadow)
+	color = vec3(
+		(ambient + (1.0 - shadow) * (diffuse + specular)) * kd
+	);
 
 	vec3 bloomOut = color;
 	vec3 dirOut = vec3(0.0);

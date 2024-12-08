@@ -44,6 +44,7 @@ namespace INANOA {
 		ImGui::Checkbox("Normal Enable", &normalEnable);
 		ImGui::Checkbox("FXAA Enable", &FXAAEnable);
 		ImGui::Checkbox("Area Light Enable", &areaLightEnable);
+		ImGui::Checkbox("Point Light Shadow", &hasPointShadow);
 
 		// Input for Deferred Option 
 		if (deferredEnable) {
@@ -56,7 +57,6 @@ namespace INANOA {
 			if (ImGui::RadioButton("Option 3", _deferredOption == 2)) _deferredOption = 2;
 			if (ImGui::RadioButton("Option 4", _deferredOption == 3)) _deferredOption = 3;
 			if (ImGui::RadioButton("Option 5", _deferredOption == 4)) _deferredOption = 4;
-			if (ImGui::RadioButton("Option 6", _deferredOption == 5)) _deferredOption = 5;
 			ImGui::PopStyleVar(2); // Pop
 		}
 	

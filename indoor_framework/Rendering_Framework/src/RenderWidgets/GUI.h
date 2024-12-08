@@ -40,8 +40,9 @@ namespace INANOA {
 		const bool getNormal() const { return normalEnable; }
 		const bool getFXAA() const { return FXAAEnable; }
 		const bool getAreaLight() const { return areaLightEnable; }
+		const bool getPointShadow() const { return hasPointShadow; }
 
-		bool changeView();
+		//bool z();
 
 		bool a = false;
 		void setLookAt(glm::vec3& look_at) {
@@ -81,6 +82,7 @@ namespace INANOA {
 		bool normalEnable;	
 		bool FXAAEnable;
 		bool areaLightEnable;
+		bool hasPointShadow;
 		float areaRotation;
 	};
 }

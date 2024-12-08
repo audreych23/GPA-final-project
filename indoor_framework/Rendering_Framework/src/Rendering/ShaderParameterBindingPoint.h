@@ -47,6 +47,7 @@ namespace INANOA {
 		const GLint DIRECTIONAL_LIGHT_POS = 30;
 		const GLint AREA_LIGHT_POS = 40;
 		const GLint AREA_LIGHT_ROT = 41;
+		const GLint HAS_POINT_SHADOW = 42;
 	}
 
 	namespace SHADER_POST_PARAMETER_BINDING {
