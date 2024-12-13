@@ -44,6 +44,9 @@ namespace INANOA {
 			glm::mat4 scale_bias_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
 			scale_bias_matrix = glm::scale(scale_bias_matrix, glm::vec3(0.5f, 0.5f, 0.5f));
 			glUniformMatrix4fv(SHADER_PARAMETER_BINDING::LIGHT_BIAS_MAT_LOCATION, 1, false, glm::value_ptr(scale_bias_matrix));*/
+			glm::mat4 scale_bias_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
+			scale_bias_matrix = glm::scale(scale_bias_matrix, glm::vec3(0.5f, 0.5f, 0.5f));
+			glUniformMatrix4fv(200, 1, false, glm::value_ptr(scale_bias_matrix));
 
 			glActiveTexture(GL_TEXTURE6);
 			glBindTexture(GL_TEXTURE_2D, _fbo_texture);

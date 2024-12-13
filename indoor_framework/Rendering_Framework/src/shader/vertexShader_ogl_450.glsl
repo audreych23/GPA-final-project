@@ -34,6 +34,7 @@ layout (location = 20) uniform int PostProcessMain;
 layout (location = 21) uniform vec3 lightBloomPos;
 
 layout (location = 30) uniform vec3 directionalPosition;
+layout(location = 200) uniform mat4 ssrBiasMatrix;
  
 // hard coding this stuff
 // light pos is in world space
@@ -96,6 +97,6 @@ void main() {
         }
     }
     vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
-    vertexData.ssrCoord    = lightBiasMat * projMat * viewMat * modelMat * vec4(v_vertex, 1.0);
+    vertexData.ssrCoord    = ssrBiasMatrix * projMat * viewMat * modelMat * vec4(v_vertex, 1.0);
 
 }

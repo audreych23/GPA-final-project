@@ -269,23 +269,28 @@ bool rayIsOutofScreen(vec2 ray){
 
 vec3 TraceRay(vec3 rayPos, vec3 dir, int iterationCount){
 	float sampleDepth;
-	vec3 hitColor = vec3(0);
+	vec3 hitColor = vec3(0, 0, 0);
 	bool hit = false;
-    float bias = 0.0005;
+    float bias = 0.001;
 
-	for(int i = 0; i < iterationCount; i++){
-		rayPos += dir;
+	for(int i = 0; i <= iterationCount * 2; i++){
+        if(i == iterationCount){
+            return vec3(0, 0, 0);
+        }
+		rayPos += dir / 2;
 		if(rayIsOutofScreen(rayPos.xy)){
-			break;
+			return vec3(0, 0, 0);
 		}
 
 		sampleDepth = texture(inColor8, rayPos.xy).r;
+        hitColor = texture(screenTexture, rayPos.xy).rgb;
 		float depthDif = rayPos.z - sampleDepth - bias;
-		if(depthDif >= 0 && depthDif < 0.00001){
+		if(depthDif >= 0 && depthDif < 0.0005){
 			hit = true;
 			hitColor = texture(screenTexture, rayPos.xy).rgb;
 			break;
 		}
+        
 	}
 	return hitColor;
 }

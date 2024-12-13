@@ -237,35 +237,6 @@ namespace INANOA {
 
 
 		// =====================================================
-		// Depth SSR
-
-		//if (ENABLE_SSR)
-		{
-			this->_depthSSR->bindFBO();
-			this->_depthSSR->renderLightSpace(4.0f, m_godCamera->viewOrig(), m_godCamera->viewMatrix(), m_godCamera->projMatrix());
-
-			/* Render Object */
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
-			this->area_light->render(areaTranslate, areaRotation);
-
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
-			this->trice->render();
-
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
-			this->indoor->render();
-
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
-			this->light_sphere->render(blinpengPos);
-
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::SUN_SPHERE);
-			this->sun_sphere->render(sunPos * glm::vec3(5.0, 2.5, 5.0));
-
-			this->_depthSSR->unbindFBO();
-
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
-
-		// =====================================================
 		// Directional Shadow Mapping
 
 		{
@@ -303,6 +274,35 @@ namespace INANOA {
 		);
 
 		this->m_renderer->setViewport(0, 0, this->m_frameWidth, this->m_frameHeight);
+
+		// =====================================================
+		// Depth SSR
+
+		//if (ENABLE_SSR)
+		{
+			this->_depthSSR->bindFBO();
+			this->_depthSSR->renderLightSpace(4.0f, m_godCamera->viewOrig(), m_godCamera->viewMatrix(), m_godCamera->projMatrix());
+
+			/* Render Object */
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+			this->area_light->render(areaTranslate, areaRotation);
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
+			this->trice->render();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::INDOOR_MODEL);
+			this->indoor->render();
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::LIGHT_SPHERE);
+			this->light_sphere->render(blinpengPos);
+
+			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::SUN_SPHERE);
+			this->sun_sphere->render(sunPos * glm::vec3(5.0, 2.5, 5.0));
+
+			this->_depthSSR->unbindFBO();
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
 
 		// =====================================================
 		// Render Scene
@@ -357,9 +357,9 @@ namespace INANOA {
 		glm::mat4 invViewMatrix = glm::inverse(viewMatrix);
 		glUniformMatrix4fv(50, 1, GL_FALSE, glm::value_ptr(invViewMatrix));
 		glUniformMatrix4fv(51, 1, GL_FALSE, glm::value_ptr(projMatrix));
-		glUniformMatrix4fv(53, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		
 		glUniformMatrix4fv(52, 1, GL_FALSE, glm::value_ptr(invProjMatrix));
+		glUniformMatrix4fv(53, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	
 		
 
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());
