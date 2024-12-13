@@ -20,6 +20,11 @@ private:
 
 	glm::mat4 m_modelMat;
 
+	// texture
+	GLuint m_elevationHandle;
+	GLuint m_normalHandle;
+	GLuint m_albedoHandle;
+
 public:
 	DynamicSceneObject(const int maxNumVertex, const int maxNumIndex, const bool normalFlag, const bool uvFlag);
 	virtual ~DynamicSceneObject();
@@ -35,5 +40,10 @@ public:
 	void setPixelFunctionId(const int functionId);
 	void setPrimitive(const GLenum primitive);
 	void setModelMat(const glm::mat4& modelMat);
+
+	// added for texture
+	void setElevationTextureHandle(const GLuint texHandle);
+	void setNormalTextureHandle(const GLuint texHandle);
+	void setAlbedoTextureHandle(const GLuint texHandle);
 };
 

@@ -61,6 +61,17 @@ DynamicSceneObject::~DynamicSceneObject()
 void DynamicSceneObject::update() {
 	// bind Buffer
 	glBindVertexArray(this->m_vao);
+
+	// Activatea TEXTURE 0/2/3 (something like that)
+	glActiveTexture(SceneManager::Instance()->m_elevationTexUnit);
+	glBindTexture(GL_TEXTURE_2D, this->m_elevationHandle);
+
+	glActiveTexture(SceneManager::Instance()->m_normalTexUnit);
+	glBindTexture(GL_TEXTURE_2D, this->m_normalHandle);
+
+	glActiveTexture(SceneManager::Instance()->m_albedoTexUnit);
+	glBindTexture(GL_TEXTURE_2D, this->m_albedoHandle);
+
 	// model matrix
 	glUniformMatrix4fv(SceneManager::Instance()->m_modelMatHandle, 1, false, glm::value_ptr(this->m_modelMat));
 
@@ -88,4 +99,17 @@ void DynamicSceneObject::setPrimitive(const GLenum primitive) {
 }
 void DynamicSceneObject::setModelMat(const glm::mat4& modelMat){
 	this->m_modelMat = modelMat;
+}
+
+// tex handle is the texture handle or the texture that you will bind 
+void DynamicSceneObject::setElevationTextureHandle(const GLuint texHandle) {
+	this->m_elevationHandle = texHandle;
+}
+
+void DynamicSceneObject::setNormalTextureHandle(const GLuint texHandle) {
+	this->m_normalHandle = texHandle;
+}
+
+void DynamicSceneObject::setAlbedoTextureHandle(const GLuint texHandle) {
+	this->m_albedoHandle = texHandle;
 }
