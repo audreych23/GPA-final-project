@@ -7,7 +7,7 @@ layout(binding = 3) uniform sampler2D inColor4;
 layout(binding = 4) uniform sampler2D inColor5;
 layout(binding = 5) uniform sampler2D inColor6;
 layout(binding = 6) uniform sampler2D inColor7; // gNormal, w=isMetal
-layout(binding = 7) uniform sampler2D inColor8;  // gPoistion,
+layout(binding = 7) uniform sampler2D inColor8;  // Sampler2D Shadow,
 
 out vec4 fragColor;
 
@@ -271,7 +271,7 @@ vec3 TraceRay(vec3 rayPos, vec3 dir, int iterationCount){
 	float sampleDepth;
 	vec3 hitColor = vec3(0, 0, 0);
 	bool hit = false;
-    float bias = 0.001;
+    float bias = 0.0005;
 
 	for(int i = 0; i <= iterationCount * 2; i++){
         if(i == iterationCount){
@@ -305,7 +305,7 @@ vec4 SSR()
 	//View Space ray calculation
 	vec3 pixelPositionTexture;
 	pixelPositionTexture.xy = vec2(gl_FragCoord.x / SCR_WIDTH,  gl_FragCoord.y / SCR_HEIGHT);
-	vec3 normalView = texture(inColor7, pixelPositionTexture.xy).rgb;	
+	vec3 normalView = (texture(inColor7, pixelPositionTexture.xy) - 0.5).rgb * 2;	
 	float pixelDepth = texture(inColor8, pixelPositionTexture.xy).r;
 	pixelPositionTexture.z = pixelDepth;		
 	vec4 positionView = invProjection * vec4(pixelPositionTexture * 2 - vec3(1), 1);
