@@ -129,6 +129,12 @@
     <ClCompile Include="src\Scene\AreaLightModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PostProcessing\PointLightShadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcessing\DepthSSR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Camera\Camera.h">
@@ -194,5 +200,14 @@
     <ClInclude Include="src\Scene\AreaLightModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PostProcessing\PointLightShadow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcessing\DepthSSR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader\geometryShader.glsl" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,9 @@ layout (location = 1) out vec4 outColor2;
 layout (location = 2) out vec4 outColor3;
 layout (location = 3) out vec4 outColor4;
 layout (location = 4) out vec4 outColor5;
+layout (location = 5) out vec4 outColor6;
+layout (location = 6) out vec4 outColor7;
+layout (location = 7) out vec4 outColor8;
 
 layout (location = 0) uniform mat4 modelMat;
 layout (location = 3) uniform vec3 cameraPosition;
@@ -41,6 +44,7 @@ uniform sampler2DShadow modelTextureShadow;
 uniform sampler2D LTC1;
 uniform sampler2D LTC2;
 uniform samplerCube depthMap;
+uniform sampler2DShadow SSRdepth;
 
 in VertexData
 {
@@ -49,7 +53,7 @@ in VertexData
     vec3 H; // eye space halfway vector
     vec3 texCoord;
 	vec4 shadowCoord;
-
+	vec4 ssrCoord;
 	// for normal mapping
 	vec3 lightDirNormalMapping;
 	vec3 eyeDirNormalMapping;
@@ -568,6 +572,7 @@ void RenderTrice() {
 	}
 
 	outColor1 = vec4((bloomOut + dirOut + areaOut), 1.0);
+	outColor6 = vec4(spec, spec, spec, 1.0);
 }
 
 
@@ -614,6 +619,17 @@ void main() {
 		} else{
 			discard;
 		} 
+
+		if(isMetalic){
+			outColor7 = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
+			// outColor8 = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
+			// outColor7 = vec4(vertexData.N, 1.0);
+			outColor8 = vec4(f_worldPosition, 1.0);
+		}
+		else{
+			outColor7 = vec4(0.0, 0.0, 0.0, 0.0);
+		}
+
 		return;
 	}
 	
@@ -646,5 +662,19 @@ void main() {
 	if(!hasDirectionalLight){
 		outColor3 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
+		float mydepth = textureProj(SSRdepth, vertexData.ssrCoord);
+		outColor8 = vec4(mydepth, mydepth, mydepth, 1);
+	if(isMetalic){
+		outColor7 = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
 
+		// outColor8 = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
+		// outColor7 = vec4(vertexData.N, 1.0);
+		// outColor8 = vec4(f_worldPosition, 1.0);
+	}
+	else{
+		outColor7 = vec4(0.0, 0.0, 0.0, 0.0);
+	}
+
+		// float mydepth = textureProj(SSRdepth, vertexData.ssrCoord);
+		// outColor1 = vec4(mydepth, mydepth, mydepth, 1);
 }

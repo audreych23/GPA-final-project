@@ -1,23 +1,13 @@
 #version 450 core
 
-layout(binding = 0) uniform sampler2D screenTexture;
+layout(binding = 0) uniform sampler2D screenTexture; // gFinalImage
 layout(binding = 1) uniform sampler2D blurTexture;
 layout(binding = 2) uniform sampler2D inColor3;
 layout(binding = 3) uniform sampler2D inColor4;
 layout(binding = 4) uniform sampler2D inColor5;
 layout(binding = 5) uniform sampler2D inColor6;
-layout(binding = 6) uniform sampler2D inColor7;
-layout(binding = 7) uniform sampler2D inColor8;
-// layout(binding = 0) uniform sampler2D screenTexture;
-// layout(binding = 1) uniform sampler2D blurTexture;
-// layout(binding = 2) uniform sampler2D inColor3;
-// layout(binding = 3) uniform sampler2D inColor4;
-// layout(binding = 4) uniform sampler2D inColor5;
-// layout(binding = 5) uniform sampler2D inColor6;
-// layout(binding = 6) uniform sampler2D inColor7;
-// layout(binding = 7) uniform sampler2D inColor8;
-// layout(binding = 8) uniform sampler2D inColor9;
-// layout(binding = 9) uniform sampler2D inColor10;
+layout(binding = 6) uniform sampler2D inColor7; // gNormal, w=isMetal
+layout(binding = 7) uniform sampler2D inColor8;  // gPoistion,
 
 out vec4 fragColor;
 
@@ -39,6 +29,13 @@ layout (location = 28) uniform bool hasFXAA;
 
 layout (location = 69) uniform mat4 projectionMat;
 layout (location = 70) uniform vec3 samples[64];
+
+layout (location = 50) uniform mat4 invView;
+layout (location = 51) uniform mat4 projection;
+layout (location = 52) uniform mat4 invProjection;
+layout (location = 53) uniform mat4 view;	
+
+vec4 SSR();
 
 const float exposure = 1.2;
 
@@ -185,7 +182,18 @@ void BloomFinalEffect() {
     vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // tone mapping
     result = pow(result, vec3(1.0 / gamma)); // also gamma correct while we're at it      
 	result = hdrColor;
-    fragColor = vec4(result, 1.0) + VolumetricLight();
+    vec4 outColor = vec4(result, 1.0) + VolumetricLight();
+
+    float Metallic;
+    Metallic = texture2D(inColor7, fs_in.texcoord).a;
+
+    if(Metallic < 0.5){
+        fragColor = outColor;
+    }
+    else{
+        
+        fragColor = outColor + SSR();
+    }
 }
 
 void ToonFinalEffect() {
@@ -223,7 +231,7 @@ void ToonFinalEffect() {
     }
 
 	float final = sqrt(sumx * sumx + sumy * sumy);
-	fragColor = vec4(vec3(texture(screenTexture, fs_in.texcoord).rgb - final), 1.0);
+    fragColor = vec4(vec3(texture(screenTexture, fs_in.texcoord).rgb - final), 1.0);
 }
 
 
@@ -254,20 +262,82 @@ float LinearizeDepth(float depth)
     return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
 }
 
+/* ===================================== SSR ========================================== */
+bool rayIsOutofScreen(vec2 ray){
+	return (ray.x > 1 || ray.y > 1 || ray.x < 0 || ray.y < 0) ? true : false;
+}
+
+vec3 TraceRay(vec3 rayPos, vec3 dir, int iterationCount){
+	float sampleDepth;
+	vec3 hitColor = vec3(0);
+	bool hit = false;
+    float bias = 0.0005;
+
+	for(int i = 0; i < iterationCount; i++){
+		rayPos += dir;
+		if(rayIsOutofScreen(rayPos.xy)){
+			break;
+		}
+
+		sampleDepth = texture(inColor8, rayPos.xy).r;
+		float depthDif = rayPos.z - sampleDepth - bias;
+		if(depthDif >= 0 && depthDif < 0.00001){
+			hit = true;
+			hitColor = texture(screenTexture, rayPos.xy).rgb;
+			break;
+		}
+	}
+	return hitColor;
+}
+
+vec4 SSR()
+{
+    float SCR_WIDTH = textureSize(screenTexture, 0).x;
+    float SCR_HEIGHT = textureSize(screenTexture, 0).y;
+
+    float maxRayDistance = 100.0f;
+
+	//View Space ray calculation
+	vec3 pixelPositionTexture;
+	pixelPositionTexture.xy = vec2(gl_FragCoord.x / SCR_WIDTH,  gl_FragCoord.y / SCR_HEIGHT);
+	vec3 normalView = texture(inColor7, pixelPositionTexture.xy).rgb;	
+	float pixelDepth = texture(inColor8, pixelPositionTexture.xy).r;
+	pixelPositionTexture.z = pixelDepth;		
+	vec4 positionView = invProjection * vec4(pixelPositionTexture * 2 - vec3(1), 1);
+	positionView /= positionView.w;
+	vec3 reflectionView = normalize(reflect(positionView.xyz, normalView));
+	if(reflectionView.z > 0){
+		return vec4(0, 0, 0, 1);
+	}
+	vec3 rayEndPositionView = positionView.xyz + reflectionView * maxRayDistance;
+
+
+	//Texture Space ray calculation
+	vec4 rayEndPositionTexture = projection * vec4(rayEndPositionView,1);
+	rayEndPositionTexture /= rayEndPositionTexture.w;
+	rayEndPositionTexture.xyz = (rayEndPositionTexture.xyz + vec3(1)) / 2.0f;
+	vec3 rayDirectionTexture = rayEndPositionTexture.xyz - pixelPositionTexture;
+
+	ivec2 screenSpaceStartPosition = ivec2(pixelPositionTexture.x * SCR_WIDTH, pixelPositionTexture.y * SCR_HEIGHT); 
+	ivec2 screenSpaceEndPosition = ivec2(rayEndPositionTexture.x * SCR_WIDTH, rayEndPositionTexture.y * SCR_HEIGHT); 
+	ivec2 screenSpaceDistance = screenSpaceEndPosition - screenSpaceStartPosition;
+	int screenSpaceMaxDistance = max(abs(screenSpaceDistance.x), abs(screenSpaceDistance.y)) / 2;
+	rayDirectionTexture /= max(screenSpaceMaxDistance, 0.001f);
+
+
+	//trace the ray
+	vec3 outColor = TraceRay(pixelPositionTexture, rayDirectionTexture, screenSpaceMaxDistance);
+	return vec4(outColor, 1);
+}
+
+/* ======================= END OF SSR ========================================== */
+
+
+
 void main()
 {	
 	if(postProcessingEffect == 2){
 		DefferedShading();
-		// fragColor = texture(screenTexture, fs_in.texcoord);
-    	// fragColor = vec4(normalize(texture(blurTexture, fs_in.texcoord).rgb), 1.0);
-
-		// fragColor = texture(inColor6, fs_in.texcoord);
-		// int index = int(floor(fs_in.texcoord.x * 64.0));       // Map to range [0, 63]
-
-		// // Fetch the corresponding kernel sample
-		// vec3 kernelSample = samples[index];
-		// fragColor = vec4(kernelSample, 1.0);
-		
 		return;
 	}
 	if (postProcessingEffect == 3) {
@@ -282,46 +352,10 @@ void main()
 		BloomBlurEffect();
 	} 
 	else if(postSubProcess == 1){
-		// final bloom
-		BloomFinalEffect();
+
+        BloomFinalEffect();
 	}
 	else{
 		ToonFinalEffect();
 	}
-	/*
-	if (postProcessingEffect == 0) {
-		RegularEffect();
-	} 
-	else if (postProcessingEffect == 1) {
-		if (postSubProcess == 0) {
-			// blur
-			BloomBlurEffect();
-		} 
-		else {
-			// final bloom
-			BloomFinalEffect();
-		}
-	}
-	else if (postProcessingEffect == 2){
-		DefferedShading();
-	} else if (postProcessingEffect == 3) {
-		float depthValue = texture(screenTexture, fs_in.texcoord).r;
-		float tt = LinearizeDepth(depthValue);
-		fragColor = vec4(vec3(tt), 1.0);
-	}
-	else if (postProcessingEffect == 4){
-		if (postSubProcess == 0) {
-			// blur
-			BloomBlurEffect();
-		} 
-		else if(postSubProcess == 1){
-			BloomFinalEffect();
-		}
-		else {
-			// Toon final bloom
-			ToonFinalEffect();
-		}
-	} else if (postProcessingEffect == 5) {
-		VolumetricLight();
-	}*/
 }

@@ -50,6 +50,7 @@ namespace INANOA {
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC1"), 3);
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "LTC2"), 4);
 			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "depthMap"), 5);
+			glUniform1i(glGetUniformLocation(this->m_shaderProgram->programId(), "SSRdepth"), 6);
 
 			// API setting
 			glEnable(GL_DEPTH_TEST);

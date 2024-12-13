@@ -26,6 +26,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\PostProcessing\DepthSSR.cpp" />
     <ClCompile Include="src\PostProcessing\PointLightShadow.cpp" />
     <ClCompile Include="src\Scene\AreaLightModel.cpp" />
     <ClCompile Include="src\PostProcessing\DirectionalShadowMapping.cpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="src\PostProcessing\VolumetricLights.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\PostProcessing\DepthSSR.h" />
     <ClInclude Include="src\PostProcessing\PointLightShadow.h" />
     <ClInclude Include="src\Scene\AreaLightModel.h" />
     <ClInclude Include="src\PostProcessing\DirectionalShadowMapping.h" />

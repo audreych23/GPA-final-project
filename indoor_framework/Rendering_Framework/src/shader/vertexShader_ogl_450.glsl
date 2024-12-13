@@ -11,7 +11,7 @@ out VertexData {
 	vec3 H; // view space halfway vector
 	vec3 texCoord;
     vec4 shadowCoord;
-
+    vec4 ssrCoord;
 	// for normal mapping
 	vec3 lightDirNormalMapping;
 	vec3 eyeDirNormalMapping;
@@ -94,6 +94,8 @@ void main() {
         } else if (postProcessId == 1) {
             
         }
-    }vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+    }
+    vertexData.shadowCoord = lightBiasMat * lightProjMat * lightViewMat * modelMat * vec4(v_vertex, 1.0);
+    vertexData.ssrCoord    = lightBiasMat * projMat * viewMat * modelMat * vec4(v_vertex, 1.0);
 
 }

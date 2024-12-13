@@ -19,6 +19,7 @@
 #include <Rendering_Framework/src/PostProcessing/DirectionalShadowMapping.h>
 #include <Rendering_Framework/src/PostProcessing/VolumetricLights.h>
 #include <Rendering_Framework/src/PostProcessing/PointLightShadow.h>
+#include <Rendering_Framework/src/PostProcessing/DepthSSR.h>
 
 //#include "Shader.h"
 
@@ -69,6 +70,7 @@ namespace INANOA {
 		POST_PROCESSING::DirectionalShadowMapping* _dir_shadow_mapping = nullptr;
 		POST_PROCESSING::VolumetricLights* _volumetric_light = nullptr;
 		POST_PROCESSING::PointLightShadow* pointLightShadow = nullptr;
+		POST_PROCESSING::DepthSSR* _depthSSR = nullptr;
 		// for screen size viewport
 		int m_frameWidth;
 		int m_frameHeight;
