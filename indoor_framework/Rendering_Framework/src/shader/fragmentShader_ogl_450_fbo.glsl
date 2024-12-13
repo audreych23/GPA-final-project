@@ -274,7 +274,7 @@ vec3 TraceRay(vec3 rayPos, vec3 dir, int iterationCount){
 	float sampleDepth;
 	vec3 hitColor = vec3(0, 0, 0);
 	bool hit = false;
-    float bias = 0; //0.0005;
+    float bias = 0.0005;
 
 	for(int i = 0; i <= iterationCount; i++){
         if(i == iterationCount){
@@ -314,7 +314,10 @@ vec4 SSR()
 	pixelPositionTexture.z = pixelDepth;		
 	vec4 positionView = invProjection * vec4(pixelPositionTexture * 2 - vec3(1), 1);
 	positionView /= positionView.w;
-	vec3 reflectionView = normalize(reflect(positionView.xyz, normalView));
+
+    vec3 normalViewSpace = normalize((view * vec4(normalView, 0.0)).xyz);
+    vec3 viewPosViewSpace = (positionView).xyz;
+    vec3 reflectionView = normalize(reflect(viewPosViewSpace, normalViewSpace));
 	if(reflectionView.z > 0){
 		return vec4(0, 0, 0, 1);
 	}

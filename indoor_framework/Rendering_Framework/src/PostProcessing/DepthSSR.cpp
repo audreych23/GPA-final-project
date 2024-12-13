@@ -26,7 +26,7 @@ namespace INANOA {
 			glEnable(GL_DEPTH_TEST);
 
 			// for removing shadow acne
-			openGLPolygonHelper(4.0f);
+			openGLPolygonHelper(16.0f);
 
 			setDirectionalShadowMappingSubProcess(DirectionalShadowMappingSubProcess::LIGHT_SPACE_RENDER);
 			glUniformMatrix4fv(SHADER_PARAMETER_BINDING::LIGHT_VIEW_MAT_LOCATION, 1, false, glm::value_ptr(lookAt));

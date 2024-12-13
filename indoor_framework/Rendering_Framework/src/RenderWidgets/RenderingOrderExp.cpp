@@ -244,8 +244,11 @@ namespace INANOA {
 			this->_depthSSR->renderLightSpace(4.0f, m_godCamera->viewOrig(), m_godCamera->viewMatrix(), m_godCamera->projMatrix());
 
 			/* Render Object */
-			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
-			this->area_light->render(areaTranslate, areaRotation);
+			if(_gui.getAreaLight())
+			{
+				this->m_renderer->setShadingModel(OPENGL::ShadingModelType::AREA_LIGHT);
+				this->area_light->render(areaTranslate, areaRotation);
+			}
 
 			this->m_renderer->setShadingModel(OPENGL::ShadingModelType::TRICE_MODEL);
 			this->trice->render();
