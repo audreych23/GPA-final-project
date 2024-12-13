@@ -34,6 +34,7 @@ layout (location = 50) uniform mat4 invView;
 layout (location = 51) uniform mat4 projection;
 layout (location = 52) uniform mat4 invProjection;
 layout (location = 53) uniform mat4 view;	
+layout (location = 54) uniform bool canReflect;	
 
 vec4 SSR();
 
@@ -187,12 +188,14 @@ void BloomFinalEffect() {
     float Metallic;
     Metallic = texture2D(inColor7, fs_in.texcoord).a;
 
-    if(Metallic < 0.5){
+    if(Metallic > 0.5 || !canReflect){
         fragColor = outColor;
     }
     else{
-        
+        // fragColor = vec4(1.0, 0.0, 0.0, 1.0);
         fragColor = outColor + SSR();
+        // vec3 normalView = normalize((texture(inColor7, fs_in.texcoord).rgb - 0.5) * 2.0);
+        // fragColor = vec4(normalView * 0.5 + 0.5, 1.0); // Visualize normals
     }
 }
 
@@ -271,21 +274,22 @@ vec3 TraceRay(vec3 rayPos, vec3 dir, int iterationCount){
 	float sampleDepth;
 	vec3 hitColor = vec3(0, 0, 0);
 	bool hit = false;
-    float bias = 0.0005;
+    float bias = 0; //0.0005;
 
-	for(int i = 0; i <= iterationCount * 2; i++){
+	for(int i = 0; i <= iterationCount; i++){
         if(i == iterationCount){
-            return vec3(0, 0, 0);
+            return hitColor;
         }
-		rayPos += dir / 2;
+		rayPos += dir;
 		if(rayIsOutofScreen(rayPos.xy)){
 			return vec3(0, 0, 0);
 		}
 
 		sampleDepth = texture(inColor8, rayPos.xy).r;
-        hitColor = texture(screenTexture, rayPos.xy).rgb;
+        float isMetal = texture2D(inColor7, rayPos.xy).a;
+        // hitColor = texture(screenTexture, rayPos.xy).rgb;
 		float depthDif = rayPos.z - sampleDepth - bias;
-		if(depthDif >= 0 && depthDif < 0.0005){
+		if(depthDif >= 0 && depthDif < 0.0005 && isMetal > 0.5){
 			hit = true;
 			hitColor = texture(screenTexture, rayPos.xy).rgb;
 			break;
@@ -303,8 +307,8 @@ vec4 SSR()
     float maxRayDistance = 100.0f;
 
 	//View Space ray calculation
-	vec3 pixelPositionTexture;
-	pixelPositionTexture.xy = vec2(gl_FragCoord.x / SCR_WIDTH,  gl_FragCoord.y / SCR_HEIGHT);
+	vec3 pixelPositionTexture = vec3(fs_in.texcoord.x, fs_in.texcoord.y, 1);
+	// pixelPositionTexture.xy = vec2(gl_FragCoord.x / SCR_WIDTH,  gl_FragCoord.y / SCR_HEIGHT);
 	vec3 normalView = (texture(inColor7, pixelPositionTexture.xy) - 0.5).rgb * 2;	
 	float pixelDepth = texture(inColor8, pixelPositionTexture.xy).r;
 	pixelPositionTexture.z = pixelDepth;		
@@ -328,7 +332,6 @@ vec4 SSR()
 	ivec2 screenSpaceDistance = screenSpaceEndPosition - screenSpaceStartPosition;
 	int screenSpaceMaxDistance = max(abs(screenSpaceDistance.x), abs(screenSpaceDistance.y)) / 2;
 	rayDirectionTexture /= max(screenSpaceMaxDistance, 0.001f);
-
 
 	//trace the ray
 	vec3 outColor = TraceRay(pixelPositionTexture, rayDirectionTexture, screenSpaceMaxDistance);

@@ -45,6 +45,7 @@ namespace INANOA {
 		ImGui::Checkbox("FXAA Enable", &FXAAEnable);
 		ImGui::Checkbox("Area Light Enable", &areaLightEnable);
 		ImGui::Checkbox("Point Light Shadow", &hasPointShadow);
+		ImGui::Checkbox("SSR", &screenSpace);
 
 		// Input for Deferred Option 
 		if (deferredEnable) {

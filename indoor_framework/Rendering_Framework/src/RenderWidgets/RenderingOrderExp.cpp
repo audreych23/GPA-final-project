@@ -358,7 +358,8 @@ namespace INANOA {
 		glUniformMatrix4fv(51, 1, GL_FALSE, glm::value_ptr(projMatrix));
 		glUniformMatrix4fv(52, 1, GL_FALSE, glm::value_ptr(invProjMatrix));
 		glUniformMatrix4fv(53, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	
+		glUniform1i(54, _gui.getReflection());
+		glUniform3fv(54, 1, glm::value_ptr(m_godCamera->viewOrig()));
 		
 
 		glUniform1i(SHADER_PARAMETER_BINDING::HAS_DIRECTIONAL_LIGHT, _gui.getDirectional());

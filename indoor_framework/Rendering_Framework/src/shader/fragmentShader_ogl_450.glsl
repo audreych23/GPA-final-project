@@ -665,14 +665,14 @@ void main() {
 		float mydepth = textureProj(SSRdepth, vertexData.ssrCoord);
 		outColor8 = vec4(mydepth, mydepth, mydepth, 1);
 	if(isMetalic){
-		outColor7 = vec4(normalize(vertexData.N) * 0.5 + 0.5, 1.0);
+		outColor7 = vec4(normalize(vertexData.N) * 0.5 + 0.5, 0.0);
 
 		// outColor8 = vec4(normalize(f_worldPosition) * 0.5 + 0.5, 1.0);
 		// outColor7 = vec4(vertexData.N, 1.0);
 		// outColor8 = vec4(f_worldPosition, 1.0);
 	}
 	else{
-		outColor7 = vec4(0.0, 0.0, 0.0, 0.0);
+		outColor7 = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 
 		// float mydepth = textureProj(SSRdepth, vertexData.ssrCoord);

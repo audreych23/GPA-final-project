@@ -41,7 +41,7 @@ namespace INANOA {
 		const bool getFXAA() const { return FXAAEnable; }
 		const bool getAreaLight() const { return areaLightEnable; }
 		const bool getPointShadow() const { return hasPointShadow; }
-
+		const bool getReflection() const { return screenSpace; }
 		//bool z();
 
 		bool a = false;
@@ -83,6 +83,7 @@ namespace INANOA {
 		bool FXAAEnable;
 		bool areaLightEnable;
 		bool hasPointShadow;
+		bool screenSpace;
 		float areaRotation;
 	};
 }
