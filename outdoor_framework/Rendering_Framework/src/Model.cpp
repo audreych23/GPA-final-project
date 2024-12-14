@@ -2,8 +2,8 @@
 
 Model::Model() {}
 
-Model::Model(char* path, char* spatial_sample_path, float texture_coord_z) : _texture_coord_z(texture_coord_z) {
-	loadModel(path);
+Model::Model(char* path, char* spatial_sample_path, std::string texture_path, float texture_coord_z) : _texture_coord_z(texture_coord_z) {
+	loadModel(path, texture_path);
 
 	// load spatialsample for each model, in this current implemtnation since 
 	// each model only has one mesh, a simpler method is done
@@ -21,7 +21,7 @@ const std::vector<Mesh>& Model::getMeshes() const {
 	return _meshes;
 }
 
-void Model::loadModel(std::string path) {
+void Model::loadModel(std::string path, std::string texture_path) {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
@@ -36,22 +36,22 @@ void Model::loadModel(std::string path) {
 	}
 	_directory = path.substr(0, path.find_last_of('/'));
 
-	processNode(scene->mRootNode, scene);
+	processNode(scene->mRootNode, scene, texture_path);
 }
 
-void Model::processNode(aiNode* node, const aiScene* scene) {
+void Model::processNode(aiNode* node, const aiScene* scene, std::string texture_path) {
 	// process all node's meshes if it exists
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		_meshes.push_back(processMesh(mesh, scene)); // process the mesh into the data structure we packed
+		_meshes.push_back(processMesh(mesh, scene, texture_path)); // process the mesh into the data structure we packed
 	}
 	// recursively call its children
 	for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-		processNode(node->mChildren[i], scene);
+		processNode(node->mChildren[i], scene, texture_path);
 	}
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, std::string texture_path) {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
@@ -96,9 +96,18 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+	
+	if (texture_path != "") {
+		Texture texture;
+		texture.id = 0/*TextureFromFile(texture_path.C_Str(), _directory)*/;
+		texture.type = "";
+		texture.path = texture_path;
+		textures.push_back(texture);
+	}
+
 
 	// process material
-	if (mesh->mMaterialIndex >= 0) {
+	/*if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		std::vector<Texture> diffuse_maps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
@@ -106,7 +115,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 		std::vector<Texture> specular_maps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
-	}
+	}*/
 
 	return Mesh(vertices, indices, textures);
 }

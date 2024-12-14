@@ -22,6 +22,7 @@ private:
 
 	std::vector<DynamicSceneObject*> m_dynamicSOs;
 	TerrainSceneObject* m_terrainSO = nullptr;
+	DynamicSceneObject* m_dynamicBushesBuildings;
 
 
 public:
@@ -33,6 +34,7 @@ public:
 	void setViewport(const int x, const int y, const int w, const int h);
 	void appendDynamicSceneObject(DynamicSceneObject *obj);
 	void appendTerrainSceneObject(TerrainSceneObject* tSO);
+	void appendDynamicBushesBuildings(DynamicSceneObject* obj);
 
 // pipeline
 public:

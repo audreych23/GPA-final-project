@@ -4,9 +4,9 @@
 MyBushesAndBuildings::MyBushesAndBuildings(
 	const GLuint fsFunctionHandle, const int pixelProcessFuncBinding) 
 {
-	this->m_modelBush01 = new Model("assets\\bush01.obj", "assets\\poissonPoints_1010.ppd2", 0.0f);
-	this->m_modelBush05 = new Model("assets\\bush05_lod2.obj", "assets\\poissonPoints_2797.ppd2", 1.0f);
-	this->m_modelGrass = new Model("assets\\grassB.obj", "assets\\poissonPoints_621043_after.ppd2", 2.0f);
+	this->m_modelBush01 = new Model("assets\\bush01_lod2.obj", "assets\\poissonPoints_1010.ppd2", "assets\\bush01.png", 0.0f);
+	this->m_modelBush05 = new Model("assets\\bush05_lod2.obj", "assets\\poissonPoints_2797.ppd2", "assets\\bush05.png", 1.0f);
+	this->m_modelGrass = new Model("assets\\grassB.obj", "assets\\poissonPoints_621043_after.ppd2", "assets\\grassB_albedo.png", 2.0f);
 	//this->m_house = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_1.obj", "assets\\cityLots_sub_0.ppd2", 3.0f);
 	//this->m_house2 = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_2.obj", "assets\\cityLots_sub_1.ppd2", 4.0f);
 
@@ -17,7 +17,7 @@ MyBushesAndBuildings::MyBushesAndBuildings(
 	// set modelMat
 	this->m_dynamicSO->setModelMat(glm::mat4(1.0f));
 	this->m_dynamicSO->setPrimitive(GL_TRIANGLES);
-	this->m_dynamicSO->setPixelFunctionId(SceneManager::Instance()->m_fs_bushesBuildingsPass);
+	this->m_dynamicSO->setPixelFunctionId(pixelProcessFuncBinding);
 }
 
 MyBushesAndBuildings::~MyBushesAndBuildings() {
@@ -221,22 +221,23 @@ void MyBushesAndBuildings::loadMergedTextureFromFile() {
 	auto modelMesh1 = m_modelBush01->getMeshes();
 	auto modelMesh2 = m_modelBush05->getMeshes();
 	auto modelMesh3 = m_modelGrass->getMeshes();
-	auto modelMesh4 = m_house->getMeshes();
-	auto modelMesh5 = m_house2->getMeshes();
+	//auto modelMesh4 = m_house->getMeshes();
+	//auto modelMesh5 = m_house2->getMeshes();
 
 	// luckily there's only 1 texture and 1 mesh
 	std::string path0 = modelMesh1[0].textures[0].path;
 	std::string path1 = modelMesh2[0].textures[0].path;
 	std::string path2 = modelMesh3[0].textures[0].path;
-	std::string path3 = modelMesh4[0].textures[0].path;
-	std::string path4 = modelMesh5[0].textures[0].path;
+	//std::string path3 = modelMesh4[0].textures[0].path;
+	//std::string path4 = modelMesh5[0].textures[0].path;
 
 	// 3 different models filename
 	std::string filename0 = std::string(path0);
 	std::string filename1 = std::string(path1);
 	std::string filename2 = std::string(path2);
-	std::string filename3 = std::string(path3);
-	std::string filename4 = std::string(path4);
+	std::cout << filename0 << " " << filename1 << " " << filename2 << '\n';
+	//std::string filename3 = std::string(path3);
+	//std::string filename4 = std::string(path4);
 	//filename = "textures/" + filename;
 	//std::cout << "file_name:\n " << filename_0 << '\n';
 
@@ -245,8 +246,8 @@ void MyBushesAndBuildings::loadMergedTextureFromFile() {
 	unsigned char* data0 = stbi_load(filename0.c_str(), &width, &height, &nrComponents, 0);
 	unsigned char* data1 = stbi_load(filename1.c_str(), &width, &height, &nrComponents, 0);
 	unsigned char* data2 = stbi_load(filename2.c_str(), &width, &height, &nrComponents, 0);
-	unsigned char* data3 = stbi_load(filename3.c_str(), &width, &height, &nrComponents, 0);
-	unsigned char* data4 = stbi_load(filename4.c_str(), &width, &height, &nrComponents, 0);
+	//unsigned char* data3 = stbi_load(filename3.c_str(), &width, &height, &nrComponents, 0);
+	//unsigned char* data4 = stbi_load(filename4.c_str(), &width, &height, &nrComponents, 0);
 
 	const int NUM_TEXTURE = 5;
 	const int IMG_WIDTH = 1024;
@@ -259,11 +260,11 @@ void MyBushesAndBuildings::loadMergedTextureFromFile() {
 	memcpy(textureArrayData, data0, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
 	memcpy(textureArrayData + IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL, data1, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
 	memcpy(textureArrayData + IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL * 2, data2, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
-	memcpy(textureArrayData + IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL * 3, data3, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
-	memcpy(textureArrayData + IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL * 4, data4, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
+	//memcpy(textureArrayData + IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL * 3, data3, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
+	//memcpy(textureArrayData + IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL * 4, data4, sizeof(unsigned char) * IMG_WIDTH * IMG_HEIGHT * IMG_CHANNEL);
 
 	GLuint textureArrayHandler;
-	if (data0 && data1 && data2 && data3 && data4)
+	if (data0 && data1 && data2 /* && data3 && data4 */)
 	{
 		glGenTextures(1, &textureArrayHandler);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, textureArrayHandler);
@@ -288,8 +289,8 @@ void MyBushesAndBuildings::loadMergedTextureFromFile() {
 		stbi_image_free(data0);
 		stbi_image_free(data1);
 		stbi_image_free(data2);
-		stbi_image_free(data3);
-		stbi_image_free(data4);
+		//stbi_image_free(data3);
+		//stbi_image_free(data4);
 	}
 	else
 	{
@@ -308,14 +309,14 @@ void MyBushesAndBuildings::loadMergedTextureFromFile() {
 			stbi_image_free(data2);
 		}
 
-		if (!data3) {
-			std::cout << "Texture failed to load at path: " << filename3 << std::endl;
-			stbi_image_free(data3);
-		}
+		//if (!data3) {
+		//	std::cout << "Texture failed to load at path: " << filename3 << std::endl;
+		//	stbi_image_free(data3);
+		//}
 
-		if (!data4) {
-			std::cout << "Texture failed to load at path: " << filename4 << std::endl;
-			stbi_image_free(data4);
-		}
+		//if (!data4) {
+		//	std::cout << "Texture failed to load at path: " << filename4 << std::endl;
+		//	stbi_image_free(data4);
+		//}
 	}
 }

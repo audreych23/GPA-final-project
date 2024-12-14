@@ -61,12 +61,17 @@ void SceneRenderer::setView(const glm::mat4 &view){
 void SceneRenderer::setViewport(const int x, const int y, const int w, const int h) {
 	glViewport(x, y, w, h);
 }
-void SceneRenderer::appendDynamicSceneObject(DynamicSceneObject *obj){
+void SceneRenderer::appendDynamicSceneObject(DynamicSceneObject *obj) {
 	this->m_dynamicSOs.push_back(obj);
 }
 void SceneRenderer::appendTerrainSceneObject(TerrainSceneObject* tSO) {
 	this->m_terrainSO = tSO;
 }
+
+void SceneRenderer::appendDynamicBushesBuildings(DynamicSceneObject* obj) {
+	this->m_dynamicBushesBuildings = obj;
+}
+
 void SceneRenderer::clear(const glm::vec4 &clearColor, const float depth){
 	static const float COLOR[] = { 0.0, 0.0, 0.0, 1.0 };
 	static const float DEPTH[] = { 1.0 };

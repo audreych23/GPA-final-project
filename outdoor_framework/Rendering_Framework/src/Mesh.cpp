@@ -6,14 +6,14 @@ Mesh::Mesh(std::vector<Vertex> vertices,
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
-	//std::cout << "======mesh======" << '\n';
-	//std::cout << vertices.size() << '\n';
-	//std::cout << indices.size() << '\n';
-	//std::cout << textures.size() << '\n';
-	//if (textures.size() > 0) {
-	//	std::cout << "texture path: " << textures[0].path << '\n';
-	//}
-	//std::cout << "====================" << '\n';
+	std::cout << "======mesh======" << '\n';
+	std::cout << vertices.size() << '\n';
+	std::cout << indices.size() << '\n';
+	std::cout << textures.size() << '\n';
+	if (textures.size() > 0) {
+		std::cout << "texture path: " << textures[0].path << '\n';
+	}
+	std::cout << "====================" << '\n';
 
 	//setupMesh();
 

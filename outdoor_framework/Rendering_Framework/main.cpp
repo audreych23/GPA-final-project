@@ -6,6 +6,7 @@
 #include "src\ViewFrustumSceneObject.h"
 #include "src\terrain\MyTerrain.h"
 #include "src\MyCameraManager.h"
+#include "src\MyBushesAndBuildings.h"
 
 
 #pragma comment (lib, "lib-vc2015\\glfw3.lib")
@@ -40,6 +41,7 @@ ShaderProgram* defaultShaderProgram = new ShaderProgram();
 
 ViewFrustumSceneObject* m_viewFrustumSO = nullptr;
 MyTerrain* m_terrain = nullptr;
+MyBushesAndBuildings* m_bushesAndBuildingsSO = nullptr;
 INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
@@ -146,6 +148,10 @@ bool initializeGL(){
 	fsShader->createShaderFromFile("src\\shader\\oglFragmentShader.glsl");
 	std::cout << fsShader->shaderInfoLog() << "\n";
 
+	Shader* csShader = new Shader(GL_COMPUTE_SHADER);
+	csShader->createShaderFromFile("src\\shader\\oglComputeShader.glsl");
+	std::cout << csShader->shaderInfoLog() << "\n";
+
 	// shader program
 	ShaderProgram* shaderProgram = new ShaderProgram();
 	shaderProgram->init();
@@ -178,6 +184,8 @@ bool initializeGL(){
 	m_viewFrustumSO = new ViewFrustumSceneObject(2, SceneManager::Instance()->m_fs_pixelProcessIdHandle, SceneManager::Instance()->m_fs_pureColor);
 	defaultRenderer->appendDynamicSceneObject(m_viewFrustumSO->sceneObject());
 
+	m_bushesAndBuildingsSO = new MyBushesAndBuildings(SceneManager::Instance()->m_fs_pixelProcessIdHandle, SceneManager::Instance()->m_fs_bushesBuildingsPass);
+	defaultRenderer->appendDynamicBushesBuildings(m_bushesAndBuildingsSO->sceneObject());
 	// initialize terrain
 	m_terrain = new MyTerrain();
 	m_terrain->init(-1); 
