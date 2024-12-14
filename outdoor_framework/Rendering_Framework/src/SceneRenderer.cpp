@@ -47,6 +47,11 @@ void SceneRenderer::renderPass(){
 			obj->update();
 		}
 	}
+
+	if (this->m_dynamicBushesBuildingsSO != nullptr) {
+		glUniform1i(SceneManager::Instance()->m_vs_vertexProcessIdHandle, SceneManager::Instance()->m_vs_multiInstanceProcess);
+		this->m_dynamicBushesBuildingsSO->update(true);
+	}
 	
 }
 
@@ -86,7 +91,7 @@ void SceneRenderer::appendTerrainSceneObject(TerrainSceneObject* tSO) {
 }
 
 void SceneRenderer::appendDynamicBushesBuildings(DynamicSceneObject* obj) {
-	this->m_dynamicBushesBuildings = obj;
+	this->m_dynamicBushesBuildingsSO = obj;
 }
 
 void SceneRenderer::setResetComputeShader(ShaderProgram* resetCsProgram) {
@@ -122,7 +127,7 @@ bool SceneRenderer::setUpShader(){
 	manager->m_vertexHandle = 0;
 	manager->m_normalHandle = 1;
 	manager->m_uvHandle = 2;
-	manager->m_instPosHandle = 3;
+	manager->m_instPosHandle = 11;
 
 	// =================================
 	manager->m_modelMatHandle = 0;
@@ -155,6 +160,7 @@ bool SceneRenderer::setUpShader(){
 	manager->m_vs_vertexProcessIdHandle = 1;
 	manager->m_vs_commonProcess = 0;
 	manager->m_vs_terrainProcess = 3;
+	manager->m_vs_multiInstanceProcess = 2;
 
 	manager->m_fs_pixelProcessIdHandle = 2;
 	manager->m_fs_pureColor = 5;

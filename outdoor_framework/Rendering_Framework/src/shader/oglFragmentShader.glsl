@@ -7,6 +7,7 @@ layout (location = 0) out vec4 fragColor ;
  
 layout(location = 2) uniform int pixelProcessId;
 layout(location = 4) uniform sampler2D albedoTexture ;
+layout(location = 3) uniform sampler2DArray bushesBuildingsTexture;
 
 
 vec4 withFog(vec4 color){
@@ -35,7 +36,8 @@ void pureColor(){
 }
 
 void bushesBuildingsPass() {
-	
+	// for debug
+	fragColor = vec4(1.0, 1.0, 0.0, 1.0);
 }
 
 void main(){	

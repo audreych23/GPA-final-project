@@ -25,7 +25,7 @@ private:
 
 	std::vector<DynamicSceneObject*> m_dynamicSOs;
 	TerrainSceneObject* m_terrainSO = nullptr;
-	DynamicSceneObject* m_dynamicBushesBuildings;
+	DynamicSceneObject* m_dynamicBushesBuildingsSO;
 
 	int m_numTotalInstance;
 public:

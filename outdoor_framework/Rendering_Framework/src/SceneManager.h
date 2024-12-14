@@ -57,7 +57,8 @@ public:
 	int m_arrayTexIdx;
 
 	int m_vs_commonProcess;
-	int m_vs_terrainProcess;	
+	int m_vs_terrainProcess;
+	int m_vs_multiInstanceProcess;
 	
 	int m_fs_pureColor;	
 	int m_fs_terrainPass;

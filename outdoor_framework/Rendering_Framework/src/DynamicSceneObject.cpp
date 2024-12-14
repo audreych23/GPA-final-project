@@ -110,7 +110,7 @@ void DynamicSceneObject::update(bool isMergedModel) {
 	else {
 		// this is the texture of the combined model already
 		glActiveTexture(SceneManager::Instance()->m_arrayTexUnit);
-		glBindTexture(GL_TEXTURE_2D, this->m_arrayTexHandle);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, this->m_arrayTexHandle);
 
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_cmdBufferHandle);
 		// model matrix

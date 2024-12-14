@@ -5,6 +5,16 @@ layout(location=1) in vec3 v_normal ;
 layout(location=2) in vec3 v_uv ;
 layout(location=3) in int index;
 
+// added for instance ( not sure if yuou can do this?? )
+struct InstanceProperties {
+    // modified
+    vec4 position;
+};
+
+layout (std430, binding=1) buffer InstanceData {
+    InstanceProperties rawInstanceProps[];
+};
+
 out vec3 f_viewVertex ;
 out vec3 f_uv ;
 
@@ -53,9 +63,26 @@ void terrainProcess(){
 	gl_Position = projMat * viewVertex ;
 }
 
+void multiInstanceProcess() {
+	// vec4 worldVertex = modelMat * vec4(v_vertex, 1.0) + vec4(rawInstanceProps[index].position.xyz, 0.0f);
+	vec4 worldVertex = modelMat * vec4(v_vertex, 1.0) + vec4(25.92, 18.27, 11.75, 0.0);
+	vec4 worldNormal = modelMat * vec4(v_normal, 0.0);
+
+	vec4 viewVertex = viewMat * worldVertex ;
+	vec4 viewNormal = viewMat * worldNormal ;
+	
+	f_viewVertex = viewVertex.xyz;
+	f_uv = v_uv ;
+
+	gl_Position = projMat * viewVertex;
+
+}
+
 void main(){
 	if(vertexProcessIdx == 0){
 		commonProcess() ;
+	} else if(vertexProcessIdx == 2) {
+		multiInstanceProcess();
 	}
 	else if(vertexProcessIdx == 3){
 		terrainProcess() ;
