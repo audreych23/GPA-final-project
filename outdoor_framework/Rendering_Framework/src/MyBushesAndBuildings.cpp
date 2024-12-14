@@ -87,7 +87,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 
 	auto data = this->m_dynamicSO->dataBuffer();
 	// modify data
-	int offset = 0;
+	offset = 0;
 	for (unsigned int i = 0; i < modelMesh1[0].vertices.size(); ++i) {
 		data[offset + i * 9 + 0] = modelMesh1[0].vertices[i].position.x;
 		data[offset + i * 9 + 1] = modelMesh1[0].vertices[i].position.y;

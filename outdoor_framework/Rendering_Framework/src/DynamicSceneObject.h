@@ -50,7 +50,7 @@ public:
 
 	virtual ~DynamicSceneObject();
 
-	void update(bool isMergedModel);
+	void update(bool isMergedModel = false);
 
 	float* dataBuffer();
 	unsigned int *indexBuffer();

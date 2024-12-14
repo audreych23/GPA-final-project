@@ -41,6 +41,7 @@
     <ClCompile Include="src\terrain\MyTerrain.cpp" />
     <ClCompile Include="src\terrain\TerrainSceneObject.cpp" />
     <ClCompile Include="src\ViewFrustumSceneObject.cpp" />
+    <ClCompile Include="util_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\externals\include\imgui\imconfig.h" />
