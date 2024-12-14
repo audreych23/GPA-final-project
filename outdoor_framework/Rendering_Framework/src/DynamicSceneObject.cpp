@@ -1,7 +1,9 @@
 #include "DynamicSceneObject.h"
 
 
-DynamicSceneObject::DynamicSceneObject(const int maxNumVertex, const int maxNumIndex, const bool normalFlag, const bool uvFlag)
+DynamicSceneObject::DynamicSceneObject(const int maxNumVertex, const int maxNumIndex,
+	const bool normalFlag, const bool uvFlag, const bool instPosFlag,
+	const int maxNumInstance, InstanceProperties* rawInstData)
 {
 	// the data should be INTERLEAF format
 
@@ -20,6 +22,8 @@ DynamicSceneObject::DynamicSceneObject(const int maxNumVertex, const int maxNumI
 
 	this->m_dataBuffer = new float[totalBufferDataByte / 4];
 	this->m_indexBuffer = new unsigned int[maxNumIndex];
+	// don't forget to initialize instance data buffer
+	
 
 	// Create Geometry Data Buffer
 	glCreateBuffers(1, &(this->m_dataBufferHandle));
@@ -47,6 +51,30 @@ DynamicSceneObject::DynamicSceneObject(const int maxNumVertex, const int maxNumI
 		byteOffset = byteOffset + 12;
 		glEnableVertexAttribArray(SceneManager::Instance()->m_uvHandle);
 	}
+	
+	// Lets do some clean way first then jump to the dirty method if it doesn't work :)
+	if (instPosFlag) {
+		// create buffer for input ssbo
+		glCreateBuffers(1, &(this->m_rawInstanceDataBufferHandle));
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_rawInstanceDataBufferHandle);
+		// ugly way
+		glBufferStorage(GL_SHADER_STORAGE_BUFFER, maxNumInstance * sizeof(InstanceProperties), rawInstData, GL_MAP_READ_BIT);
+		//glBufferStorage(GL_SHADER_STORAGE_BUFFER, maxNumInstance * sizeof(InstanceProperties), nullptr, GL_MAP_READ_BIT);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SceneManager::Instance()->m_rawInstanceDataBufferId, m_rawInstanceDataBufferHandle);
+
+		// create buffer for output ssbo
+		glGenBuffers(1, &(this->m_validInstanceDataBufferHandle));
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_validInstanceDataBufferHandle);
+		glBufferStorage(GL_SHADER_STORAGE_BUFFER, maxNumInstance * sizeof(InstancePropertiesOut), nullptr, GL_MAP_READ_BIT);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SceneManager::Instance()->m_validInstanceDataBufferId, m_validInstanceDataBufferHandle);
+
+		
+		// bind another vbo for instance position
+		glBindBuffer(GL_ARRAY_BUFFER, m_validInstanceDataBufferHandle);
+		glEnableVertexAttribArray(SceneManager::Instance()->m_instPosHandle);
+		glVertexAttribPointer(SceneManager::Instance()->m_instPosHandle, 4, GL_FLOAT, false, 0, (void*)0);
+		glVertexAttribDivisor(SceneManager::Instance()->m_instPosHandle, 1);
+	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
 	glBindVertexArray(0);
 }
@@ -58,25 +86,40 @@ DynamicSceneObject::~DynamicSceneObject()
 	delete[] this->m_indexBuffer;
 }
 
-void DynamicSceneObject::update() {
-	// bind Buffer
+void DynamicSceneObject::update(bool isMergedModel) {
+	// bind buffer
 	glBindVertexArray(this->m_vao);
 
-	// Activatea TEXTURE 0/2/3 (something like that)
-	glActiveTexture(SceneManager::Instance()->m_elevationTexUnit);
-	glBindTexture(GL_TEXTURE_2D, this->m_elevationHandle);
+	if (!isMergedModel) {
+		// Activatea TEXTURE 0/2/3 (something like that)
+		glActiveTexture(SceneManager::Instance()->m_elevationTexUnit);
+		glBindTexture(GL_TEXTURE_2D, this->m_elevationHandle);
 
-	glActiveTexture(SceneManager::Instance()->m_normalTexUnit);
-	glBindTexture(GL_TEXTURE_2D, this->m_normalHandle);
+		glActiveTexture(SceneManager::Instance()->m_normalTexUnit);
+		glBindTexture(GL_TEXTURE_2D, this->m_normalHandle);
 
-	glActiveTexture(SceneManager::Instance()->m_albedoTexUnit);
-	glBindTexture(GL_TEXTURE_2D, this->m_albedoHandle);
+		glActiveTexture(SceneManager::Instance()->m_albedoTexUnit);
+		glBindTexture(GL_TEXTURE_2D, this->m_albedoHandle);
 
-	// model matrix
-	glUniformMatrix4fv(SceneManager::Instance()->m_modelMatHandle, 1, false, glm::value_ptr(this->m_modelMat));
+		// model matrix
+		glUniformMatrix4fv(SceneManager::Instance()->m_modelMatHandle, 1, false, glm::value_ptr(this->m_modelMat));
 
-	glUniform1i(SceneManager::Instance()->m_fs_pixelProcessIdHandle, this->m_pixelFunctionId);
-	glDrawElements(this->m_primitive, this->m_indexCount, GL_UNSIGNED_INT, nullptr);
+		glUniform1i(SceneManager::Instance()->m_fs_pixelProcessIdHandle, this->m_pixelFunctionId);
+		glDrawElements(this->m_primitive, this->m_indexCount, GL_UNSIGNED_INT, nullptr);
+	}
+	else {
+		// this is the texture of the combined model already
+		glActiveTexture(SceneManager::Instance()->m_arrayTexUnit);
+		glBindTexture(GL_TEXTURE_2D, this->m_arrayTexHandle);
+
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_cmdBufferHandle);
+		// model matrix
+		glUniformMatrix4fv(SceneManager::Instance()->m_modelMatHandle, 1, false, glm::value_ptr(this->m_modelMat));
+
+		glUniform1i(SceneManager::Instance()->m_fs_pixelProcessIdHandle, this->m_pixelFunctionId);
+		// ask kent, no need index count??
+		glMultiDrawElementsIndirect(this->m_primitive, GL_UNSIGNED_INT, (GLvoid*)0, 3, 0);
+	}
 }
 
 float* DynamicSceneObject::dataBuffer() { return this->m_dataBuffer; }
@@ -112,4 +155,12 @@ void DynamicSceneObject::setNormalTextureHandle(const GLuint texHandle) {
 
 void DynamicSceneObject::setAlbedoTextureHandle(const GLuint texHandle) {
 	this->m_albedoHandle = texHandle;
+}
+
+void DynamicSceneObject::setArrayTextureHandle(const GLuint texHandle) {
+	this->m_arrayTexHandle = texHandle;
+}
+
+void DynamicSceneObject::setCmdBufferHandle(const GLuint cmdBufferHandle) {
+	this->m_cmdBufferHandle = cmdBufferHandle;
 }

@@ -88,6 +88,7 @@ bool SceneRenderer::setUpShader(){
 	manager->m_vertexHandle = 0;
 	manager->m_normalHandle = 1;
 	manager->m_uvHandle = 2;
+	manager->m_instPosHandle = 3;
 
 	// =================================
 	manager->m_modelMatHandle = 0;
@@ -106,8 +107,13 @@ bool SceneRenderer::setUpShader(){
 	manager->m_normalMapHandle = 6;
 	manager->m_normalMapTexIdx = 2;
 	glUniform1i(manager->m_normalMapHandle, manager->m_normalMapTexIdx);
+
+	manager->m_arrayTexHandle = 3;
+	manager->m_arrayTexIdx = 1;
+	glUniform1i(manager->m_arrayTexHandle, manager->m_arrayTexIdx);
 	
 	manager->m_albedoTexUnit = GL_TEXTURE0;
+	manager->m_arrayTexUnit = GL_TEXTURE1;
 	manager->m_elevationTexUnit = GL_TEXTURE3;
 	manager->m_normalTexUnit = GL_TEXTURE2;
 
@@ -118,6 +124,12 @@ bool SceneRenderer::setUpShader(){
 	manager->m_fs_pixelProcessIdHandle = 2;
 	manager->m_fs_pureColor = 5;
 	manager->m_fs_terrainPass = 7;
+	manager->m_fs_bushesBuildingsPass = 8;
+	
+	// ------------------------------ ssbo binding location
+	manager->m_rawInstanceDataBufferId = 1;
+	manager->m_validInstanceDataBufferId = 2;
+	manager->m_cmdBufferId = 3;
 	
 	return true;
 }

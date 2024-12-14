@@ -4,7 +4,7 @@ in vec3 f_viewVertex ;
 in vec3 f_uv ;
 
 layout (location = 0) out vec4 fragColor ;
-
+ 
 layout(location = 2) uniform int pixelProcessId;
 layout(location = 4) uniform sampler2D albedoTexture ;
 
@@ -34,12 +34,18 @@ void pureColor(){
 	fragColor = withFog(vec4(1.0, 0.0, 0.0, 1.0)) ;
 }
 
+void bushesBuildingsPass() {
+	
+}
+
 void main(){	
 	if(pixelProcessId == 5){
 		pureColor() ;
 	}
 	else if(pixelProcessId == 7){
 		terrainPass() ;
+	} else if(pixelProcessId == 8) {
+		bushesBuildingsPass();
 	}
 	else{
 		pureColor() ;

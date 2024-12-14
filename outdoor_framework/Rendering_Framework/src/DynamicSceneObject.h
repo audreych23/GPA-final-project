@@ -6,11 +6,20 @@
 
 class DynamicSceneObject 
 {
+public: 
+	struct InstanceProperties {
+		glm::vec4 position;
+		//glm::mat4 rotMatrix;
+	};
 
+	struct InstancePropertiesOut {
+		glm::vec4 position;
+	};
 private:
 	GLuint m_indexBufferHandle;
 	float *m_dataBuffer = nullptr;
 	unsigned int *m_indexBuffer = nullptr;
+	InstanceProperties* m_rawInstBuffer = nullptr;
 
 	GLuint m_vao;
 	GLuint m_dataBufferHandle;
@@ -24,18 +33,32 @@ private:
 	GLuint m_elevationHandle;
 	GLuint m_normalHandle;
 	GLuint m_albedoHandle;
+	GLuint m_arrayTexHandle;
+
+
+	// for array instanced draw call
+	GLuint m_cmdBufferHandle;
+
+	// for building and bushes
+	GLuint m_rawInstanceDataBufferHandle;
+	GLuint m_validInstanceDataBufferHandle;
 
 public:
-	DynamicSceneObject(const int maxNumVertex, const int maxNumIndex, const bool normalFlag, const bool uvFlag);
+	DynamicSceneObject(const int maxNumVertex, const int maxNumIndex, 
+		const bool normalFlag, const bool uvFlag, const bool instPosFlag = false, 
+		const int maxNumInstance = 0, InstanceProperties* rawInstData = nullptr);
+
 	virtual ~DynamicSceneObject();
 
-	void update();
+	void update(bool isMergedModel);
 
 	float* dataBuffer();
 	unsigned int *indexBuffer();
 
 	void updateDataBuffer(const int byteOffset, const int dataByte);
 	void updateIndexBuffer(const int byteOffset, const int dataByte);
+	// a clean way to do modification to rawInstanceDataBuffer
+	//void updateSSBO();
 
 	void setPixelFunctionId(const int functionId);
 	void setPrimitive(const GLenum primitive);
@@ -45,5 +68,6 @@ public:
 	void setElevationTextureHandle(const GLuint texHandle);
 	void setNormalTextureHandle(const GLuint texHandle);
 	void setAlbedoTextureHandle(const GLuint texHandle);
+	void setArrayTextureHandle(const GLuint texHandle);
+	void setCmdBufferHandle(const GLuint cmdBufferHandle);
 };
-
