@@ -3,6 +3,7 @@
 layout(location=0) in vec3 v_vertex;
 layout(location=1) in vec3 v_normal ;
 layout(location=2) in vec3 v_uv ;
+layout(location=3) in int index;
 
 out vec3 f_viewVertex ;
 out vec3 f_uv ;

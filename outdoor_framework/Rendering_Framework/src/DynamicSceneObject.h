@@ -13,7 +13,7 @@ public:
 	};
 
 	struct InstancePropertiesOut {
-		glm::vec4 position;
+		int index;
 	};
 private:
 	GLuint m_indexBufferHandle;

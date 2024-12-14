@@ -72,7 +72,7 @@ DynamicSceneObject::DynamicSceneObject(const int maxNumVertex, const int maxNumI
 		// bind another vbo for instance position
 		glBindBuffer(GL_ARRAY_BUFFER, m_validInstanceDataBufferHandle);
 		glEnableVertexAttribArray(SceneManager::Instance()->m_instPosHandle);
-		glVertexAttribPointer(SceneManager::Instance()->m_instPosHandle, 4, GL_FLOAT, false, 0, (void*)0);
+		glVertexAttribIPointer(SceneManager::Instance()->m_instPosHandle, 1, GL_INT, 0, (void*)0);
 		glVertexAttribDivisor(SceneManager::Instance()->m_instPosHandle, 1);
 	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
