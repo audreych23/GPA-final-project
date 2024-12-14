@@ -13,6 +13,24 @@ void SceneRenderer::startNewFrame() {
 	this->m_shaderProgram->useProgram();
 	this->clear();
 }
+
+void SceneRenderer::useCullingCSProgram() {
+	// set camera before this, so can bind correctly
+	this->m_cullingCSProgram->useProgram();
+	int NUM_TOTAL_INSTANCE = 2797 + 1010 + 155304;
+	glUniform1i(SHADER_PARAMETER_BINDING::NUM_TOTAL_INSTANCE, NUM_TOTAL_INSTANCE);
+	//glUniform4fv(SHADER_PARAMETER_BINDING::SLIME_POS, 1, &slime_pos[0]);
+	// hard coded value 
+	glDispatchCompute((NUM_TOTAL_INSTANCE / 1024) + 1, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+
+void SceneRenderer::useResetCSProgram() {
+	this->m_resetCSProgram->useProgram();
+	glDispatchCompute(3, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+
 void SceneRenderer::renderPass(){
 	SceneManager *manager = SceneManager::Instance();	
 

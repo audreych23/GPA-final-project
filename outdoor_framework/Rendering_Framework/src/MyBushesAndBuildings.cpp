@@ -7,8 +7,8 @@ MyBushesAndBuildings::MyBushesAndBuildings(
 	this->m_modelBush01 = new Model("assets\\bush01_lod2.obj", "assets\\poissonPoints_1010.ppd2", "assets\\bush01.png", 0.0f);
 	this->m_modelBush05 = new Model("assets\\bush05_lod2.obj", "assets\\poissonPoints_2797.ppd2", "assets\\bush05.png", 1.0f);
 	this->m_modelGrass = new Model("assets\\grassB.obj", "assets\\poissonPoints_621043_after.ppd2", "assets\\grassB_albedo.png", 2.0f);
-	//this->m_house = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_1.obj", "assets\\cityLots_sub_0.ppd2", 3.0f);
-	//this->m_house2 = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_2.obj", "assets\\cityLots_sub_1.ppd2", 4.0f);
+	//this->m_house = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_2.obj", "assets\\cityLots_sub_0.ppd2", 3.0f);
+	//this->m_house2 = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_1.obj", "assets\\cityLots_sub_1.ppd2", 4.0f);
 
 	// pass in 3 model max num vertex, pass in 3 model maxnum index
 	setupDrawCommand();

@@ -15,6 +15,9 @@ public:
 
 private:
 	ShaderProgram *m_shaderProgram = nullptr;
+	ShaderProgram* m_resetCSProgram = nullptr;
+	ShaderProgram* m_cullingCSProgram = nullptr;
+
 	glm::mat4 m_projMat;
 	glm::mat4 m_viewMat;
 	int m_frameWidth;
@@ -40,6 +43,12 @@ public:
 public:
 	void startNewFrame();
 	void renderPass();
+
+// compute shader pipeline
+public:
+	void useCullingCSProgram();
+
+	void useResetCSProgram();
 
 private:
 	void clear(const glm::vec4 &clearColor = glm::vec4(0.0, 0.0, 0.0, 1.0), const float depth = 1.0);

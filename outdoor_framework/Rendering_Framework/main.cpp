@@ -175,6 +175,10 @@ bool initializeGL(){
 		return false;
 	}
 
+	// set reset compute shader program to renderer
+
+	// set frustum culling compute shader program to renderer
+
 	// =================================================================
 	// initialize camera
 	m_myCameraManager = new INANOA::MyCameraManager();
@@ -247,6 +251,11 @@ void paintGL(){
 	
 	// start new frame
 	defaultRenderer->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+	// start culling here 
+	defaultRenderer->useResetCSProgram();
+
+	defaultRenderer->useCullingCSProgram();
+
 	defaultRenderer->startNewFrame();
 
 	// rendering with player view		
