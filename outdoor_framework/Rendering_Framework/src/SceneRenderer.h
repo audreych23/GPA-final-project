@@ -15,8 +15,8 @@ public:
 
 private:
 	ShaderProgram *m_shaderProgram = nullptr;
-	ShaderProgram* m_resetCSProgram = nullptr;
-	ShaderProgram* m_cullingCSProgram = nullptr;
+	ShaderProgram* m_resetCsProgram = nullptr;
+	ShaderProgram* m_cullingCsProgram = nullptr;
 
 	glm::mat4 m_projMat;
 	glm::mat4 m_viewMat;
@@ -27,7 +27,7 @@ private:
 	TerrainSceneObject* m_terrainSO = nullptr;
 	DynamicSceneObject* m_dynamicBushesBuildings;
 
-
+	int m_numTotalInstance;
 public:
 	void resize(const int w, const int h);
 	bool initialize(const int w, const int h, ShaderProgram* shaderProgram);
@@ -39,6 +39,10 @@ public:
 	void appendTerrainSceneObject(TerrainSceneObject* tSO);
 	void appendDynamicBushesBuildings(DynamicSceneObject* obj);
 
+	void setResetComputeShader(ShaderProgram* shaderProgram);
+	void setCullingComputeShader(ShaderProgram* shaderProgram);
+
+	void setNumInstance(int numInstance);
 // pipeline
 public:
 	void startNewFrame();
@@ -47,7 +51,6 @@ public:
 // compute shader pipeline
 public:
 	void useCullingCSProgram();
-
 	void useResetCSProgram();
 
 private:

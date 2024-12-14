@@ -16,17 +16,16 @@ void SceneRenderer::startNewFrame() {
 
 void SceneRenderer::useCullingCSProgram() {
 	// set camera before this, so can bind correctly
-	this->m_cullingCSProgram->useProgram();
-	int NUM_TOTAL_INSTANCE = 2797 + 1010 + 155304;
-	glUniform1i(SHADER_PARAMETER_BINDING::NUM_TOTAL_INSTANCE, NUM_TOTAL_INSTANCE);
+	this->m_cullingCsProgram->useProgram();
+	glUniform1i(SceneManager::Instance()->m_numTotalInstanceHandle, m_numTotalInstance);
 	//glUniform4fv(SHADER_PARAMETER_BINDING::SLIME_POS, 1, &slime_pos[0]);
 	// hard coded value 
-	glDispatchCompute((NUM_TOTAL_INSTANCE / 1024) + 1, 1, 1);
+	glDispatchCompute((m_numTotalInstance / 1024) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 void SceneRenderer::useResetCSProgram() {
-	this->m_resetCSProgram->useProgram();
+	this->m_resetCsProgram->useProgram();
 	glDispatchCompute(3, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
@@ -90,6 +89,18 @@ void SceneRenderer::appendDynamicBushesBuildings(DynamicSceneObject* obj) {
 	this->m_dynamicBushesBuildings = obj;
 }
 
+void SceneRenderer::setResetComputeShader(ShaderProgram* resetCsProgram) {
+	this->m_resetCsProgram = resetCsProgram;
+}
+
+void SceneRenderer::setCullingComputeShader(ShaderProgram* cullingCsProgram) {
+	this->m_cullingCsProgram = cullingCsProgram;
+}
+
+void SceneRenderer::setNumInstance(int numInstance) {
+	m_numTotalInstance = numInstance;
+}
+
 void SceneRenderer::clear(const glm::vec4 &clearColor, const float depth){
 	static const float COLOR[] = { 0.0, 0.0, 0.0, 1.0 };
 	static const float DEPTH[] = { 1.0 };
@@ -118,6 +129,7 @@ bool SceneRenderer::setUpShader(){
 	manager->m_viewMatHandle = 7;
 	manager->m_projMatHandle = 8;
 	manager->m_terrainVToUVMatHandle = 9;
+	manager->m_numTotalInstanceHandle = 10;
 
 	manager->m_albedoMapHandle = 4;
 	manager->m_albedoMapTexIdx = 0;

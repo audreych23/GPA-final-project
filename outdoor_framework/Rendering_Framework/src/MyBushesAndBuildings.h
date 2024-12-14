@@ -44,6 +44,8 @@ public:
 	void updateDataBuffer();
 	void updateState(const glm::mat4& viewMat, const glm::vec3& viewPos);
 
+public:
+	int getNumInstance() { return m_totalInstance; }
 private:
 	void setupDrawCommand();
 	void loadMergedTextureFromFile();
@@ -51,13 +53,12 @@ private:
 
 	DynamicSceneObject* m_dynamicSO;
 	int m_totalDataByte;
+	int m_totalInstance;
 
 	Model* m_modelBush01;
 	Model* m_modelBush05;
 	Model* m_modelGrass;
 	Model* m_house;
 	Model* m_house2;
-
-	GLuint _tex;
 };
 

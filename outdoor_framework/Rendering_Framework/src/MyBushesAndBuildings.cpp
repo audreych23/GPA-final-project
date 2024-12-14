@@ -10,6 +10,8 @@ MyBushesAndBuildings::MyBushesAndBuildings(
 	//this->m_house = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_2.obj", "assets\\cityLots_sub_0.ppd2", 3.0f);
 	//this->m_house2 = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_1.obj", "assets\\cityLots_sub_1.ppd2", 4.0f);
 
+	m_totalInstance = m_modelBush01->getNumSamples() +
+		m_modelBush05->getNumSamples() + m_modelGrass->getNumSamples();
 	// pass in 3 model max num vertex, pass in 3 model maxnum index
 	setupDrawCommand();
 	loadMergedTextureFromFile();

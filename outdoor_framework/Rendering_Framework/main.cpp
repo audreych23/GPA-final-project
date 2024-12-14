@@ -148,6 +148,12 @@ bool initializeGL(){
 	fsShader->createShaderFromFile("src\\shader\\oglFragmentShader.glsl");
 	std::cout << fsShader->shaderInfoLog() << "\n";
 
+	// reset compute shader
+	Shader* resetCsShader = new Shader(GL_COMPUTE_SHADER);
+	resetCsShader->createShaderFromFile("src\\shader\\oglResetComputeShader.glsl");
+	std::cout << resetCsShader->shaderInfoLog() << '\n';
+
+	// compute shader culling
 	Shader* csShader = new Shader(GL_COMPUTE_SHADER);
 	csShader->createShaderFromFile("src\\shader\\oglComputeShader.glsl");
 	std::cout << csShader->shaderInfoLog() << "\n";
@@ -168,6 +174,35 @@ bool initializeGL(){
 	
 	delete vsShader;
 	delete fsShader;
+
+	// create reset compute shader program
+	ShaderProgram* resetCsProgram = new ShaderProgram();
+	resetCsProgram->init();
+	resetCsProgram->attachShader(resetCsShader);
+	resetCsProgram->checkStatus();
+	if (resetCsProgram->status() != ShaderProgramStatus::READY) {
+		std::cout << "meo";
+		return false;
+	}
+	resetCsProgram->linkProgram();
+	resetCsShader->releaseShader();
+
+	delete resetCsShader;
+
+
+	// create compute shader program
+	ShaderProgram* csProgram = new ShaderProgram();
+	csProgram->init();
+	csProgram->attachShader(csShader);
+	csProgram->checkStatus();
+	if (csProgram->status() != ShaderProgramStatus::READY) {
+		return false;
+	}
+	csProgram->linkProgram();
+	csShader->releaseShader();
+
+	delete csShader;
+
 	// =================================================================
 	// init renderer
 	defaultRenderer = new SceneRenderer();
@@ -176,8 +211,10 @@ bool initializeGL(){
 	}
 
 	// set reset compute shader program to renderer
-
+	defaultRenderer->setResetComputeShader(resetCsProgram);
 	// set frustum culling compute shader program to renderer
+	defaultRenderer->setCullingComputeShader(csProgram);
+
 
 	// =================================================================
 	// initialize camera
@@ -188,8 +225,14 @@ bool initializeGL(){
 	m_viewFrustumSO = new ViewFrustumSceneObject(2, SceneManager::Instance()->m_fs_pixelProcessIdHandle, SceneManager::Instance()->m_fs_pureColor);
 	defaultRenderer->appendDynamicSceneObject(m_viewFrustumSO->sceneObject());
 
+	// initialize bushes and buildings
 	m_bushesAndBuildingsSO = new MyBushesAndBuildings(SceneManager::Instance()->m_fs_pixelProcessIdHandle, SceneManager::Instance()->m_fs_bushesBuildingsPass);
 	defaultRenderer->appendDynamicBushesBuildings(m_bushesAndBuildingsSO->sceneObject());
+
+	// special extra step to get the number of instances from bushes and buildings
+	defaultRenderer->setNumInstance(m_bushesAndBuildingsSO->getNumInstance()); // for compute shader
+
+	
 	// initialize terrain
 	m_terrain = new MyTerrain();
 	m_terrain->init(-1); 
