@@ -36,6 +36,12 @@ layout (std430, binding=2) buffer CurrValidInstanceData {
 layout (location = 10) uniform int numMaxInstance;
 // layout (location = 2) uniform mat4 projMat;
 // layout (location = 1) uniform mat4 viewMat;
+layout (location = 15) uniform vec4 planeEquation1;
+layout (location = 16) uniform vec4 planeEquation2;
+layout (location = 17) uniform vec4 planeEquation3;
+layout (location = 18) uniform vec4 planeEquation4;
+layout (location = 19) uniform vec4 planeEquation5;
+layout (location = 20) uniform vec4 planeEquation6;
 
 // hardcoded bounding sphere spec
 uniform float radius[5] = float[] (3.4, 2.6, 1.4, 8.5, 10.2);

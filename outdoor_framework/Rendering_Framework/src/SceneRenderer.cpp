@@ -20,6 +20,20 @@ void SceneRenderer::useCullingCSProgram() {
 	glUniform1i(SceneManager::Instance()->m_numTotalInstanceHandle, m_numTotalInstance);
 	//glUniform4fv(SHADER_PARAMETER_BINDING::SLIME_POS, 1, &slime_pos[0]);
 	// hard coded value 
+	for (int i = 0; i < 6; ++i) {
+		glm::vec4 dummyVec4;
+		dummyVec4.x = m_planes[i].normal.x;
+		dummyVec4.y = m_planes[i].normal.y;
+		dummyVec4.z = m_planes[i].normal.z;
+		dummyVec4.w = m_planes[i].distance;
+		if (i == 0) glUniform4fv(SceneManager::Instance()->m_planeEquationHandle1, 1, glm::value_ptr(dummyVec4));
+		if (i == 1) glUniform4fv(SceneManager::Instance()->m_planeEquationHandle2, 1, glm::value_ptr(dummyVec4));
+		if (i == 2) glUniform4fv(SceneManager::Instance()->m_planeEquationHandle3, 1, glm::value_ptr(dummyVec4));
+		if (i == 3) glUniform4fv(SceneManager::Instance()->m_planeEquationHandle4, 1, glm::value_ptr(dummyVec4));
+		if (i == 4) glUniform4fv(SceneManager::Instance()->m_planeEquationHandle5, 1, glm::value_ptr(dummyVec4));
+		if (i == 5) glUniform4fv(SceneManager::Instance()->m_planeEquationHandle6, 1, glm::value_ptr(dummyVec4));
+	}
+	
 	glDispatchCompute((m_numTotalInstance / 1024) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
@@ -68,7 +82,10 @@ bool SceneRenderer::initialize(const int w, const int h, ShaderProgram* shaderPr
 	
 	if (!flag) {
 		return false;
-	}	
+	}
+
+	// initialize planes frustum definition
+	m_planes = std::vector<FrustumPlane>(6);
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -106,6 +123,54 @@ void SceneRenderer::setNumInstance(int numInstance) {
 	m_numTotalInstance = numInstance;
 }
 
+void SceneRenderer::setFrustumPlaneEquation(glm::mat4& playerView, glm::mat4& playerProj) {
+	glm::mat4 viewProj = playerProj * playerView;
+
+	// Extract planes from view-projection matrix
+	// Left plane
+	m_planes[0].normal.x = viewProj[0][3] + viewProj[0][0];
+	m_planes[0].normal.y = viewProj[1][3] + viewProj[1][0];
+	m_planes[0].normal.z = viewProj[2][3] + viewProj[2][0];
+	m_planes[0].distance = viewProj[3][3] + viewProj[3][0];
+
+	// Right plane
+	m_planes[1].normal.x = viewProj[0][3] - viewProj[0][0];
+	m_planes[1].normal.y = viewProj[1][3] - viewProj[1][0];
+	m_planes[1].normal.z = viewProj[2][3] - viewProj[2][0];
+	m_planes[1].distance = viewProj[3][3] - viewProj[3][0];
+
+	// Bottom plane
+	m_planes[2].normal.x = viewProj[0][3] + viewProj[0][1];
+	m_planes[2].normal.y = viewProj[1][3] + viewProj[1][1];
+	m_planes[2].normal.z = viewProj[2][3] + viewProj[2][1];
+	m_planes[2].distance = viewProj[3][3] + viewProj[3][1];
+
+	// Top plane
+	m_planes[3].normal.x = viewProj[0][3] - viewProj[0][1];
+	m_planes[3].normal.y = viewProj[1][3] - viewProj[1][1];
+	m_planes[3].normal.z = viewProj[2][3] - viewProj[2][1];
+	m_planes[3].distance = viewProj[3][3] - viewProj[3][1];
+
+	// Near plane
+	m_planes[4].normal.x = viewProj[0][3] + viewProj[0][2];
+	m_planes[4].normal.y = viewProj[1][3] + viewProj[1][2];
+	m_planes[4].normal.z = viewProj[2][3] + viewProj[2][2];
+	m_planes[4].distance = viewProj[3][3] + viewProj[3][2];
+
+	// Far plane
+	m_planes[5].normal.x = viewProj[0][3] - viewProj[0][2];
+	m_planes[5].normal.y = viewProj[1][3] - viewProj[1][2];
+	m_planes[5].normal.z = viewProj[2][3] - viewProj[2][2];
+	m_planes[5].distance = viewProj[3][3] - viewProj[3][2];
+
+	// Normalize all planes
+	/*for (auto& plane : planes) {
+		float length = glm::length(plane.normal);
+		plane.normal /= length;
+		plane.distance /= length;
+	}*/
+}
+
 void SceneRenderer::clear(const glm::vec4 &clearColor, const float depth){
 	static const float COLOR[] = { 0.0, 0.0, 0.0, 1.0 };
 	static const float DEPTH[] = { 1.0 };
@@ -135,6 +200,14 @@ bool SceneRenderer::setUpShader(){
 	manager->m_projMatHandle = 8;
 	manager->m_terrainVToUVMatHandle = 9;
 	manager->m_numTotalInstanceHandle = 10;
+
+	manager->m_planeEquationHandle1 = 15;
+	manager->m_planeEquationHandle2 = 16;
+	manager->m_planeEquationHandle3 = 17;
+	manager->m_planeEquationHandle4 = 18;
+	manager->m_planeEquationHandle5 = 19;
+	manager->m_planeEquationHandle6 = 20;
+
 
 	manager->m_albedoMapHandle = 4;
 	manager->m_albedoMapTexIdx = 0;

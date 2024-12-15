@@ -147,7 +147,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	//	indexData[offset + i] = modelMesh3[0].indices[i];
 	//}
 
-	// fill in updateIndex Buffer
+	// fill in updateIndex Buffer 
 	this->m_dynamicSO->updateIndexBuffer(0, maxNumIndices / 3 * sizeof(unsigned int));
 
 	//GLuint rawInstanceDataBufferHandle;

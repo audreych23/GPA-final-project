@@ -14,6 +14,11 @@ public:
 	virtual ~SceneRenderer();
 
 private:
+	struct FrustumPlane {
+		glm::vec3 normal;
+		float distance;
+	};
+
 	ShaderProgram *m_shaderProgram = nullptr;
 	ShaderProgram* m_resetCsProgram = nullptr;
 	ShaderProgram* m_cullingCsProgram = nullptr;
@@ -28,6 +33,13 @@ private:
 	DynamicSceneObject* m_dynamicBushesBuildingsSO;
 
 	int m_numTotalInstance;
+
+	// useful for frustum culling
+	//glm::mat4 playerViewMat;
+	//glm::mat4 playerProjMat;
+
+	std::vector<FrustumPlane> m_planes;
+
 public:
 	void resize(const int w, const int h);
 	bool initialize(const int w, const int h, ShaderProgram* shaderProgram);
@@ -43,6 +55,8 @@ public:
 	void setCullingComputeShader(ShaderProgram* shaderProgram);
 
 	void setNumInstance(int numInstance);
+
+	void setFrustumPlaneEquation(glm::mat4& playerView, glm::mat4& playerProj);
 // pipeline
 public:
 	void startNewFrame();

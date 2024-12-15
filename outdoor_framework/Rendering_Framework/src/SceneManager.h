@@ -42,7 +42,15 @@ public:
 	GLuint m_fs_pixelProcessIdHandle;
 	GLuint m_vs_vertexProcessIdHandle;
 
+	// for compute shader
 	GLuint m_numTotalInstanceHandle;
+
+	GLuint m_planeEquationHandle1;
+	GLuint m_planeEquationHandle2;
+	GLuint m_planeEquationHandle3;
+	GLuint m_planeEquationHandle4;
+	GLuint m_planeEquationHandle5;
+	GLuint m_planeEquationHandle6;
 
 	// GL_TEXTURE0, 1, 2 etc
 	GLenum m_albedoTexUnit;
