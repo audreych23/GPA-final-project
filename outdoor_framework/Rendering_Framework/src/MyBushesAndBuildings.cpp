@@ -61,8 +61,6 @@ void MyBushesAndBuildings::setupDrawCommand() {
 
 	int maxNumInstance = m_totalInstance;
 
-	//InstanceProperties* rawInsData = new InstanceProperties[NUM_TOTAL_INSTANCE];
-
 	DynamicSceneObject::InstanceProperties* rawInstData = new DynamicSceneObject::InstanceProperties[maxNumInstance];
 
 	int offset = 0;
