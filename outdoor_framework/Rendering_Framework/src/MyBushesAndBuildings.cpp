@@ -148,7 +148,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	//}
 
 	// fill in updateIndex Buffer
-	this->m_dynamicSO->updateIndexBuffer(0, maxNumIndices * sizeof(unsigned int));
+	this->m_dynamicSO->updateIndexBuffer(0, maxNumIndices / 3 * sizeof(unsigned int));
 
 	//GLuint rawInstanceDataBufferHandle;
 	//glGenBuffers(1, &rawInstanceDataBufferHandle);
@@ -169,7 +169,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	drawCommands[0].instanceCount = m_modelBush01->getNumSamples();
 	drawCommands[0].firstIndex = 0;
 	drawCommands[0].baseVertex = 0;
-	drawCommands[0].baseInstance = 0 * sizeof(float);
+	drawCommands[0].baseInstance = 0;
 
 	// second bush model
 	drawCommands[1].count = modelMesh2[0].indices.size();
