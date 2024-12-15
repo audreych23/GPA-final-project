@@ -9,10 +9,8 @@ MyBushesAndBuildings::MyBushesAndBuildings(
 	this->m_modelGrass = new Model("assets\\grassB.obj", "assets\\poissonPoints_621043_after.ppd2", "assets\\grassB_albedo.png", 2.0f);
 	//this->m_house = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_2.obj", "assets\\cityLots_sub_0.ppd2", 3.0f);
 	//this->m_house2 = new Model("assets\\Medieval_Building_LowPoly\\medieval_building_lowpoly_1.obj", "assets\\cityLots_sub_1.ppd2", 4.0f);
-
-	m_totalInstance = m_modelBush01->getNumSamples() +
-		m_modelBush05->getNumSamples() + m_modelGrass->getNumSamples();
 	// pass in 3 model max num vertex, pass in 3 model maxnum index
+	m_totalInstance = m_modelBush01->getNumSamples() + m_modelBush05->getNumSamples();
 	setupDrawCommand();
 	loadMergedTextureFromFile();
 
@@ -39,17 +37,17 @@ void MyBushesAndBuildings::updateState(const glm::mat4& viewMat, const glm::vec3
 void MyBushesAndBuildings::setupDrawCommand() {
 	auto modelMesh1 = m_modelBush01->getMeshes();
 	auto modelMesh2 = m_modelBush05->getMeshes();
-	auto modelMesh3 = m_modelGrass->getMeshes();
+	//auto modelMesh3 = m_modelGrass->getMeshes();
 	//auto modelMesh4 = m_house->getMeshes();
 	//auto modelMesh5 = m_house->getMeshes();
 
 	int maxNumVertex = modelMesh1[0].vertices.size() + 
-		modelMesh2[0].vertices.size() + modelMesh3[0].vertices.size();
+		modelMesh2[0].vertices.size() /* + modelMesh3[0].vertices.size() */;
 	int maxNumIndices = modelMesh1[0].indices.size() + 
-		modelMesh2[0].indices.size() + modelMesh3[0].indices.size();
+		modelMesh2[0].indices.size() /* + modelMesh3[0].indices.size()*/;
 
 	int maxNumInstance = m_modelBush01->getNumSamples() +
-		m_modelBush05->getNumSamples() + m_modelGrass->getNumSamples();
+		m_modelBush05->getNumSamples() /* + m_modelGrass->getNumSamples() */;
 
 	//InstanceProperties* rawInsData = new InstanceProperties[NUM_TOTAL_INSTANCE];
 
@@ -74,17 +72,17 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	}
 
 	offset += m_modelBush05->getNumSamples();
-	for (int i = 0; i < m_modelGrass->getNumSamples(); ++i) {
-		const float* instPos = m_modelGrass->getInstancePositions(i);
-		rawInstData[offset + i].position = glm::vec4(instPos[0], instPos[1], instPos[2], 2.0f);
-		//const float* instRad = m_modelGrass->getInstanceRadians(i);
-		//glm::quat q = glm::quat(glm::vec3(instRad[0], instRad[1], instRad[2]));
-		//rawInstData[offset + i].rotMatrix = glm::toMat4(q);
-	}
+	//for (int i = 0; i < m_modelGrass->getNumSamples(); ++i) {
+	//	const float* instPos = m_modelGrass->getInstancePositions(i);
+	//	rawInstData[offset + i].position = glm::vec4(instPos[0], instPos[1], instPos[2], 2.0f);
+	//	//const float* instRad = m_modelGrass->getInstanceRadians(i);
+	//	//glm::quat q = glm::quat(glm::vec3(instRad[0], instRad[1], instRad[2]));
+	//	//rawInstData[offset + i].rotMatrix = glm::toMat4(q);
+	//}
 	
 	// no normal but has texture coord and has instance instance
 	// pass in the raw Instance Data since it is quite difficult to rebind it (small hacks) 
-	this->m_dynamicSO = new DynamicSceneObject(maxNumVertex, maxNumIndices, false, true, true, maxNumInstance, rawInstData);
+	this->m_dynamicSO = new DynamicSceneObject(maxNumVertex, maxNumIndices, true, true, true, maxNumInstance, rawInstData);
 
 
 	auto data = this->m_dynamicSO->dataBuffer();
@@ -115,7 +113,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 		data[offset + i * 9 + 8] = modelMesh2[0].vertices[i].tex_coords.z;
 	}
 
-	offset += modelMesh2[0].vertices.size();
+	/*offset += modelMesh2[0].vertices.size();
 	for (unsigned int i = 0; i < modelMesh3[0].vertices.size(); ++i) {
 		data[offset + i * 9 + 0] = modelMesh3[0].vertices[i].position.x;
 		data[offset + i * 9 + 1] = modelMesh3[0].vertices[i].position.y;
@@ -126,7 +124,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 		data[offset + i * 9 + 6] = modelMesh3[0].vertices[i].tex_coords.x;
 		data[offset + i * 9 + 7] = modelMesh3[0].vertices[i].tex_coords.y;
 		data[offset + i * 9 + 8] = modelMesh3[0].vertices[i].tex_coords.z;
-	}
+	}*/
 
 	// fill in updateDataBuffer
 	this->m_dynamicSO->updateDataBuffer(0, maxNumVertex * 9 * sizeof(float));
@@ -145,13 +143,10 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	}
 
 	offset += modelMesh2[0].indices.size();
-	for (unsigned int i = 0; i < modelMesh3[0].indices.size(); ++i) {
-		indexData[offset + i] = modelMesh3[0].indices[i];
-	}
+	//for (unsigned int i = 0; i < modelMesh3[0].indices.size(); ++i) {
+	//	indexData[offset + i] = modelMesh3[0].indices[i];
+	//}
 
-	for (int i = 0; i < modelMesh1[0].indices.size(); ++i) {
-		std::cout << indexData[i] << " ";
-	}
 	// fill in updateIndex Buffer
 	this->m_dynamicSO->updateIndexBuffer(0, maxNumIndices * sizeof(unsigned int));
 
@@ -168,7 +163,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	//glBufferStorage(GL_SHADER_STORAGE_BUFFER, NUM_TOTAL_INSTANCE * sizeof(InstancePropertiesOut), nullptr, GL_MAP_READ_BIT);
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, validInstanceDataBufferHandle);
 
-	DrawElementsIndirectCommand drawCommands[3];
+	DrawElementsIndirectCommand drawCommands[2];
 	// first bush model
 	drawCommands[0].count = modelMesh1[0].indices.size();
 	drawCommands[0].instanceCount = m_modelBush01->getNumSamples();
@@ -184,11 +179,11 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	drawCommands[1].baseInstance = m_modelBush01->getNumSamples();
 
 	// third bush model
-	drawCommands[2].count = modelMesh3[0].indices.size();
-	drawCommands[2].instanceCount = m_modelGrass->getNumSamples();
-	drawCommands[2].firstIndex = modelMesh1[0].indices.size() + modelMesh2[0].indices.size();
-	drawCommands[2].baseVertex = modelMesh1[0].vertices.size() + modelMesh2[0].vertices.size();
-	drawCommands[2].baseInstance = m_modelBush01->getNumSamples() + m_modelBush05->getNumSamples();
+	//drawCommands[2].count = modelMesh3[0].indices.size();
+	//drawCommands[2].instanceCount = m_modelGrass->getNumSamples();
+	//drawCommands[2].firstIndex = modelMesh1[0].indices.size() + modelMesh2[0].indices.size();
+	//drawCommands[2].baseVertex = modelMesh1[0].vertices.size() + modelMesh2[0].vertices.size();
+	//drawCommands[2].baseInstance = m_modelBush01->getNumSamples() + m_modelBush05->getNumSamples();
 
 	//// first house model
 	//drawCommands[3].count = model_mesh_3[0].indices.size();
@@ -209,7 +204,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 
 	glGenBuffers(1, &cmdBufferHandle);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, cmdBufferHandle);
-	glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(DrawElementsIndirectCommand) * 3,
+	glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(DrawElementsIndirectCommand) * 2,
 		drawCommands, GL_DYNAMIC_STORAGE_BIT | GL_MAP_READ_BIT);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SceneManager::Instance()->m_cmdBufferId, cmdBufferHandle);
 
