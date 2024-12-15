@@ -76,7 +76,7 @@ void main() {
         }
     }
 
-    if(true) {
+    if(!frustumCulled) {
         // get UNIQUE buffer location for assigning the instance data
         // it also updates instanceCount
         const uint UNIQUE_IDX = atomicAdd(commands[objectId].instanceCount, 1);

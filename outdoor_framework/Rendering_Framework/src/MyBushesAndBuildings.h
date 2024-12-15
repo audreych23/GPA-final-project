@@ -60,5 +60,9 @@ private:
 	Model* m_modelGrass;
 	Model* m_house;
 	Model* m_house2;
+
+	std::vector<Model*> m_mergedModel;
+
+	int m_numModel;
 };
 

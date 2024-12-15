@@ -40,7 +40,7 @@ void SceneRenderer::useCullingCSProgram() {
 
 void SceneRenderer::useResetCSProgram() {
 	this->m_resetCsProgram->useProgram();
-	glDispatchCompute(3, 1, 1);
+	glDispatchCompute(5, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
