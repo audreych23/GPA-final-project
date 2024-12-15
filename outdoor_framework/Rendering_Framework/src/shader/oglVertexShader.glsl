@@ -18,6 +18,8 @@ layout (std430, binding=1) buffer InstanceData {
 
 out vec3 f_viewVertex ;
 out vec3 f_uv ;
+out vec3 f_viewNormal ;
+out vec3 f_worldPos ;
 
 layout(location = 0) uniform mat4 modelMat ;
 layout(location = 5) uniform sampler2D elevationMap ;
@@ -72,8 +74,11 @@ void multiInstanceProcess() {
 	vec4 viewVertex = viewMat * worldVertex ;
 	vec4 viewNormal = viewMat * worldNormal ;
 	
+	
 	f_viewVertex = viewVertex.xyz;
 	f_uv = v_uv ;
+	f_viewNormal = normalize(viewNormal.xyz) ;
+	f_worldPos = worldVertex.xyz ;
 
 	gl_Position = projMat * viewVertex;
 
