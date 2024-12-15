@@ -33,7 +33,7 @@ layout (std430, binding=2) buffer CurrValidInstanceData {
 };
 
 // layout (location = 6) uniform vec4 slimePos;
-layout (location = 11) uniform int numMaxInstance;
+layout (location = 10) uniform int numMaxInstance;
 // layout (location = 2) uniform mat4 projMat;
 // layout (location = 1) uniform mat4 viewMat;
 

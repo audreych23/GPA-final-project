@@ -58,7 +58,7 @@ DynamicSceneObject::DynamicSceneObject(const int maxNumVertex, const int maxNumI
 		glCreateBuffers(1, &(this->m_rawInstanceDataBufferHandle));
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_rawInstanceDataBufferHandle);
 		// ugly way
-		glBufferStorage(GL_SHADER_STORAGE_BUFFER, maxNumInstance * sizeof(InstanceProperties), rawInstData, GL_MAP_READ_BIT);
+		glBufferStorage(GL_SHADER_STORAGE_BUFFER, maxNumInstance * sizeof(InstanceProperties), rawInstData, GL_DYNAMIC_STORAGE_BIT | GL_MAP_READ_BIT);
 		//glBufferStorage(GL_SHADER_STORAGE_BUFFER, maxNumInstance * sizeof(InstanceProperties), nullptr, GL_MAP_READ_BIT);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SceneManager::Instance()->m_rawInstanceDataBufferId, m_rawInstanceDataBufferHandle);
 

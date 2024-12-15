@@ -148,6 +148,10 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	for (unsigned int i = 0; i < modelMesh3[0].indices.size(); ++i) {
 		indexData[offset + i] = modelMesh3[0].indices[i];
 	}
+
+	for (int i = 0; i < modelMesh1[0].indices.size(); ++i) {
+		std::cout << indexData[i] << " ";
+	}
 	// fill in updateIndex Buffer
 	this->m_dynamicSO->updateIndexBuffer(0, maxNumIndices * sizeof(unsigned int));
 
@@ -206,7 +210,7 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	glGenBuffers(1, &cmdBufferHandle);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, cmdBufferHandle);
 	glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(DrawElementsIndirectCommand) * 3,
-		drawCommands, GL_MAP_READ_BIT);
+		drawCommands, GL_DYNAMIC_STORAGE_BIT | GL_MAP_READ_BIT);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SceneManager::Instance()->m_cmdBufferId, cmdBufferHandle);
 
 	this->m_dynamicSO->setCmdBufferHandle(cmdBufferHandle);

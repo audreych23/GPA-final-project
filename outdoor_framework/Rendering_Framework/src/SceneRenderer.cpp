@@ -127,7 +127,7 @@ bool SceneRenderer::setUpShader(){
 	manager->m_vertexHandle = 0;
 	manager->m_normalHandle = 1;
 	manager->m_uvHandle = 2;
-	manager->m_instPosHandle = 11;
+	manager->m_instPosHandle = 3;
 
 	// =================================
 	manager->m_modelMatHandle = 0;
