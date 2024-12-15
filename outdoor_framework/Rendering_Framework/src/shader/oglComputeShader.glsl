@@ -54,23 +54,34 @@ void main() {
     // // discarding invalid array - access
     if(idx >= numMaxInstance) { return; }
 
-    // // translate the position to clip space
-    // vec4 clipSpaceV = projMat * viewMat * vec4(rawInstanceProps[idx].position.xyz, 1.0);
-
-    // clipSpaceV = clipSpaceV / clipSpaceV.w;
-
-    // // determine if it is culled
-    // bool frustumCulled = max(max(abs(clipSpaceV.x) - 1.0, abs(clipSpaceV.y) - 1.0), abs(clipSpaceV.z) - 1.0) > 0.0;
-
-    // doing the frustum culling
     bool frustumCulled = false;
+
+    uint objectId = uint(rawInstanceProps[idx].position.w);
+    vec3 worldCenter = vec3(
+        rawInstanceProps[idx].position * (center[objectId], 1.0f)
+    );
+
+    for (int i = 0; i < 6; ++i) {
+        float distance = 0;
+        // lack of time no time to think ;)
+        if (i == 0) distance = dot(planeEquation1.xyz, worldCenter) + planeEquation1.w;
+        else if (i == 1) distance = dot(planeEquation2.xyz, worldCenter) + planeEquation2.w;
+        else if (i == 2) distance = dot(planeEquation3.xyz, worldCenter) + planeEquation3.w;
+        else if (i == 3) distance = dot(planeEquation4.xyz, worldCenter) + planeEquation4.w;
+        else if (i == 4) distance = dot(planeEquation5.xyz, worldCenter) + planeEquation5.w;
+        else if (i == 5) distance = dot(planeEquation6.xyz, worldCenter) + planeEquation6.w;
+
+        if (distance < -radius[objectId]) {
+            frustumCulled = true;
+        }
+    }
 
     if(!frustumCulled) {
         // get UNIQUE buffer location for assigning the instance data
         // it also updates instanceCount
-        const uint UNIQUE_IDX = atomicAdd(commands[uint(rawInstanceProps[idx].position.w)].instanceCount, 1);
+        const uint UNIQUE_IDX = atomicAdd(commands[objectId].instanceCount, 1);
         // put data into valid instance buffer
-        currValidInstanceProps[UNIQUE_IDX + commands[uint(rawInstanceProps[idx].position.w)].baseInstance].index = int(idx);
+        currValidInstanceProps[UNIQUE_IDX + commands[objectId].baseInstance].index = int(idx);
     }
 
 }

@@ -56,7 +56,7 @@ public:
 
 	void setNumInstance(int numInstance);
 
-	void setFrustumPlaneEquation(glm::mat4& playerView, glm::mat4& playerProj);
+	void setFrustumPlaneEquation(glm::mat4 playerView, glm::mat4 playerProj);
 // pipeline
 public:
 	void startNewFrame();

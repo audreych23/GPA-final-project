@@ -285,7 +285,10 @@ void paintGL(){
 	// update geography
 	m_terrain->updateState(playerVM, playerViewOrg, playerProjMat, nullptr);
 	// =============================================
-		
+	
+	// set the frustum plane 
+	defaultRenderer->setFrustumPlaneEquation(playerVM, playerProjMat);
+
 	// =============================================
 	// start rendering
 	ImGui_ImplOpenGL3_NewFrame();

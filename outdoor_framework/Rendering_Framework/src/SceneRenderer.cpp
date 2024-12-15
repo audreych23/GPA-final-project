@@ -123,7 +123,7 @@ void SceneRenderer::setNumInstance(int numInstance) {
 	m_numTotalInstance = numInstance;
 }
 
-void SceneRenderer::setFrustumPlaneEquation(glm::mat4& playerView, glm::mat4& playerProj) {
+void SceneRenderer::setFrustumPlaneEquation(glm::mat4 playerView, glm::mat4 playerProj) {
 	glm::mat4 viewProj = playerProj * playerView;
 
 	// Extract planes from view-projection matrix
