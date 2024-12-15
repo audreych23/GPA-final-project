@@ -37,9 +37,51 @@ void pureColor(){
 
 void bushesBuildingsPass() {
 	// for debug
-	fragColor = vec4(1.0, 0.0, 1.0, 1.0);
+	vec4 texel = texture(bushesBuildingsTexture, f_uv);
+
+	if (texel.a < 0.5) {
+		discard;
+	}
+
+	fragColor = vec4(texel.xyz, texel.a);
 }
 
+// void RenderBushModel() {
+// 	vec4 texel = texture(bushTexture, f_uv);
+
+// 	if (texel.a < 0.5) {
+// 		discard;
+// 	}
+
+// 	// fragColor = texel;
+// 	// fragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+// 	// fragColor = vec4(f_texCoord.x, f_texCoord.y, 1.0f, 1.0f);
+// 	// Normalize input vectors
+//     vec3 N = normalize(f_normal);
+// 	vec3 L = lightDir;
+//     vec3 V = normalize(f_neg_viewVertex); // View vector
+//     vec3 H = normalize(V + L);
+	
+//     // Ambient component
+//     vec3 ambient = Ka * lightIntensity;
+
+// 	// Diffuse component
+// 	vec3 diffuse = max(dot(N, L), 0.0) * Kd * lightIntensity;
+
+//     // Specular component
+//     vec3 specular = pow(max(dot(N, H), 0.0), 100.0) * Ks * lightIntensity;
+
+//     // Combine Phong shading components
+//     vec3 phongLighting = ambient + diffuse + specular;
+
+//     // Combine texture color with Phong lighting
+//     vec3 finalColor = texel.rgb * phongLighting;
+
+// 	vec3 mappedColor = vec3(1.0f) - exp(-finalColor * exposure);
+
+//     // Output final color
+//     fragColor = vec4(mappedColor, texel.a);
+// }
 void main(){	
 	if(pixelProcessId == 5){
 		pureColor() ;
