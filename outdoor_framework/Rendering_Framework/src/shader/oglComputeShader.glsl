@@ -58,9 +58,8 @@ void main() {
     bool frustumCulled = false;
 
     uint objectId = uint(rawInstanceProps[idx].position.w);
-    vec3 worldCenter = vec3(
-        rawInstanceProps[idx].position * (center[objectId], 1.0f)
-    );
+    vec3 worldCenter = 
+        rawInstanceProps[idx].position.xyz + vec3(0, center[objectId], 0);
 
     for (int i = 0; i < 6; ++i) {
         float distance = 0;
@@ -77,7 +76,7 @@ void main() {
         }
     }
 
-    if(!frustumCulled) {
+    if(true) {
         // get UNIQUE buffer location for assigning the instance data
         // it also updates instanceCount
         const uint UNIQUE_IDX = atomicAdd(commands[objectId].instanceCount, 1);

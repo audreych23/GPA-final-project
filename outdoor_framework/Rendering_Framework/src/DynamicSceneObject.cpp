@@ -118,7 +118,7 @@ void DynamicSceneObject::update(bool isMergedModel) {
 
 		glUniform1i(SceneManager::Instance()->m_fs_pixelProcessIdHandle, this->m_pixelFunctionId);
 		// ask kent, no need index count??
-		glMultiDrawElementsIndirect(this->m_primitive, GL_UNSIGNED_INT, (GLvoid*)0, 2, 0);
+		glMultiDrawElementsIndirect(this->m_primitive, GL_UNSIGNED_INT, (GLvoid*)0, 5, 0);
 	}
 }
 

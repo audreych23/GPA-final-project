@@ -26,7 +26,7 @@ void Model::loadModel(std::string path, std::string texture_path) {
 	const aiScene* scene = importer.ReadFile(path, aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
 		aiProcess_JoinIdenticalVertices |
-		aiProcess_SortByPType);
+		aiProcess_SortByPType | aiProcess_FlipUVs);
 	// remember to flip the uvs
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
