@@ -9,7 +9,7 @@ class DynamicSceneObject
 public: 
 	struct InstanceProperties {
 		glm::vec4 position;
-		//glm::mat4 rotMatrix;
+		glm::mat4 rotMatrix;
 	};
 
 	struct InstancePropertiesOut {

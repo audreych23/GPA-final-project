@@ -14,6 +14,7 @@ struct DrawCommand {
 struct InstanceProperties {
     // modified
     vec4 position;
+    mat4 rotMatrix;
 };
 
 struct InstancePropertiesOut {

@@ -57,18 +57,18 @@ void MyBushesAndBuildings::setupDrawCommand() {
 	for (int i = 0; i < m_modelBush01->getNumSamples(); ++i) {
 		const float* instPos = m_modelBush01->getInstancePositions(i);
 		rawInstData[offset + i].position = glm::vec4(instPos[0], instPos[1], instPos[2], 0.0f);
-		//const float* instRad = m_modelBush01->getInstanceRadians(i);
-		//glm::quat q = glm::quat(glm::vec3(instRad[0], instRad[1], instRad[2]));
-		//rawInstData[offset + i].rotMatrix = glm::toMat4(q);
+		const float* instRad = m_modelBush01->getInstanceRadians(i);
+		glm::quat q = glm::quat(glm::vec3(instRad[0], instRad[1], instRad[2]));
+		rawInstData[offset + i].rotMatrix = glm::toMat4(q);
 	}
 	
 	offset += m_modelBush01->getNumSamples();
 	for (int i = 0; i < m_modelBush05->getNumSamples(); ++i) {
 		const float* instPos = m_modelBush05->getInstancePositions(i);
 		rawInstData[offset + i].position = glm::vec4(instPos[0], instPos[1], instPos[2], 1.0f);
-		//const float* instRad = m_modelBush05->getInstanceRadians(i);
-		//glm::quat q = glm::quat(glm::vec3(instRad[0], instRad[1], instRad[2]));
-		//rawInstData[offset + i].rotMatrix = glm::toMat4(q);
+		const float* instRad = m_modelBush05->getInstanceRadians(i);
+		glm::quat q = glm::quat(glm::vec3(instRad[0], instRad[1], instRad[2]));
+		rawInstData[offset + i].rotMatrix = glm::toMat4(q);
 	}
 
 	offset += m_modelBush05->getNumSamples();

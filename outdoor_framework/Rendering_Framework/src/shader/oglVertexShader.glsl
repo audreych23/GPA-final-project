@@ -9,6 +9,7 @@ layout(location=3) in int index;
 struct InstanceProperties {
     // modified
     vec4 position;
+	mat4 rotMatrix;
 };
 
 layout (std430, binding=1) buffer InstanceData {
@@ -64,7 +65,7 @@ void terrainProcess(){
 }
 
 void multiInstanceProcess() {
-	vec4 worldVertex = modelMat * vec4(v_vertex, 1.0) + vec4(rawInstanceProps[index].position.xyz, 0.0f);
+	vec4 worldVertex = rawInstanceProps[index].rotMatrix * modelMat * vec4(v_vertex, 1.0) + vec4(rawInstanceProps[index].position.xyz, 0.0f);
 	// vec4 worldVertex = modelMat * vec4(v_vertex, 1.0) + vec4(25.92, 18.27, 11.75, 0.0);
 	vec4 worldNormal = modelMat * vec4(v_normal, 0.0);
 
