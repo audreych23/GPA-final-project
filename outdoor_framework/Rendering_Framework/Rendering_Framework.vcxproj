@@ -28,7 +28,9 @@
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\airplane\MyAirplane.cpp" />
-    <ClCompile Include="src\bushes_and_buildings\MyBushesAndBuildings.cpp" />
+    <ClCompile Include="src\bush&amp;building\Mesh.cpp" />
+    <ClCompile Include="src\bush&amp;building\Model.cpp" />
+    <ClCompile Include="src\bush&amp;building\MyBushBuilding.cpp" />
     <ClCompile Include="src\camera\MyCamera.cpp" />
     <ClCompile Include="src\camera\MyOrbitControl.cpp" />
     <ClCompile Include="src\DynamicSceneObject.cpp" />
@@ -53,7 +55,9 @@
     <ClInclude Include="..\externals\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\externals\include\imgui\imstb_truetype.h" />
     <ClInclude Include="src\airplane\MyAirplane.h" />
-    <ClInclude Include="src\bushes_and_buildings\MyBushesAndBuildings.h" />
+    <ClInclude Include="src\bush&amp;building\Mesh.h" />
+    <ClInclude Include="src\bush&amp;building\Model.h" />
+    <ClInclude Include="src\bush&amp;building\MyBushBuilding.h" />
     <ClInclude Include="src\camera\MyCamera.h" />
     <ClInclude Include="src\camera\MyOrbitControl.h" />
     <ClInclude Include="src\DynamicSceneObject.h" />
@@ -73,7 +77,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>
     <RootNamespace>Rendering_Framework</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -13,8 +13,9 @@ layout (location = 2) uniform int pixelProcessId;
 layout (location = 4) uniform sampler2D albedoTexture;
 layout (location = 6) uniform sampler2D normalMap;
 layout (location = 7) uniform mat4 viewMat;
-layout (location = 20) uniform bool isNormalMap;
+layout (location = 30) uniform bool isNormalMap;
 layout (location = 21) uniform int renderMode;
+layout(location = 3) uniform sampler2DArray bushesBuildingsTexture;
 
 const vec3 lightDirWorld = normalize(vec3(0.4, 0.5, 0.8));
 const vec3 Ia = vec3(0.2, 0.2, 0.2);
@@ -157,6 +158,19 @@ void rockPass() {
 	}
 }
 
+void bushesBuildingsPass() {
+	// for debug
+	vec4 texel = texture(bushesBuildingsTexture, f_uv);
+
+	if (texel.a < 0.5) {
+		discard;
+	}
+	vec4 color = calculateBlinnPhong(texel, f_viewNormal, vec3(1.0), 32.0, false);
+	vec4 finalColor = withFog(color);
+	finalColor.rgb = pow(finalColor.rgb, vec3(0.5));
+	fragColor = vec4(finalColor.rgb, finalColor.a);
+}
+
 void main() {
 	if (pixelProcessId == 1) {
 		airplanePass();
@@ -166,6 +180,8 @@ void main() {
 		instancedObjectPass();
 	} else if (pixelProcessId == 7) {
 		terrainPass();
+	} else if(pixelProcessId == 8) {
+		bushesBuildingsPass();
 	} else {
 		fragColor = vec4(1.0, 0.0, 0.0, 1.0); // Default red color for unknown process
 	}

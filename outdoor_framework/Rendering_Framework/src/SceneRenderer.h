@@ -14,7 +14,14 @@ public:
 	virtual ~SceneRenderer();
 
 private:
+	struct FrustumPlane {
+		glm::vec3 normal;
+		float distance;
+	};
+
 	ShaderProgram *m_shaderProgram = nullptr;
+	ShaderProgram* m_resetCsProgram = nullptr;
+	ShaderProgram* m_cullingCsProgram = nullptr;
 	glm::mat4 m_projMat;
 	glm::mat4 m_viewMat;
 	int m_frameWidth;
@@ -23,7 +30,11 @@ private:
 
 	std::vector<DynamicSceneObject*> m_dynamicSOs;
 	TerrainSceneObject* m_terrainSO = nullptr;
+	DynamicSceneObject* m_dynamicBushesBuildingsSO;
 
+	int m_numTotalInstance;
+
+	std::vector<FrustumPlane> m_planes;
 
 public:
 	void resize(const int w, const int h);
@@ -35,11 +46,23 @@ public:
 	void setRenderMode(const int mode);
 	void appendDynamicSceneObject(DynamicSceneObject *obj);
 	void appendTerrainSceneObject(TerrainSceneObject* tSO);
+	void appendDynamicBushesBuildings(DynamicSceneObject* obj);
+
+	void setResetComputeShader(ShaderProgram* shaderProgram);
+	void setCullingComputeShader(ShaderProgram* shaderProgram);
+
+	void setNumInstance(int numInstance);
+
+	void setFrustumPlaneEquation(glm::mat4 playerView, glm::mat4 playerProj);
 
 // pipeline
 public:
 	void startNewFrame();
 	void renderPass();
+
+public:
+	void useCullingCSProgram();
+	void useResetCSProgram();
 
 private:
 	void clear(const glm::vec4 &clearColor = glm::vec4(0.0, 0.0, 0.0, 1.0), const float depth = 1.0);

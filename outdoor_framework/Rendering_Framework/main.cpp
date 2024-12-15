@@ -7,7 +7,7 @@
 #include "src\terrain\MyTerrain.h"
 #include "src\airplane\MyAirplane.h"
 #include "src\rock\MyRock.h"
-#include "src\bushes_and_buildings\MyBushesAndBuildings.h"
+#include "src\bush&building\MyBushBuilding.h"
 
 #include "src\MyCameraManager.h"
 
@@ -48,7 +48,7 @@ ViewFrustumSceneObject* m_viewFrustumSO = nullptr;
 MyTerrain* m_terrain = nullptr;
 MyAirplane* m_airplane = nullptr;
 MyRock* m_rock = nullptr;
-MyBushesAndBuildings* m_bushesAndBuildings = nullptr;
+MyBushesAndBuildings* m_bushesAndBuildingsSO = nullptr;
 INANOA::MyCameraManager* m_myCameraManager = nullptr;
 // ==============================================
 
@@ -156,6 +156,16 @@ bool initializeGL(){
 	fsShader->createShaderFromFile("src\\shader\\oglFragmentShader.glsl");
 	std::cout << fsShader->shaderInfoLog() << "\n";
 
+	// reset compute shader
+	Shader* resetCsShader = new Shader(GL_COMPUTE_SHADER);
+	resetCsShader->createShaderFromFile("src\\shader\\oglResetComputeShader.glsl");
+	std::cout << resetCsShader->shaderInfoLog() << '\n';
+
+	// compute shader culling
+	Shader* csShader = new Shader(GL_COMPUTE_SHADER);
+	csShader->createShaderFromFile("src\\shader\\oglComputeShader.glsl");
+	std::cout << csShader->shaderInfoLog() << "\n";
+
 	// shader program
 	ShaderProgram* shaderProgram = new ShaderProgram();
 	shaderProgram->init();
@@ -172,12 +182,46 @@ bool initializeGL(){
 	
 	delete vsShader;
 	delete fsShader;
+
+	// create reset compute shader program
+	ShaderProgram* resetCsProgram = new ShaderProgram();
+	resetCsProgram->init();
+	resetCsProgram->attachShader(resetCsShader);
+	resetCsProgram->checkStatus();
+	if (resetCsProgram->status() != ShaderProgramStatus::READY) {
+		std::cout << "meo";
+		return false;
+	}
+	resetCsProgram->linkProgram();
+	resetCsShader->releaseShader();
+
+	delete resetCsShader;
+
+
+	// create compute shader program
+	ShaderProgram* csProgram = new ShaderProgram();
+	csProgram->init();
+	csProgram->attachShader(csShader);
+	csProgram->checkStatus();
+	if (csProgram->status() != ShaderProgramStatus::READY) {
+		return false;
+	}
+	csProgram->linkProgram();
+	csShader->releaseShader();
+
+	delete csShader;
+
 	// =================================================================
 	// init renderer
 	defaultRenderer = new SceneRenderer();
 	if (!defaultRenderer->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram)) {
 		return false;
 	}
+
+	// set reset compute shader program to renderer
+	defaultRenderer->setResetComputeShader(resetCsProgram);
+	// set frustum culling compute shader program to renderer
+	defaultRenderer->setCullingComputeShader(csProgram);
 
 	// =================================================================
 	// initialize camera
@@ -187,6 +231,13 @@ bool initializeGL(){
 	// initialize view frustum
 	m_viewFrustumSO = new ViewFrustumSceneObject(2, SceneManager::Instance()->m_fs_pixelProcessIdHandle, SceneManager::Instance()->m_fs_pureColor);
 	defaultRenderer->appendDynamicSceneObject(m_viewFrustumSO->sceneObject());
+
+	// initialize bushes and buildings
+	m_bushesAndBuildingsSO = new MyBushesAndBuildings(SceneManager::Instance()->m_fs_pixelProcessIdHandle, SceneManager::Instance()->m_fs_bushesBuildingsPass);
+	defaultRenderer->appendDynamicBushesBuildings(m_bushesAndBuildingsSO->sceneObject());
+
+	// special extra step to get the number of instances from bushes and buildings
+	defaultRenderer->setNumInstance(m_bushesAndBuildingsSO->getNumInstance()); // for compute shader
 
 	// initialize terrain
 	m_terrain = new MyTerrain();
@@ -198,9 +249,6 @@ bool initializeGL(){
 	
 	// initialize rock
 	m_rock = new MyRock();
-	
-	// initialize bushes and buildings
-	m_bushesAndBuildings = new MyBushesAndBuildings();
 
 	
 	// =================================================================	
@@ -251,6 +299,10 @@ void paintGL(){
 	// update geography
 	m_terrain->updateState(playerVM, playerViewOrg, playerProjMat, nullptr);
 	// =============================================
+
+	// set the frustum plane 
+	defaultRenderer->setFrustumPlaneEquation(playerVM, playerProjMat);
+
 		
 	// =============================================
 	// start rendering
@@ -260,6 +312,10 @@ void paintGL(){
 	
 	// start new frame
 	defaultRenderer->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+
+	defaultRenderer->useResetCSProgram();
+	defaultRenderer->useCullingCSProgram();
+
 	defaultRenderer->startNewFrame();
 
 	// rendering with player view		
